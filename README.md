@@ -27,7 +27,11 @@ pnpm install
 pnpm hoi <script>       # 例: pnpm hoi build
 pnpm utsushi <script>   # 例: pnpm utsushi test
 pnpm build              # すべてのパッケージをビルド
+pnpm biome:check        # すべてのパッケージを lint / format チェック
+pnpm biome:write        # lint / format を自動修正
 ```
+
+lint と format は [Biome](https://biomejs.dev/) で行います。共通の設定はルートの `biome.json` にあり、クォートとセミコロンの書き方だけ各パッケージの `biome.json` で上書きしています（hoi はシングルクォート・セミコロンなし、utsushi はダブルクォート・セミコロンあり）。
 
 使えるスクリプトは各パッケージの README を見てください。
 

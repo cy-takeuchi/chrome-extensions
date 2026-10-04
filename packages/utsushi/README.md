@@ -62,6 +62,7 @@ kintone のレコード詳細画面（`/k/{アプリID}/show#record={レコー�
 pnpm dev        # HMR 付きで起動
 pnpm test       # 単体テスト
 pnpm compile    # 型チェック
+pnpm biome:check  # lint / format チェック（biome:write で自動修正）
 pnpm build && CHROMIUM_PATH=/path/to/chromium pnpm e2e   # モックした kintone でのスモークテスト
 ```
 

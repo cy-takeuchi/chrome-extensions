@@ -141,4 +141,4 @@ chore: ビルド・CI 等の変更
 1. `main` ブランチから作業ブランチを作成
 2. 変更をコミット
 3. `main` に向けて PR を作成
-4. CI（typecheck + biome:check）が通ることを確認
+4. CI（typecheck + biome:check）が通ることを確認。Biome の設定はリポジトリのルートの `biome.json` にあります
