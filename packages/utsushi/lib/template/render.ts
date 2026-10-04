@@ -5,7 +5,7 @@ import type { Comment, KintoneRecord, SubtableRow } from "../kintone/types";
 import type { Catalog } from "./catalog";
 import { formatDateTime, formatValue } from "./format";
 import type { BlockNode, InlineNode, TemplateDoc } from "./schema";
-import { validateTemplate, type Problem } from "./validate";
+import { type Problem, validateTemplate } from "./validate";
 
 export type RenderContext = {
   location: RecordLocation;
@@ -56,8 +56,7 @@ export const renderTemplate = (tpl: TemplateDoc, ctx: RenderContext): string => 
     const meta = ctx.catalog.byCode.get(code);
     if (!meta) return "";
     if (!meta.table) return formatValue(ctx.record[code], meta);
-    if (scope.row && code in scope.row.value)
-      return formatValue(scope.row.value[code], meta);
+    if (scope.row && code in scope.row.value) return formatValue(scope.row.value[code], meta);
     return subtableRows(ctx.record, meta.table.code)
       .map((row) => formatValue(row.value[code], meta))
       .filter((v) => v !== "")
@@ -67,11 +66,7 @@ export const renderTemplate = (tpl: TemplateDoc, ctx: RenderContext): string => 
   const renderInline = (nodes: InlineNode[] | undefined, scope: Scope) =>
     (nodes ?? [])
       .map((n) =>
-        n.type === "text"
-          ? n.text
-          : n.type === "hardBreak"
-            ? "\n"
-            : fieldText(n.attrs.code, scope),
+        n.type === "text" ? n.text : n.type === "hardBreak" ? "\n" : fieldText(n.attrs.code, scope),
       )
       .join("");
 
@@ -83,9 +78,7 @@ export const renderTemplate = (tpl: TemplateDoc, ctx: RenderContext): string => 
           ? ctx.comments.map((comment) => ({ comment }))
           : subtableRows(ctx.record, block.attrs.code).map((row) => ({ row }));
       if (scopes.length === 0) return [];
-      return [
-        scopes.map((s) => renderBlocks(block.content, s).join("\n")).join("\n"),
-      ];
+      return [scopes.map((s) => renderBlocks(block.content, s).join("\n")).join("\n")];
     });
 
   return renderBlocks(tpl.content, {}).join("\n").replace(/\n+$/, "");

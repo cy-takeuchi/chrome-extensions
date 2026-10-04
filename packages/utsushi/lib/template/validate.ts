@@ -1,8 +1,4 @@
-import {
-  COMMENT_PSEUDO,
-  RECORD_PSEUDO,
-  type Catalog,
-} from "./catalog";
+import { type Catalog, COMMENT_PSEUDO, RECORD_PSEUDO } from "./catalog";
 import type { BlockNode, InlineNode, LoopAttrs, TemplateDoc } from "./schema";
 
 export type Problem = {
@@ -20,10 +16,7 @@ const COMMENT_CODES = new Set<string>(COMMENT_PSEUDO.map((p) => p.code));
  * テンプレートが参照するフィールドがアプリに実在するかを調べる。
  * 1 件でも問題があればコピーを中止する（黙って欠けたデータを渡さない）。
  */
-export const validateTemplate = (
-  tpl: TemplateDoc,
-  catalog: Catalog,
-): Problem[] => {
+export const validateTemplate = (tpl: TemplateDoc, catalog: Catalog): Problem[] => {
   const problems: Problem[] = [];
   const tableCodes = new Set(catalog.tables.map((t) => t.code));
 
@@ -33,12 +26,10 @@ export const validateTemplate = (
       const { code, label } = node.attrs;
       if (RECORD_CODES.has(code)) continue;
       if (COMMENT_CODES.has(code)) {
-        if (loop?.source !== "comments")
-          problems.push({ code, label, reason: "outside-comments" });
+        if (loop?.source !== "comments") problems.push({ code, label, reason: "outside-comments" });
         continue;
       }
-      if (!catalog.byCode.has(code))
-        problems.push({ code, label, reason: "missing" });
+      if (!catalog.byCode.has(code)) problems.push({ code, label, reason: "missing" });
     }
   };
 

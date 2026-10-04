@@ -20,8 +20,7 @@ export type AppKey = { domain: string; appId: string };
 
 const PREFIX = "app:";
 
-const itemKey = ({ domain, appId }: AppKey) =>
-  `local:${PREFIX}${domain}:${appId}` as const;
+const itemKey = ({ domain, appId }: AppKey) => `local:${PREFIX}${domain}:${appId}` as const;
 
 export const emptySettings = (): AppSettings => ({
   presets: [],
@@ -32,10 +31,7 @@ export const emptySettings = (): AppSettings => ({
 export const loadAppSettings = async (key: AppKey): Promise<AppSettings> =>
   (await storage.getItem<AppSettings>(itemKey(key))) ?? emptySettings();
 
-export const saveAppSettings = async (
-  key: AppKey,
-  settings: AppSettings,
-): Promise<void> => {
+export const saveAppSettings = async (key: AppKey, settings: AppSettings): Promise<void> => {
   if (settings.presets.length === 0 && settings.downloadFieldCodes === null) {
     await storage.removeItem(itemKey(key));
     return;
@@ -47,17 +43,12 @@ export const saveAppSettings = async (
 export const defaultPreset = (s: AppSettings): Preset | undefined =>
   s.presets.find((p) => p.id === s.defaultPresetId) ?? s.presets[0];
 
-export const upsertPreset = (
-  s: AppSettings,
-  preset: Preset,
-  makeDefault: boolean,
-): AppSettings => {
+export const upsertPreset = (s: AppSettings, preset: Preset, makeDefault: boolean): AppSettings => {
   const exists = s.presets.some((p) => p.id === preset.id);
   const presets = exists
     ? s.presets.map((p) => (p.id === preset.id ? preset : p))
     : [...s.presets, preset];
-  const defaultPresetId =
-    makeDefault || presets.length === 1 ? preset.id : s.defaultPresetId;
+  const defaultPresetId = makeDefault || presets.length === 1 ? preset.id : s.defaultPresetId;
   return { ...s, presets, defaultPresetId };
 };
 
@@ -66,8 +57,7 @@ export const removePreset = (s: AppSettings, id: string): AppSettings => {
   return {
     ...s,
     presets,
-    defaultPresetId:
-      s.defaultPresetId === id ? (presets[0]?.id ?? null) : s.defaultPresetId,
+    defaultPresetId: s.defaultPresetId === id ? (presets[0]?.id ?? null) : s.defaultPresetId,
   };
 };
 
@@ -82,9 +72,7 @@ const parseKey = (raw: string): AppKey | null => {
   return { domain: rest.slice(0, i), appId: rest.slice(i + 1) };
 };
 
-export const loadAllSettings = async (): Promise<
-  { key: AppKey; settings: AppSettings }[]
-> => {
+export const loadAllSettings = async (): Promise<{ key: AppKey; settings: AppSettings }[]> => {
   const all = await browser.storage.local.get(null);
   return Object.entries(all).flatMap(([raw, value]) => {
     const key = parseKey(raw);

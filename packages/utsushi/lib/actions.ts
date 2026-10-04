@@ -1,11 +1,5 @@
 import { collectFiles, downloadDir, sanitizeFileName } from "./files";
-import {
-  fileUrl,
-  getAllComments,
-  getForm,
-  getRecord,
-  KintoneApiError,
-} from "./kintone/api";
+import { fileUrl, getAllComments, getForm, getRecord, KintoneApiError } from "./kintone/api";
 import type { RecordLocation } from "./kintone/location";
 import type { DownloadRequest, DownloadResult } from "./messages";
 import { loadAppSettings, type Preset } from "./settings";
@@ -51,7 +45,10 @@ export const writeClipboard = async (text: string): Promise<void> => {
     ta.select();
     const ok = document.execCommand("copy");
     ta.remove();
-    if (!ok) throw new Error("クリップボードに書き込めませんでした。ページをクリックしてからもう一度試してください");
+    if (!ok)
+      throw new Error(
+        "クリップボードに書き込めませんでした。ページをクリックしてからもう一度試してください",
+      );
   }
 };
 
@@ -62,10 +59,7 @@ export const errorMessage = (e: unknown): string => {
   return e instanceof Error ? e.message : String(e);
 };
 
-export const copyWithPreset = async (
-  loc: RecordLocation,
-  preset: Preset,
-): Promise<Outcome> => {
+export const copyWithPreset = async (loc: RecordLocation, preset: Preset): Promise<Outcome> => {
   try {
     const text = await renderForRecord(loc, preset.template);
     await writeClipboard(text);
@@ -78,9 +72,7 @@ export const copyWithPreset = async (
   }
 };
 
-export const downloadAttachments = async (
-  loc: RecordLocation,
-): Promise<Outcome> => {
+export const downloadAttachments = async (loc: RecordLocation): Promise<Outcome> => {
   try {
     const [settings, catalog, record] = await Promise.all([
       loadAppSettings(loc),

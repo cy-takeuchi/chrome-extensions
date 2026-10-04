@@ -1,4 +1,4 @@
-import { pseudoLabel, type Catalog } from "./catalog";
+import { type Catalog, pseudoLabel } from "./catalog";
 import type { BlockNode, InlineNode, TemplateDoc } from "./schema";
 
 /**
@@ -20,8 +20,7 @@ export const refreshLabels = (tpl: TemplateDoc, catalog: Catalog): TemplateDoc =
 
   const blocks = (bs: BlockNode[]): BlockNode[] =>
     bs.map((b) => {
-      if (b.type === "paragraph")
-        return b.content ? { ...b, content: inline(b.content) } : b;
+      if (b.type === "paragraph") return b.content ? { ...b, content: inline(b.content) } : b;
       const attrs =
         b.attrs.source === "subtable"
           ? { ...b.attrs, label: tableLabels.get(b.attrs.code) ?? b.attrs.label }

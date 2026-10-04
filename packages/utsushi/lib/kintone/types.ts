@@ -15,11 +15,7 @@ export type FieldValue =
   | { type: "FILE"; value: FileValue[] }
   | { type: "CREATOR" | "MODIFIER"; value: Entity }
   | {
-      type:
-        | "USER_SELECT"
-        | "ORGANIZATION_SELECT"
-        | "GROUP_SELECT"
-        | "STATUS_ASSIGNEE";
+      type: "USER_SELECT" | "ORGANIZATION_SELECT" | "GROUP_SELECT" | "STATUS_ASSIGNEE";
       value: Entity[];
     }
   | { type: "CHECK_BOX" | "MULTI_SELECT" | "CATEGORY"; value: string[] }

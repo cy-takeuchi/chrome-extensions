@@ -1,4 +1,4 @@
-import { toForm, type Form, type Layout, type Properties } from "kisekae";
+import { type Form, type Layout, type Properties, toForm } from "kisekae";
 import type { RecordLocation } from "./location";
 import type { Comment, KintoneRecord } from "./types";
 
@@ -17,9 +17,7 @@ export const apiUrl = (
   path: string,
   params: Record<string, string | number>,
 ): string => {
-  const query = new URLSearchParams(
-    Object.entries(params).map(([k, v]) => [k, String(v)]),
-  );
+  const query = new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)]));
   return `${loc.origin}${loc.apiPrefix}/v1/${path}?${query}`;
 };
 
@@ -31,10 +29,7 @@ const get = async <T>(url: string): Promise<T> => {
   });
   const body = await res.json().catch(() => null);
   if (!res.ok) {
-    const message =
-      body && typeof body.message === "string"
-        ? body.message
-        : `HTTP ${res.status}`;
+    const message = body && typeof body.message === "string" ? body.message : `HTTP ${res.status}`;
     throw new KintoneApiError(message, res.status);
   }
   return body as T;
@@ -48,9 +43,7 @@ export const getRecord = async (loc: RecordLocation): Promise<KintoneRecord> => 
 };
 
 /** コメントを全件、古い順で取る。API は 1 回 10 件まで */
-export const getAllComments = async (
-  loc: RecordLocation,
-): Promise<Comment[]> => {
+export const getAllComments = async (loc: RecordLocation): Promise<Comment[]> => {
   const limit = 10;
   const all: Comment[] = [];
   for (let offset = 0; ; offset += limit) {
@@ -76,9 +69,7 @@ export const getForm = async (loc: RecordLocation): Promise<Form> => {
     get<{ properties: Properties }>(
       apiUrl(loc, "app/form/fields.json", { app: loc.appId, lang: "user" }),
     ),
-    get<{ layout: Layout.OneOf[] }>(
-      apiUrl(loc, "app/form/layout.json", { app: loc.appId }),
-    ),
+    get<{ layout: Layout.OneOf[] }>(apiUrl(loc, "app/form/layout.json", { app: loc.appId })),
   ]);
   return toForm(fields.properties, layout.layout);
 };

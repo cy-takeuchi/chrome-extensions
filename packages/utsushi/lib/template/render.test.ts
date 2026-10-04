@@ -77,9 +77,7 @@ describe("renderTemplate", () => {
 
   it("レコード URL などの擬似フィールド", () => {
     const tpl = doc(paragraph(field("$record.url", "レコードURL")));
-    expect(renderTemplate(tpl, ctx)).toBe(
-      "https://example.cybozu.com/k/12/show#record=34",
-    );
+    expect(renderTemplate(tpl, ctx)).toBe("https://example.cybozu.com/k/12/show#record=34");
   });
 
   it("閲覧権限が無く値が返らないフィールドは空", () => {

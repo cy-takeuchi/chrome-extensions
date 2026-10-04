@@ -7,10 +7,10 @@ import {
   importAll,
   loadAllSettings,
   loadAppSettings,
+  type Preset,
   removePreset,
   saveAppSettings,
   upsertPreset,
-  type Preset,
 } from "./settings";
 import { doc } from "./template/schema";
 

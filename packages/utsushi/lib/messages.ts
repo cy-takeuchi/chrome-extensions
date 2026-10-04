@@ -12,5 +12,4 @@ export type DownloadRequest = {
 };
 export type DownloadResult = { ok: number; failed: string[] };
 
-export const isCommand = (c: string): c is Command =>
-  (COMMANDS as readonly string[]).includes(c);
+export const isCommand = (c: string): c is Command => (COMMANDS as readonly string[]).includes(c);

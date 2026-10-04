@@ -1,11 +1,24 @@
 /** e2e 用の kintone のモック。アプリ 12 のレコード 34 */
 export const ORIGIN = "https://example.cybozu.com";
 
-const text = (code, label) => ({ type: "SINGLE_LINE_TEXT", code, label, noLabel: false, required: false });
+const text = (code, label) => ({
+  type: "SINGLE_LINE_TEXT",
+  code,
+  label,
+  noLabel: false,
+  required: false,
+});
 
 export const properties = {
   subject: text("subject", "件名"),
-  body: { type: "RICH_TEXT", code: "body", label: "本文", noLabel: false, required: false, defaultValue: "" },
+  body: {
+    type: "RICH_TEXT",
+    code: "body",
+    label: "本文",
+    noLabel: false,
+    required: false,
+    defaultValue: "",
+  },
   billing: { type: "GROUP", code: "billing", label: "請求先", noLabel: false, openGroup: true },
   billing_address: text("billing_address", "住所"),
   lines: {
@@ -15,20 +28,42 @@ export const properties = {
     noLabel: false,
     fields: {
       item: text("item", "品名"),
-      spec: { type: "FILE", code: "spec", label: "仕様書", noLabel: false, required: false, thumbnailSize: "150" },
+      spec: {
+        type: "FILE",
+        code: "spec",
+        label: "仕様書",
+        noLabel: false,
+        required: false,
+        thumbnailSize: "150",
+      },
     },
   },
-  attachments: { type: "FILE", code: "attachments", label: "添付", noLabel: false, required: false, thumbnailSize: "150" },
+  attachments: {
+    type: "FILE",
+    code: "attachments",
+    label: "添付",
+    noLabel: false,
+    required: false,
+    thumbnailSize: "150",
+  },
   ステータス: { type: "STATUS", code: "ステータス", label: "ステータス", enabled: true },
 };
 
 export const layout = [
   { type: "ROW", fields: [{ type: "SINGLE_LINE_TEXT", code: "subject", size: { width: "200" } }] },
-  { type: "ROW", fields: [{ type: "RICH_TEXT", code: "body", size: { width: "400", innerHeight: "100" } }] },
+  {
+    type: "ROW",
+    fields: [{ type: "RICH_TEXT", code: "body", size: { width: "400", innerHeight: "100" } }],
+  },
   {
     type: "GROUP",
     code: "billing",
-    layout: [{ type: "ROW", fields: [{ type: "SINGLE_LINE_TEXT", code: "billing_address", size: { width: "200" } }] }],
+    layout: [
+      {
+        type: "ROW",
+        fields: [{ type: "SINGLE_LINE_TEXT", code: "billing_address", size: { width: "200" } }],
+      },
+    ],
   },
   {
     type: "SUBTABLE",
@@ -50,8 +85,20 @@ export const record = {
   lines: {
     type: "SUBTABLE",
     value: [
-      { id: "1", value: { item: { type: "SINGLE_LINE_TEXT", value: "りんご" }, spec: { type: "FILE", value: [file("k-spec1", "仕様1.txt")] } } },
-      { id: "2", value: { item: { type: "SINGLE_LINE_TEXT", value: "みかん" }, spec: { type: "FILE", value: [] } } },
+      {
+        id: "1",
+        value: {
+          item: { type: "SINGLE_LINE_TEXT", value: "りんご" },
+          spec: { type: "FILE", value: [file("k-spec1", "仕様1.txt")] },
+        },
+      },
+      {
+        id: "2",
+        value: {
+          item: { type: "SINGLE_LINE_TEXT", value: "みかん" },
+          spec: { type: "FILE", value: [] },
+        },
+      },
     ],
   },
   attachments: { type: "FILE", value: [file("k-att", "見積書.txt")] },
@@ -82,7 +129,10 @@ export const installMock = async (context, log) => {
     }
     switch (url.pathname) {
       case "/k/12/show":
-        return route.fulfill({ contentType: "text/html", body: "<!doctype html><html><body><h1>kintone mock</h1></body></html>" });
+        return route.fulfill({
+          contentType: "text/html",
+          body: "<!doctype html><html><body><h1>kintone mock</h1></body></html>",
+        });
       case "/k/v1/app/form/fields.json":
         return json(route, { properties, revision: "1" });
       case "/k/v1/app/form/layout.json":
@@ -93,10 +143,17 @@ export const installMock = async (context, log) => {
         const offset = Number(url.searchParams.get("offset"));
         const limit = Number(url.searchParams.get("limit"));
         const page = comments.slice(offset, offset + limit);
-        return json(route, { comments: page, older: offset > 0, newer: offset + limit < comments.length });
+        return json(route, {
+          comments: page,
+          older: offset > 0,
+          newer: offset + limit < comments.length,
+        });
       }
       case "/k/v1/file.json":
-        return route.fulfill({ contentType: "text/plain", body: `file:${url.searchParams.get("fileKey")}` });
+        return route.fulfill({
+          contentType: "text/plain",
+          body: `file:${url.searchParams.get("fileKey")}`,
+        });
       default:
         return route.fulfill({ status: 404, body: "not found" });
     }

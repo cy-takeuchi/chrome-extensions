@@ -43,9 +43,7 @@ export const form = {
     { ...base, type: "FILE", code: "attachments", label: "添付", parent: null },
   ],
   tables: [{ type: "SUBTABLE", code: "lines", label: "明細", noLabel: false }],
-  groups: [
-    { type: "GROUP", code: "billing", label: "請求先", noLabel: false, openGroup: true },
-  ],
+  groups: [{ type: "GROUP", code: "billing", label: "請求先", noLabel: false, openGroup: true }],
   elements: [],
   unplaced: [
     { type: "STATUS", code: "ステータス", label: "ステータス", enabled: true },
@@ -60,8 +58,20 @@ export const record: KintoneRecord = {
   lines: {
     type: "SUBTABLE",
     value: [
-      { id: "1", value: { item: { type: "SINGLE_LINE_TEXT", value: "りんご" }, qty: { type: "NUMBER", value: "3" } } },
-      { id: "2", value: { item: { type: "SINGLE_LINE_TEXT", value: "みかん" }, qty: { type: "NUMBER", value: "5" } } },
+      {
+        id: "1",
+        value: {
+          item: { type: "SINGLE_LINE_TEXT", value: "りんご" },
+          qty: { type: "NUMBER", value: "3" },
+        },
+      },
+      {
+        id: "2",
+        value: {
+          item: { type: "SINGLE_LINE_TEXT", value: "みかん" },
+          qty: { type: "NUMBER", value: "5" },
+        },
+      },
     ],
   },
   attachments: {

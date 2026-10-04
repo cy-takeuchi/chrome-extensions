@@ -25,10 +25,7 @@ export const App = ({ commands }: { commands: CommandSource }) => {
     seq.current += 1;
     setToast({ kind, message, id: seq.current });
   }, []);
-  const report = useCallback(
-    (o: Outcome) => show(o.ok ? "ok" : "error", o.message),
-    [show],
-  );
+  const report = useCallback((o: Outcome) => show(o.ok ? "ok" : "error", o.message), [show]);
   const hideToast = useCallback(() => setToast(null), []);
 
   const copy = useCallback(

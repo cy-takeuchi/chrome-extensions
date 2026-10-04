@@ -1,13 +1,5 @@
-import { COMMENTS_LABEL, pseudoField, type Catalog } from "./catalog";
-import {
-  doc,
-  field,
-  loop,
-  paragraph,
-  text,
-  type BlockNode,
-  type FieldNode,
-} from "./schema";
+import { type Catalog, COMMENTS_LABEL, pseudoField } from "./catalog";
+import { type BlockNode, doc, type FieldNode, field, loop, paragraph, text } from "./schema";
 
 /**
  * 新規プリセットの初期値。全フィールドをレイアウト順に「ラベル: 値」で並べ、
@@ -26,9 +18,7 @@ export const buildDefaultTemplate = (catalog: Catalog) => {
     if (f.table) {
       if (emittedTables.has(f.table.code)) continue;
       emittedTables.add(f.table.code);
-      const columns = catalog.fields.filter(
-        (c) => c.table?.code === f.table?.code,
-      );
+      const columns = catalog.fields.filter((c) => c.table?.code === f.table?.code);
       const row: (FieldNode | ReturnType<typeof text>)[] = [text("- ")];
       columns.forEach((c, i) => {
         if (i > 0) row.push(text(" / "));
@@ -36,10 +26,7 @@ export const buildDefaultTemplate = (catalog: Catalog) => {
       });
       blocks.push(
         paragraph(text(`【${f.table.label}】`)),
-        loop(
-          { source: "subtable", code: f.table.code, label: f.table.label },
-          paragraph(...row),
-        ),
+        loop({ source: "subtable", code: f.table.code, label: f.table.label }, paragraph(...row)),
       );
       currentGroup = undefined;
       continue;

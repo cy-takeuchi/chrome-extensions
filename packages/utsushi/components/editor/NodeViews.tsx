@@ -1,8 +1,4 @@
-import {
-  NodeViewContent,
-  NodeViewWrapper,
-  type ReactNodeViewProps,
-} from "@tiptap/react";
+import { NodeViewContent, NodeViewWrapper, type ReactNodeViewProps } from "@tiptap/react";
 import { createContext, useContext } from "react";
 
 /** 参照切れのフィールドコード。チップを赤くする */

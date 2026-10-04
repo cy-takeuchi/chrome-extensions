@@ -6,12 +6,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 import type { Catalog } from "@/lib/template/catalog";
 import type { TemplateDoc } from "@/lib/template/schema";
-import {
-  FieldNode,
-  FieldSuggestion,
-  LoopNode,
-  TemplateDocument,
-} from "./extensions";
+import { FieldNode, FieldSuggestion, LoopNode, TemplateDocument } from "./extensions";
 import { BrokenCodesContext } from "./NodeViews";
 import { createSuggestionStore, type SuggestionStore } from "./suggestionStore";
 
@@ -67,9 +62,7 @@ const SuggestionPopup = ({ store }: { store: SuggestionStore }) => {
   const listRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
-    listRef.current
-      ?.querySelector('[aria-selected="true"]')
-      ?.scrollIntoView({ block: "nearest" });
+    listRef.current?.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: "nearest" });
   }, [state?.selected]);
 
   if (!state || !state.rect) return null;
@@ -82,9 +75,7 @@ const SuggestionPopup = ({ store }: { store: SuggestionStore }) => {
       role="listbox"
       style={{
         left: Math.min(rect.left, window.innerWidth - 340),
-        ...(below
-          ? { top: rect.bottom + 4 }
-          : { bottom: window.innerHeight - rect.top + 4 }),
+        ...(below ? { top: rect.bottom + 4 } : { bottom: window.innerHeight - rect.top + 4 }),
       }}
     >
       {items.length === 0 && <li className="suggest-empty">該当なし</li>}

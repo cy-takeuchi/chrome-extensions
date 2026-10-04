@@ -1,11 +1,11 @@
-import { Extension, Node, mergeAttributes, type Editor } from "@tiptap/core";
+import { type Editor, Extension, mergeAttributes, Node } from "@tiptap/core";
 import Document from "@tiptap/extension-document";
 import { PluginKey } from "@tiptap/pm/state";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import Suggestion from "@tiptap/suggestion";
-import { candidates, type Candidate } from "@/lib/template/candidates";
-import { pseudoField, type Catalog } from "@/lib/template/catalog";
-import { paragraph, text, type LoopAttrs, type ParagraphNode } from "@/lib/template/schema";
+import { type Candidate, candidates } from "@/lib/template/candidates";
+import { type Catalog, pseudoField } from "@/lib/template/catalog";
+import { type LoopAttrs, type ParagraphNode, paragraph, text } from "@/lib/template/schema";
 import { FieldChipView, LoopView } from "./NodeViews";
 import type { SuggestionStore } from "./suggestionStore";
 
@@ -112,13 +112,15 @@ export const FieldSuggestion = Extension.create<FieldSuggestionOptions>({
               .run();
             return;
           }
-          chain
-            .insertContent({ type: "loop", attrs: c.attrs, content: loopInner(c.attrs) })
-            .run();
+          chain.insertContent({ type: "loop", attrs: c.attrs, content: loopInner(c.attrs) }).run();
         },
         render: () => {
           let selected = 0;
-          let latest: { items: Candidate[]; command: (c: Candidate) => void; rect: DOMRect | null } = {
+          let latest: {
+            items: Candidate[];
+            command: (c: Candidate) => void;
+            rect: DOMRect | null;
+          } = {
             items: [],
             command: () => {},
             rect: null,
@@ -133,12 +135,20 @@ export const FieldSuggestion = Extension.create<FieldSuggestionOptions>({
           return {
             onStart: (props) => {
               selected = 0;
-              latest = { items: props.items, command: props.command, rect: props.clientRect?.() ?? null };
+              latest = {
+                items: props.items,
+                command: props.command,
+                rect: props.clientRect?.() ?? null,
+              };
               publish();
             },
             onUpdate: (props) => {
               selected = 0;
-              latest = { items: props.items, command: props.command, rect: props.clientRect?.() ?? null };
+              latest = {
+                items: props.items,
+                command: props.command,
+                rect: props.clientRect?.() ?? null,
+              };
               publish();
             },
             onKeyDown: ({ event }) => {

@@ -45,7 +45,8 @@ const clipboard = () => page.evaluate(() => navigator.clipboard.readText());
 const step = (name) => console.log(`- ${name}`);
 /** SCREENSHOTS=dir を渡すと要所でスクリーンショットを撮る */
 const shot = (name) =>
-  process.env.SCREENSHOTS && page.screenshot({ path: path.join(process.env.SCREENSHOTS, `${name}.png`) });
+  process.env.SCREENSHOTS &&
+  page.screenshot({ path: path.join(process.env.SCREENSHOTS, `${name}.png`) });
 
 // content script の読み込みを待つ
 await host.waitFor({ state: "attached" });
@@ -106,7 +107,10 @@ await page.keyboard.press("Enter");
 await host.getByRole("button", { name: "保存してコピー" }).click();
 await toast.filter({ hasText: "「要約」でコピーしました" }).waitFor();
 text = await clipboard();
-assert.equal(text, "件名は見積もり依頼 です。\n* りんご を確認\n* みかん を確認\n全品名: りんご, みかん ");
+assert.equal(
+  text,
+  "件名は見積もり依頼 です。\n* りんご を確認\n* みかん を確認\n全品名: りんご, みかん ",
+);
 
 step("パレットから番号でコピー（デフォルトは 1 番目のまま）");
 await send("open-palette");

@@ -1,20 +1,20 @@
-import { useMemo, useState, type KeyboardEvent } from "react";
+import { type KeyboardEvent, useMemo, useState } from "react";
 import { errorMessage } from "@/lib/actions";
 import type { RecordLocation } from "@/lib/kintone/location";
 import {
   defaultPreset,
   loadAppSettings,
+  type Preset,
   removePreset,
   saveAppSettings,
   upsertPreset,
-  type Preset,
 } from "@/lib/settings";
 import { buildDefaultTemplate } from "@/lib/template/defaultTemplate";
 import { refreshLabels } from "@/lib/template/refresh";
 import type { TemplateDoc } from "@/lib/template/schema";
 import { describeProblems, validateTemplate } from "@/lib/template/validate";
 import { TemplateEditor } from "./editor/TemplateEditor";
-import { useAppData, type AppData } from "./useAppData";
+import { type AppData, useAppData } from "./useAppData";
 
 type Props = {
   loc: RecordLocation;
@@ -34,7 +34,9 @@ export const PresetEditor = ({ loc, presetId, onClose, onSaved }: Props) => {
           <>
             <p className="error">{errorMessage(loaded.error)}</p>
             <div className="actions">
-              <button type="button" onClick={onClose}>閉じる</button>
+              <button type="button" onClick={onClose}>
+                閉じる
+              </button>
             </div>
           </>
         )}
@@ -53,26 +55,14 @@ export const PresetEditor = ({ loc, presetId, onClose, onSaved }: Props) => {
   );
 };
 
-const EditorBody = ({
-  loc,
-  presetId,
-  settings,
-  catalog,
-  onClose,
-  onSaved,
-}: Props & AppData) => {
+const EditorBody = ({ loc, presetId, settings, catalog, onClose, onSaved }: Props & AppData) => {
   const existing = settings.presets.find((p) => p.id === presetId);
   const initial = useMemo(
-    () =>
-      existing
-        ? refreshLabels(existing.template, catalog)
-        : buildDefaultTemplate(catalog),
+    () => (existing ? refreshLabels(existing.template, catalog) : buildDefaultTemplate(catalog)),
     // 開いた時点の内容で初期化する
     [],
   );
-  const [name, setName] = useState(
-    existing?.name ?? `プリセット ${settings.presets.length + 1}`,
-  );
+  const [name, setName] = useState(existing?.name ?? `プリセット ${settings.presets.length + 1}`);
   const [makeDefault, setMakeDefault] = useState(
     existing ? existing.id === defaultPreset(settings)?.id : settings.presets.length === 0,
   );
@@ -158,7 +148,9 @@ const EditorBody = ({
         }}
       />
       <p className="muted small">
-        @ でフィールドを差し込みます。サブテーブルやコメントを選ぶと、各行（各件）を繰り返すブロックになります。ブロックから出るには ↓ キー。
+        @
+        でフィールドを差し込みます。サブテーブルやコメントを選ぶと、各行（各件）を繰り返すブロックになります。ブロックから出るには
+        ↓ キー。
       </p>
       {problems.length > 0 && (
         <p className="error">
@@ -173,7 +165,9 @@ const EditorBody = ({
           </button>
         )}
         <span className="spacer" />
-        <button type="button" onClick={close}>キャンセル</button>
+        <button type="button" onClick={close}>
+          キャンセル
+        </button>
         <button type="button" onClick={() => save(false)} title="⌘Enter">
           保存
         </button>

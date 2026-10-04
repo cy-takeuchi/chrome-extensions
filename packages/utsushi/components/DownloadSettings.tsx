@@ -3,7 +3,7 @@ import { errorMessage } from "@/lib/actions";
 import { fileFields } from "@/lib/files";
 import type { RecordLocation } from "@/lib/kintone/location";
 import { loadAppSettings, saveAppSettings } from "@/lib/settings";
-import { useAppData, type AppData } from "./useAppData";
+import { type AppData, useAppData } from "./useAppData";
 
 type Props = {
   loc: RecordLocation;
@@ -41,13 +41,7 @@ export const DownloadSettings = ({ loc, onClose, onSaved }: Props) => {
   );
 };
 
-const Body = ({
-  loc,
-  settings,
-  catalog,
-  onClose,
-  onSaved,
-}: Props & AppData) => {
+const Body = ({ loc, settings, catalog, onClose, onSaved }: Props & AppData) => {
   const fields = fileFields(catalog);
   const [all, setAll] = useState(settings.downloadFieldCodes === null);
   const [codes, setCodes] = useState<Set<string>>(
@@ -67,7 +61,9 @@ const Body = ({
       <>
         <p className="muted">このアプリには添付ファイルフィールドがありません。</p>
         <div className="actions">
-          <button type="button" onClick={onClose}>閉じる</button>
+          <button type="button" onClick={onClose}>
+            閉じる
+          </button>
         </div>
       </>
     );
@@ -98,7 +94,8 @@ const Body = ({
               />
               {f.label}
               <span className="muted small">
-                {f.table ? ` ${f.table.label} の列` : f.group ? ` グループ: ${f.group}` : ""} · {f.code}
+                {f.table ? ` ${f.table.label} の列` : f.group ? ` グループ: ${f.group}` : ""} ·{" "}
+                {f.code}
               </span>
             </label>
           </li>
@@ -106,8 +103,12 @@ const Body = ({
       </ul>
       <div className="actions">
         <span className="spacer" />
-        <button type="button" onClick={onClose}>キャンセル</button>
-        <button type="button" onClick={() => save(false)}>保存</button>
+        <button type="button" onClick={onClose}>
+          キャンセル
+        </button>
+        <button type="button" onClick={() => save(false)}>
+          保存
+        </button>
         <button
           type="button"
           className="primary"

@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
 import type { Form } from "kisekae";
+import { describe, expect, it } from "vitest";
 import { collectFiles, sanitizeFileName } from "./files";
-import { buildCatalog } from "./template/catalog";
 import type { KintoneRecord } from "./kintone/types";
+import { buildCatalog } from "./template/catalog";
 
 const base = { noLabel: false, required: false };
 const catalog = buildCatalog({
@@ -50,10 +50,7 @@ describe("collectFiles", () => {
   });
 
   it("選んだフィールドだけ", () => {
-    expect(collectFiles(record, catalog, ["inner"]).map((f) => f.name)).toEqual([
-      "b.txt",
-      "c.txt",
-    ]);
+    expect(collectFiles(record, catalog, ["inner"]).map((f) => f.name)).toEqual(["b.txt", "c.txt"]);
   });
 });
 

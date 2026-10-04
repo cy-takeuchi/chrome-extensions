@@ -3,9 +3,7 @@ import { parseRecordLocation, recordUrl } from "./location";
 
 describe("parseRecordLocation", () => {
   it("通常の詳細画面", () => {
-    const loc = parseRecordLocation(
-      "https://example.cybozu.com/k/123/show#record=45&l.view=1",
-    );
+    const loc = parseRecordLocation("https://example.cybozu.com/k/123/show#record=45&l.view=1");
     expect(loc).toEqual({
       origin: "https://example.cybozu.com",
       domain: "example.cybozu.com",
@@ -20,9 +18,7 @@ describe("parseRecordLocation", () => {
       "https://example.cybozu.com/k/guest/7/123/show#record=45&mode=edit",
     );
     expect(loc?.apiPrefix).toBe("/k/guest/7");
-    expect(loc && recordUrl(loc)).toBe(
-      "https://example.cybozu.com/k/guest/7/123/show#record=45",
-    );
+    expect(loc && recordUrl(loc)).toBe("https://example.cybozu.com/k/guest/7/123/show#record=45");
   });
 
   it.each([

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { form } from "./__fixtures__/sample";
-import { buildCatalog } from "./catalog";
 import { candidates } from "./candidates";
+import { buildCatalog } from "./catalog";
 
 const catalog = buildCatalog(form);
 const labels = (cs: ReturnType<typeof candidates>) => cs.map((c) => c.label);
@@ -9,10 +9,7 @@ const labels = (cs: ReturnType<typeof candidates>) => cs.map((c) => c.label);
 describe("candidates", () => {
   it("ブロック外ではサブテーブルとコメントのブロックも出す", () => {
     const cs = candidates(catalog, "", null);
-    expect(cs.filter((c) => c.kind === "loop").map((c) => c.label)).toEqual([
-      "明細",
-      "コメント",
-    ]);
+    expect(cs.filter((c) => c.kind === "loop").map((c) => c.label)).toEqual(["明細", "コメント"]);
     expect(labels(cs)).not.toContain("投稿者");
   });
 

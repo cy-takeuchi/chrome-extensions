@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import {
+  type AppKey,
+  type AppSettings,
   defaultPreset,
   emptySettings,
   exportAll,
@@ -7,8 +9,6 @@ import {
   loadAllSettings,
   removePreset,
   saveAppSettings,
-  type AppKey,
-  type AppSettings,
 } from "@/lib/settings";
 
 type Entry = { key: AppKey; settings: AppSettings };
@@ -109,7 +109,11 @@ export const Options = () => {
                       <span className="badge">デフォルト</span>
                     )}
                     <span className="muted"> 更新 {p.updatedAt.slice(0, 10)}</span>
-                    <button type="button" className="link danger" onClick={() => deletePreset(entry, p.id, p.name)}>
+                    <button
+                      type="button"
+                      className="link danger"
+                      onClick={() => deletePreset(entry, p.id, p.name)}
+                    >
                       削除
                     </button>
                   </li>
@@ -130,7 +134,9 @@ export const Options = () => {
         <h2>エクスポート / インポート</h2>
         <p className="muted">インポートすると、ファイルに含まれるアプリの設定を上書きします。</p>
         <div className="row">
-          <button type="button" onClick={download}>エクスポート</button>
+          <button type="button" onClick={download}>
+            エクスポート
+          </button>
           <label className="button">
             インポート
             <input

@@ -1,5 +1,5 @@
 import type { Form } from "kisekae";
-import { field, type FieldNode } from "./schema";
+import { type FieldNode, field } from "./schema";
 
 /**
  * 差し込みに使える項目の一覧。オートコンプリート候補と、
@@ -50,8 +50,7 @@ const PSEUDO_LABELS: ReadonlyMap<string, string> = new Map(
 export const pseudoLabel = (code: string): string | undefined => PSEUDO_LABELS.get(code);
 
 /** 拡張が用意する差し込み項目のチップ */
-export const pseudoField = (code: PseudoCode): FieldNode =>
-  field(code, pseudoLabel(code) ?? code);
+export const pseudoField = (code: PseudoCode): FieldNode => field(code, pseudoLabel(code) ?? code);
 
 export type Catalog = {
   /** レイアウト順。フォーム外の項目（ステータスなど）は末尾 */
@@ -66,9 +65,9 @@ const unitOf = (f: object) =>
   "unit" in f && typeof f.unit === "string" && f.unit !== ""
     ? {
         unit: f.unit,
-        unitPosition: ("unitPosition" in f && f.unitPosition === "BEFORE"
-          ? "BEFORE"
-          : "AFTER") as "BEFORE" | "AFTER",
+        unitPosition: ("unitPosition" in f && f.unitPosition === "BEFORE" ? "BEFORE" : "AFTER") as
+          | "BEFORE"
+          | "AFTER",
       }
     : {};
 
@@ -81,9 +80,7 @@ export const buildCatalog = (form: Form): Catalog => {
       code: f.code,
       label: f.label,
       type: f.type,
-      ...(parent?.type === "SUBTABLE"
-        ? { table: { code: parent.code, label: parent.label } }
-        : {}),
+      ...(parent?.type === "SUBTABLE" ? { table: { code: parent.code, label: parent.label } } : {}),
       ...(parent?.type === "GROUP" ? { group: parent.label } : {}),
       ...unitOf(f),
       ...(f.type === "CALC" ? { calcFormat: f.format } : {}),

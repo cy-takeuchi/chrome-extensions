@@ -3,8 +3,7 @@ import type { FileValue, KintoneRecord } from "./kintone/types";
 import type { Catalog } from "./template/catalog";
 
 /** 添付ファイルフィールド（サブテーブル内を含む）。DL 設定の選択肢 */
-export const fileFields = (catalog: Catalog) =>
-  catalog.fields.filter((f) => f.type === "FILE");
+export const fileFields = (catalog: Catalog) => catalog.fields.filter((f) => f.type === "FILE");
 
 /**
  * レコードからダウンロード対象のファイルを集める。
@@ -15,9 +14,7 @@ export const collectFiles = (
   catalog: Catalog,
   codes: string[] | null,
 ): FileValue[] => {
-  const targets = fileFields(catalog).filter(
-    (f) => codes === null || codes.includes(f.code),
-  );
+  const targets = fileFields(catalog).filter((f) => codes === null || codes.includes(f.code));
   return targets.flatMap((f) =>
     f.table
       ? subtableRows(record, f.table.code).flatMap((row) => filesOf(row.value[f.code]))
@@ -34,5 +31,4 @@ export const sanitizeFileName = (name: string): string => {
   return cleaned === "" ? "file" : cleaned;
 };
 
-export const downloadDir = (appId: string, recordId: string) =>
-  `kintone/${appId}-${recordId}`;
+export const downloadDir = (appId: string, recordId: string) => `kintone/${appId}-${recordId}`;

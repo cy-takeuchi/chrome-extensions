@@ -32,19 +32,14 @@ const names = (entities: Entity[]) => entities.map((e) => e.name).join(", ");
 
 const withUnit = (value: string, meta: FieldMeta) => {
   if (value === "" || !meta.unit) return value;
-  return meta.unitPosition === "BEFORE"
-    ? `${meta.unit}${value}`
-    : `${value}${meta.unit}`;
+  return meta.unitPosition === "BEFORE" ? `${meta.unit}${value}` : `${value}${meta.unit}`;
 };
 
 /**
  * フィールドの値を差し込み用の文字列にする。
  * 値が無い（閲覧権限が無くて API が返さなかった場合を含む）ときは空文字。
  */
-export const formatValue = (
-  fv: FieldValue | undefined,
-  meta: FieldMeta,
-): string => {
+export const formatValue = (fv: FieldValue | undefined, meta: FieldMeta): string => {
   if (!fv || fv.value === null || fv.value === undefined) return "";
   switch (fv.type) {
     case "SUBTABLE":

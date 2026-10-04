@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import type { RecordLocation } from "@/lib/kintone/location";
-import { defaultPreset, loadAppSettings, saveAppSettings, type Preset } from "@/lib/settings";
+import { defaultPreset, loadAppSettings, type Preset, saveAppSettings } from "@/lib/settings";
 import { useAsync } from "./useAsync";
 
 type Props = {
@@ -73,9 +73,7 @@ export const Palette = ({ loc, onClose, onCopy, onEdit, onDownloadSettings }: Pr
               >
                 <span className="preset-key">{i < 9 ? i + 1 : ""}</span>
                 <span className="preset-name">{p.name}</span>
-                {p.id === defaultId && (
-                  <span className="badge">デフォルト</span>
-                )}
+                {p.id === defaultId && <span className="badge">デフォルト</span>}
                 <button
                   type="button"
                   className="link"
@@ -91,8 +89,12 @@ export const Palette = ({ loc, onClose, onCopy, onEdit, onDownloadSettings }: Pr
           </ul>
         )}
         <div className="palette-actions">
-          <button type="button" onClick={() => onEdit(null)}>新規作成</button>
-          <button type="button" onClick={onDownloadSettings}>DL設定</button>
+          <button type="button" onClick={() => onEdit(null)}>
+            新規作成
+          </button>
+          <button type="button" onClick={onDownloadSettings}>
+            DL設定
+          </button>
         </div>
         <div className="keys">
           1-9/Enter コピー · ↑↓ 選択 · e 編集 · n 新規 · s デフォルトにする · d DL設定 · Esc 閉じる

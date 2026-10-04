@@ -1,15 +1,14 @@
 import {
-  isCommand,
   type CommandMessage,
   type DownloadRequest,
   type DownloadResult,
+  isCommand,
 } from "@/lib/messages";
 
 export default defineBackground(() => {
   browser.commands.onCommand.addListener(async (command, tab) => {
     if (!isCommand(command)) return;
-    const target =
-      tab ?? (await browser.tabs.query({ active: true, currentWindow: true }))[0];
+    const target = tab ?? (await browser.tabs.query({ active: true, currentWindow: true }))[0];
     if (target?.id === undefined) return;
     const message: CommandMessage = { type: "command", command };
     // kintone 以外のタブでは受け手がいないので失敗する。それで構わない

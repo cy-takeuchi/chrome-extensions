@@ -1,9 +1,4 @@
-import {
-  COMMENT_PSEUDO,
-  COMMENTS_LABEL,
-  RECORD_PSEUDO,
-  type Catalog,
-} from "./catalog";
+import { type Catalog, COMMENT_PSEUDO, COMMENTS_LABEL, RECORD_PSEUDO } from "./catalog";
 import type { LoopAttrs } from "./schema";
 
 /** `@` で出す候補 */

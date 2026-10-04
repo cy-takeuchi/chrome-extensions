@@ -1,6 +1,6 @@
 import { loadCatalog } from "@/lib/actions";
 import type { RecordLocation } from "@/lib/kintone/location";
-import { loadAppSettings, type AppSettings } from "@/lib/settings";
+import { type AppSettings, loadAppSettings } from "@/lib/settings";
 import type { Catalog } from "@/lib/template/catalog";
 import { useAsync } from "./useAsync";
 

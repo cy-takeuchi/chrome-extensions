@@ -5,7 +5,7 @@ export type AsyncState<T> =
   | { status: "error"; error: unknown }
   | { status: "ready"; value: T };
 
-export const useAsync = <T,>(load: () => Promise<T>, deps: unknown[]): AsyncState<T> => {
+export const useAsync = <T>(load: () => Promise<T>, deps: unknown[]): AsyncState<T> => {
   const [state, setState] = useState<AsyncState<T>>({ status: "loading" });
   useEffect(() => {
     let alive = true;
