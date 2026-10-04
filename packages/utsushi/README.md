@@ -61,9 +61,9 @@ kintone のレコード詳細画面（`/k/{アプリID}/show#record={レコー�
 ```sh
 pnpm dev        # HMR 付きで起動
 pnpm test       # 単体テスト
-pnpm compile    # 型チェック
+pnpm typecheck  # 型チェック
 pnpm biome:check  # lint / format チェック（biome:write で自動修正）
-pnpm build && CHROMIUM_PATH=/path/to/chromium pnpm e2e   # モックした kintone でのスモークテスト
+pnpm build && CHROMIUM_PATH=/path/to/chromium pnpm test:e2e   # モックした kintone でのスモークテスト
 ```
 
 e2e は Playwright で拡張を読み込ませ、`https://example.cybozu.com` へのリクエストをモックに差し替えて動かします。ブランド版の Google Chrome は `--load-extension` を受け付けないので、Chrome for Testing / Chromium を `CHROMIUM_PATH` で指定してください。

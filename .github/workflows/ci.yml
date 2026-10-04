@@ -50,5 +50,5 @@ jobs:
           cache: 'pnpm'
 
       - run: pnpm install
-      - run: pnpm utsushi compile
+      - run: pnpm utsushi typecheck
       - run: pnpm utsushi test

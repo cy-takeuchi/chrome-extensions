@@ -19,12 +19,13 @@
     "dev": "wxt",
     "build": "wxt build",
     "zip": "wxt zip",
-    "compile": "tsc --noEmit",
-    "test": "vitest run",
     "prepare": "wxt prepare",
-    "e2e": "node e2e/smoke.mjs",
+    "typecheck": "tsc --noEmit",
     "biome:check": "biome check .",
-    "biome:write": "biome check --write ."
+    "biome:write": "biome check --write .",
+    "test": "vitest run",
+    "test:e2e": "node e2e/smoke.mjs",
+    "test:e2e:headed": "HEADED=1 node e2e/smoke.mjs"
   },
   "dependencies": {
     "@tiptap/core": "^3.31.4",

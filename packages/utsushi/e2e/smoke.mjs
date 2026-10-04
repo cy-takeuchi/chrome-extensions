@@ -1,7 +1,7 @@
 /**
  * ビルドした拡張を Chromium に読み込ませ、モックした kintone で一通り動かす。
  *
- *   pnpm build && CHROMIUM_PATH=... node e2e/smoke.mjs
+ *   pnpm build && CHROMIUM_PATH=... pnpm test:e2e
  *
  * ショートカットはブラウザの UI が受けるので Playwright のキー入力では発火しない。
  * バックグラウンドからタブへ送るメッセージを直接送って代わりにする。
