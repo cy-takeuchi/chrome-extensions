@@ -2,7 +2,7 @@
   "name": "hoi",
   "description": "kintone などの画面で選択したテキストを、元ページへのリンク付きで GitHub Projects に Draft Issue として登録する",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "author": "Yoshihiko Takeuchi",
   "homepage": "https://github.com/cy-takeuchi/chrome-extensions/tree/main/packages/hoi#readme",
