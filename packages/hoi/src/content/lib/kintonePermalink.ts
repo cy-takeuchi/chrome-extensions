@@ -8,24 +8,44 @@
  * 適切な方法で permalink を取得する。
  */
 
-// Thread comment selectors (new React UI, 2026-10~)
-// CSS Modules のハッシュ部分はビルドごとに変わるため部分一致で指定する
-const THREAD_COMMENT_BODY_SELECTOR = '.ck-content'
-const THREAD_COMMENT_ITEM_SELECTOR = '[class*="_commentContent_"]'
-const THREAD_PERMALINK_SELECTOR = 'a[class*="_createdAt_"]'
+/**
+ * コメントの日時リンクにパーマリンクが直接入っている画面
+ * body: 選択範囲を含むコメント本文, item: コメント 1 件, link: パーマリンク
+ */
+interface DirectLinkLayout {
+  name: string
+  body: string
+  item: string
+  link: string
+}
+
+const DIRECT_LINK_LAYOUTS: DirectLinkLayout[] = [
+  // スレッドコメント (React UI, 2026-10~)
+  // CSS Modules のハッシュ部分はビルドごとに変わるため部分一致で指定する
+  {
+    name: 'thread',
+    body: '.ck-content',
+    item: '[class*="_commentContent_"]',
+    link: 'a[class*="_createdAt_"]',
+  },
+  // レコード詳細画面のコメント
+  {
+    name: 'record',
+    body: '.commentlist-body-gaia',
+    item: '.itemlist-item-head-gaia',
+    link: '.itemlist-datetime-gaia a',
+  },
+]
 
 // Thread comment page selectors (legacy ocean UI)
-const PERMALINK_LINK_SELECTOR = 'a.ocean-ui-comments-commentbase-link'
-const PERMALINK_POPUP_SELECTOR = '.ocean-ui-comments-linkpopup'
-const PERMALINK_INPUT_SELECTOR = 'textarea.ocean-ui-comments-linkpopup-input'
-const COMMENT_TEXT_SELECTOR = '.ocean-ui-comments-commentbase-text'
-const COMMENT_BODY_SELECTOR = '.ocean-ui-comments-commentbase-body'
-const TIMEOUT_MS = 3000
-
-// Record detail page selectors
-const RECORD_COMMENT_ITEM_SELECTOR = '.itemlist-item-head-gaia'
-const RECORD_COMMENT_BODY_SELECTOR = '.commentlist-body-gaia'
-const RECORD_PERMALINK_SELECTOR = '.itemlist-datetime-gaia a'
+// リンクをクリックして開くポップアップからパーマリンクを読む
+const LEGACY_COMMENT_TEXT_SELECTOR = '.ocean-ui-comments-commentbase-text'
+const LEGACY_COMMENT_BODY_SELECTOR = '.ocean-ui-comments-commentbase-body'
+const LEGACY_PERMALINK_LINK_SELECTOR = 'a.ocean-ui-comments-commentbase-link'
+const LEGACY_PERMALINK_LINK_TEXTS = ['リンク', 'Permalink']
+const LEGACY_PERMALINK_POPUP_SELECTOR = '.ocean-ui-comments-linkpopup'
+const LEGACY_PERMALINK_INPUT_SELECTOR = 'textarea.ocean-ui-comments-linkpopup-input'
+const LEGACY_POPUP_TIMEOUT_MS = 3000
 
 // Notification page selectors
 // 新しい通知画面: data-testid, 旧通知画面: class
@@ -78,44 +98,25 @@ export const findActiveSelectionContext = (): SelectionContext | null => {
 }
 
 /**
- * 選択範囲の祖先要素を取得
- */
-const getSelectionAncestorElement = (selection: Selection): Element | null => {
-  if (!selection.rangeCount) return null
-
-  const range = selection.getRangeAt(0)
-  const node = range.commonAncestorContainer
-
-  if (node.nodeType === Node.TEXT_NODE) {
-    return node.parentElement
-  }
-  return node as Element
-}
-
-/**
  * 選択箇所の DOM 祖先から種別を判定し、permalink を取得
- * - .ck-content が祖先 → 新スレッド方式(直接リンク)
+ * - DIRECT_LINK_LAYOUTS の本文が祖先 → 日時リンクから直接取得
  * - .ocean-ui-comments-commentbase-text が祖先 → 旧スレッド方式(ポップアップ)
- * - .commentlist-body-gaia が祖先 → レコード方式(直接リンク)
  */
 export const getKintoneCommentPermalink = async (ctx: SelectionContext): Promise<string | null> => {
-  const node = getSelectionAncestorElement(ctx.selection)
-  if (!node) return null
+  const element = getSelectionAncestorElement(ctx.selection)
+  if (!element) return null
 
-  // 新スレッドコメント判定: コメント内の .ck-content が祖先にある
-  const threadBody = node.closest(THREAD_COMMENT_BODY_SELECTOR)
-  if (threadBody?.closest(THREAD_COMMENT_ITEM_SELECTOR)) {
-    return getKintoneThreadPermalink(threadBody)
-  }
+  try {
+    for (const layout of DIRECT_LINK_LAYOUTS) {
+      const body = element.closest(layout.body)
+      const item = body?.closest(layout.item)
+      if (item) return getDirectPermalink(item, layout)
+    }
 
-  // 旧スレッドコメント判定: .ocean-ui-comments-commentbase-text が祖先にある
-  if (node.closest(COMMENT_TEXT_SELECTOR) || node.matches(COMMENT_TEXT_SELECTOR)) {
-    return getKintonePermalink(ctx.win, ctx.doc)
-  }
-
-  // レコードコメント判定: .commentlist-body-gaia が祖先にある
-  if (node.closest(RECORD_COMMENT_BODY_SELECTOR) || node.matches(RECORD_COMMENT_BODY_SELECTOR)) {
-    return getKintoneRecordPermalink(ctx.win)
+    const legacyText = element.closest(LEGACY_COMMENT_TEXT_SELECTOR)
+    if (legacyText) return await getLegacyThreadPermalink(legacyText, ctx.doc)
+  } catch (error) {
+    console.error('hoi: Error getting permalink:', error)
   }
 
   return null
@@ -124,204 +125,89 @@ export const getKintoneCommentPermalink = async (ctx: SelectionContext): Promise
 // --- Internal functions ---
 
 /**
- * 指定されたdocument/window内で選択範囲を含むコメントのパーマリンクリンクを探す
+ * 選択範囲の祖先要素を取得
  */
-const findPermalinkLinkFromSelectionInContext = (
-  selection: Selection,
-): HTMLAnchorElement | null => {
+const getSelectionAncestorElement = (selection: Selection): Element | null => {
   if (!selection.rangeCount) return null
 
-  const range = selection.getRangeAt(0)
-  const node = range.commonAncestorContainer
-  const element = node.nodeType === Node.TEXT_NODE ? node.parentElement : (node as Element)
-  if (!element) return null
+  const node = selection.getRangeAt(0).commonAncestorContainer
+  return node.nodeType === Node.TEXT_NODE ? node.parentElement : (node as Element)
+}
 
-  // .ocean-ui-comments-commentbase-text を探す
-  const textContainer = element.closest(COMMENT_TEXT_SELECTOR)
-  if (!textContainer) {
-    console.log('hoi: Comment text container not found')
+/**
+ * コメントの日時リンクからパーマリンクを取得
+ * 日時はコメントヘッダーにあり本文や返信より前に来るため、最初にマッチしたものが自コメントのリンク
+ */
+const getDirectPermalink = (item: Element, layout: DirectLinkLayout): string | null => {
+  const link = item.querySelector<HTMLAnchorElement>(layout.link)
+  if (!link?.href) {
+    console.log(`hoi: ${layout.name} permalink link not found`)
     return null
   }
 
-  // .ocean-ui-comments-commentbase-body を探す
-  const bodyContainer = textContainer.closest(COMMENT_BODY_SELECTOR)
-  if (!bodyContainer) {
-    console.log('hoi: Comment body container not found')
+  console.log(`hoi: Got ${layout.name} permalink:`, link.href)
+  return link.href
+}
+
+/**
+ * 旧スレッドコメントのパーマリンクを取得（ポップアップ経由）
+ */
+const getLegacyThreadPermalink = async (
+  textContainer: Element,
+  doc: Document,
+): Promise<string | null> => {
+  const link = findLegacyPermalinkLink(textContainer)
+  if (!link) {
+    console.log('hoi: Permalink link not found in comment')
     return null
   }
 
-  // Permalink リンクを探す
-  const links = bodyContainer.querySelectorAll<HTMLAnchorElement>(PERMALINK_LINK_SELECTOR)
+  removePopups(doc)
+  link.click()
+  const permalink = await waitForPopupValue(doc)
+  removePopups(doc)
+
+  if (!permalink) {
+    console.log('hoi: Could not get permalink from popup')
+    return null
+  }
+
+  console.log('hoi: Got permalink:', permalink)
+  return permalink
+}
+
+const findLegacyPermalinkLink = (textContainer: Element): HTMLAnchorElement | null => {
+  const body = textContainer.closest(LEGACY_COMMENT_BODY_SELECTOR)
+  if (!body) return null
+
+  const links = body.querySelectorAll<HTMLAnchorElement>(LEGACY_PERMALINK_LINK_SELECTOR)
   for (const link of links) {
-    const text = link.textContent?.trim() || ''
-    if (text === 'リンク' || text === 'Permalink') {
-      console.log('hoi: Found permalink in comment')
-      return link
-    }
+    if (LEGACY_PERMALINK_LINK_TEXTS.includes(link.textContent?.trim() ?? '')) return link
   }
-
-  console.log('hoi: Permalink link not found in comment')
   return null
 }
 
-/**
- * パーマリンクリンク要素を探す
- * 選択範囲がない場合は null を返す（window.location.href にフォールバック）
- */
-const findPermalinkLink = (win: Window = window): HTMLAnchorElement | null => {
-  const selection = win.getSelection()
-  if (!selection?.toString().trim()) {
-    console.log('hoi: No selection, skipping permalink')
-    return null
-  }
-
-  return findPermalinkLinkFromSelectionInContext(selection)
-}
-
-/**
- * 指定時間待機するPromise
- */
-const wait = (ms: number): Promise<void> => {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
+const wait = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
 
 /**
  * ポップアップが表示されるまで待機し、URLを取得
  */
-const waitForPermalinkPopup = async (doc: Document = document): Promise<string | null> => {
+const waitForPopupValue = async (doc: Document): Promise<string | null> => {
   const startTime = Date.now()
 
-  while (Date.now() - startTime < TIMEOUT_MS) {
-    const popup = doc.querySelector(PERMALINK_POPUP_SELECTOR)
-    if (popup) {
-      // ポップアップ内のtextareaを探す
-      const textarea = popup.querySelector<HTMLTextAreaElement>(PERMALINK_INPUT_SELECTOR)
-      if (textarea?.value) {
-        return textarea.value
-      }
-    }
+  while (Date.now() - startTime < LEGACY_POPUP_TIMEOUT_MS) {
+    const textarea = doc.querySelector<HTMLTextAreaElement>(
+      `${LEGACY_PERMALINK_POPUP_SELECTOR} ${LEGACY_PERMALINK_INPUT_SELECTOR}`,
+    )
+    if (textarea?.value) return textarea.value
     await wait(100)
   }
 
   return null
 }
 
-/**
- * 既存のポップアップをすべて削除
- */
-const removeExistingPopups = (doc: Document = document): void => {
-  const existingPopups = doc.querySelectorAll(PERMALINK_POPUP_SELECTOR)
-  for (const popup of existingPopups) {
+const removePopups = (doc: Document): void => {
+  for (const popup of doc.querySelectorAll(LEGACY_PERMALINK_POPUP_SELECTOR)) {
     popup.remove()
-  }
-}
-
-/**
- * スレッドコメントのパーマリンクを取得（ポップアップ経由）
- */
-const getKintonePermalink = async (
-  win: Window = window,
-  doc: Document = document,
-): Promise<string | null> => {
-  try {
-    // パーマリンクリンクを探す
-    const permalinkLink = findPermalinkLink(win)
-    if (!permalinkLink) {
-      console.log('hoi: Permalink link not found')
-      return null
-    }
-
-    // 既存のポップアップを削除
-    removeExistingPopups(doc)
-
-    // リンクをクリックしてポップアップを開く
-    permalinkLink.click()
-
-    // ポップアップからURLを取得
-    const permalink = await waitForPermalinkPopup(doc)
-
-    // ポップアップを閉じる
-    removeExistingPopups(doc)
-
-    if (permalink) {
-      console.log('hoi: Got permalink:', permalink)
-      return permalink
-    }
-
-    console.log('hoi: Could not get permalink from popup')
-    return null
-  } catch (error) {
-    console.error('hoi: Error getting permalink:', error)
-    return null
-  }
-}
-
-/**
- * 新スレッドコメントのパーマリンクを取得
- * コメントヘッダーの日時リンクからURLを直接取得
- */
-const getKintoneThreadPermalink = (body: Element): string | null => {
-  const commentItem = body.closest(THREAD_COMMENT_ITEM_SELECTOR)
-  if (!commentItem) {
-    console.log('hoi: Thread comment item not found')
-    return null
-  }
-
-  // ヘッダーは本文や返信より前にあるため、最初にマッチしたものが自コメントのリンク
-  const permalinkLink = commentItem.querySelector<HTMLAnchorElement>(THREAD_PERMALINK_SELECTOR)
-  if (!permalinkLink?.href) {
-    console.log('hoi: Thread permalink link not found')
-    return null
-  }
-
-  console.log('hoi: Got thread permalink:', permalinkLink.href)
-  return permalinkLink.href
-}
-
-/**
- * レコード詳細ページでコメントのパーマリンクを取得
- * 選択範囲を含むコメントの日時リンクからURLを直接取得
- */
-const getKintoneRecordPermalink = (win: Window = window): string | null => {
-  try {
-    const selection = win.getSelection()
-    if (!selection?.toString().trim()) {
-      console.log('hoi: No selection, skipping record permalink')
-      return null
-    }
-
-    if (!selection.rangeCount) return null
-
-    const range = selection.getRangeAt(0)
-    const node = range.commonAncestorContainer
-    const element = node.nodeType === Node.TEXT_NODE ? node.parentElement : (node as Element)
-    if (!element) return null
-
-    // .commentlist-body-gaia を探す（選択範囲を含むコメント本文）
-    const commentBody = element.closest(RECORD_COMMENT_BODY_SELECTOR)
-    if (!commentBody) {
-      console.log('hoi: Record comment body not found')
-      return null
-    }
-
-    // 親の .itemlist-item-head-gaia を探す
-    const commentItem = commentBody.closest(RECORD_COMMENT_ITEM_SELECTOR)
-    if (!commentItem) {
-      console.log('hoi: Record comment item not found')
-      return null
-    }
-
-    // .itemlist-datetime-gaia a からpermalinkを取得
-    const permalinkLink = commentItem.querySelector<HTMLAnchorElement>(RECORD_PERMALINK_SELECTOR)
-    if (!permalinkLink?.href) {
-      console.log('hoi: Record permalink link not found')
-      return null
-    }
-
-    console.log('hoi: Got record permalink:', permalinkLink.href)
-    return permalinkLink.href
-  } catch (error) {
-    console.error('hoi: Error getting record permalink:', error)
-    return null
   }
 }
