@@ -22,8 +22,7 @@ export default defineContentScript({
     const ui = await createShadowRootUi(ctx, {
       name: "utsushi-root",
       position: "overlay",
-      // kintone のヘッダーより前に出す。同じ値なら後から追加したこちらが前面になる
-      zIndex: 2147483647,
+      zIndex: 2147483000,
       onMount: (container, _shadow, host) => {
         // オーバーレイ内のキー操作を kintone 側のショートカットに渡さない
         for (const type of ["keydown", "keyup", "keypress"])

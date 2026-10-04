@@ -15,9 +15,14 @@
   color: #1f2328;
 }
 
+/*
+ * ホスト要素は position: static なので、重なり順は fixed の要素ごとに指定する。
+ * kintone のヘッダーは position: fixed; z-index: 10 で、指定しないとその下に隠れる
+ */
 .backdrop {
   position: fixed;
   inset: 0;
+  z-index: 2147483647;
   background: rgb(0 0 0 / 0.35);
   display: flex;
   align-items: flex-start;
@@ -328,6 +333,7 @@ input.name {
 /* トースト */
 .toast {
   position: fixed;
+  z-index: 2147483647;
   right: 24px;
   bottom: 24px;
   max-width: 420px;
