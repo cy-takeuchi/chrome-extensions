@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, writeFile } from 'node:fs/promises'
+import { mkdtemp, readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -38,6 +38,22 @@ const anonymizeText = (text: string) =>
     .sort(([a], [b]) => b.length - a.length)
     .reduce((acc, [from, to]) => acc.split(from).join(to), text)
 
+/** ページの <!-- name:start --> と <!-- name:end --> の間に、テキストを <pre> で書き込む */
+const embedSample = async (page: string, name: string, text: string) => {
+  const file = path.join(OUT, '..', page)
+  const html = await readFile(file, 'utf8')
+  const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  const pattern = new RegExp(`(<!-- ${name}:start[^>]*-->)[\\s\\S]*?(\\s*<!-- ${name}:end -->)`)
+  if (!pattern.test(html)) throw new Error(`${page} に ${name} の目印がありません`)
+  await writeFile(
+    file,
+    html.replace(
+      pattern,
+      (_, start, end) => `${start}\n      <pre><code>${escaped}</code></pre>${end}`,
+    ),
+  )
+}
+
 const shot = async (target: Page, name: string) => {
   await anonymize(target, replacements)
   await target.screenshot({ path: path.join(OUT, `${name}.png`) })
@@ -70,7 +86,6 @@ const login = async () => {
 }
 
 test.beforeAll(async () => {
-  await mkdir(path.join(OUT, '../samples'), { recursive: true })
   data = await createSampleData()
 
   const host = new URL(baseUrl()).host
@@ -156,7 +171,7 @@ test('utsushi', async () => {
   await toast.filter({ hasText: 'コピーしました' }).waitFor()
   await shot(page, 'utsushi-copied')
   const copied = await page.evaluate(() => navigator.clipboard.readText())
-  await writeFile(path.join(OUT, '../samples/utsushi-copied.txt'), anonymizeText(copied))
+  await embedSample('utsushi/index.html', 'utsushi-copied', anonymizeText(copied))
 
   // 2 つ目のプリセットを作りながら、@ の候補を出す
   await send('open-palette')
@@ -199,6 +214,7 @@ test('utsushi', async () => {
 
   await page.keyboard.press('d')
   await ui.getByText('一括ダウンロードの対象').waitFor()
+  await ui.getByText('すべての添付ファイルフィールド').waitFor()
   await shot(page, 'utsushi-download')
   await page.keyboard.press('Escape')
 
