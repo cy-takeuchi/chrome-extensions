@@ -292,10 +292,10 @@ importers:
   site:
     devDependencies:
       '@kintone/rest-api-client':
-        specifier: ''
+        specifier: ^6.2.1
         version: 6.2.1(debug@4.4.3)
       '@playwright/test':
-        specifier: ^1.63.0 ^6.2.1
+        specifier: ^1.63.0
         version: 1.63.0
       '@types/chrome':
         specifier: ^0.3.4

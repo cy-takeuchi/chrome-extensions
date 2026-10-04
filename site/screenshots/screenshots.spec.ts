@@ -94,9 +94,13 @@ test.beforeAll(async () => {
     permissions: ['clipboard-read', 'clipboard-write'],
     args: [`--disable-extensions-except=${extensions}`, `--load-extension=${extensions}`],
   })
+  // 2 つの拡張機能の service worker を、manifest の名前で引けるようにする
+  const seen = new Set<string>()
   while (workers.size < 2) {
-    const worker = context.serviceWorkers().find((w) => !workers.has(w.url()))
-    const w = worker ?? (await context.waitForEvent('serviceworker'))
+    const w =
+      context.serviceWorkers().find((sw) => !seen.has(sw.url())) ??
+      (await context.waitForEvent('serviceworker'))
+    seen.add(w.url())
     const name = await w.evaluate(() => chrome.runtime.getManifest().name)
     workers.set(name, w)
   }
