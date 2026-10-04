@@ -4,8 +4,8 @@ import { PluginKey } from "@tiptap/pm/state";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import Suggestion from "@tiptap/suggestion";
 import { candidates, type Candidate } from "@/lib/template/candidates";
-import type { Catalog } from "@/lib/template/catalog";
-import type { LoopAttrs, ParagraphNode } from "@/lib/template/schema";
+import { pseudoField, type Catalog } from "@/lib/template/catalog";
+import { paragraph, text, type LoopAttrs, type ParagraphNode } from "@/lib/template/schema";
 import { FieldChipView, LoopView } from "./NodeViews";
 import type { SuggestionStore } from "./suggestionStore";
 
@@ -63,24 +63,19 @@ export const loopAt = (editor: Editor): LoopAttrs | null => {
   return null;
 };
 
+/** ブロックを挿入したときの中身。コメントは投稿者・日時・本文を入れておく */
 const loopInner = (attrs: LoopAttrs): ParagraphNode[] =>
   attrs.source === "comments"
     ? [
-        {
-          type: "paragraph",
-          content: [
-            { type: "field", attrs: { code: "$comment.author", label: "投稿者" } },
-            { type: "text", text: "（" },
-            { type: "field", attrs: { code: "$comment.date", label: "日時" } },
-            { type: "text", text: "）" },
-          ],
-        },
-        {
-          type: "paragraph",
-          content: [{ type: "field", attrs: { code: "$comment.body", label: "本文" } }],
-        },
+        paragraph(
+          pseudoField("$comment.author"),
+          text("（"),
+          pseudoField("$comment.date"),
+          text("）"),
+        ),
+        paragraph(pseudoField("$comment.body")),
       ]
-    : [{ type: "paragraph" }];
+    : [paragraph()];
 
 export type FieldSuggestionOptions = {
   getCatalog: () => Catalog | null;

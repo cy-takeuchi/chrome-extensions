@@ -1,9 +1,4 @@
-import {
-  COMMENT_PSEUDO,
-  COMMENTS_LABEL,
-  RECORD_PSEUDO,
-  type Catalog,
-} from "./catalog";
+import { COMMENTS_LABEL, pseudoField, type Catalog } from "./catalog";
 import {
   doc,
   field,
@@ -14,12 +9,6 @@ import {
   type FieldNode,
 } from "./schema";
 
-const pseudo = (list: readonly { code: string; label: string }[], code: string) => {
-  const p = list.find((x) => x.code === code);
-  if (!p) throw new Error(`unknown pseudo field: ${code}`);
-  return field(p.code, p.label);
-};
-
 /**
  * 新規プリセットの初期値。全フィールドをレイアウト順に「ラベル: 値」で並べ、
  * サブテーブルは繰り返しブロック、最後にコメントブロックを置く。
@@ -27,7 +16,7 @@ const pseudo = (list: readonly { code: string; label: string }[], code: string) 
  */
 export const buildDefaultTemplate = (catalog: Catalog) => {
   const blocks: BlockNode[] = [
-    paragraph(text("レコード: "), pseudo(RECORD_PSEUDO, "$record.url")),
+    paragraph(text("レコード: "), pseudoField("$record.url")),
     paragraph(),
   ];
   let currentGroup: string | undefined;
@@ -69,12 +58,12 @@ export const buildDefaultTemplate = (catalog: Catalog) => {
       { source: "comments", code: null, label: COMMENTS_LABEL },
       paragraph(
         text("■ "),
-        pseudo(COMMENT_PSEUDO, "$comment.author"),
+        pseudoField("$comment.author"),
         text("（"),
-        pseudo(COMMENT_PSEUDO, "$comment.date"),
+        pseudoField("$comment.date"),
         text("）"),
       ),
-      paragraph(pseudo(COMMENT_PSEUDO, "$comment.body")),
+      paragraph(pseudoField("$comment.body")),
       paragraph(),
     ),
   );

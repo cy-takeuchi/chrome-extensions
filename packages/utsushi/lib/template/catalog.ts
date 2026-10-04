@@ -1,4 +1,5 @@
 import type { Form } from "kisekae";
+import { field, type FieldNode } from "./schema";
 
 /**
  * 差し込みに使える項目の一覧。オートコンプリート候補と、
@@ -36,6 +37,21 @@ export const COMMENT_PSEUDO = [
 ] as const;
 
 export const COMMENTS_LABEL = "コメント";
+
+export type PseudoCode =
+  | (typeof RECORD_PSEUDO)[number]["code"]
+  | (typeof COMMENT_PSEUDO)[number]["code"];
+
+const PSEUDO_LABELS: ReadonlyMap<string, string> = new Map(
+  [...RECORD_PSEUDO, ...COMMENT_PSEUDO].map((p) => [p.code, p.label]),
+);
+
+/** 拡張が用意する差し込み項目の表示名。該当しなければ `undefined` */
+export const pseudoLabel = (code: string): string | undefined => PSEUDO_LABELS.get(code);
+
+/** 拡張が用意する差し込み項目のチップ */
+export const pseudoField = (code: PseudoCode): FieldNode =>
+  field(code, pseudoLabel(code) ?? code);
 
 export type Catalog = {
   /** レイアウト順。フォーム外の項目（ステータスなど）は末尾 */

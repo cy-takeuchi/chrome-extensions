@@ -1,9 +1,5 @@
-import { COMMENT_PSEUDO, RECORD_PSEUDO, type Catalog } from "./catalog";
+import { pseudoLabel, type Catalog } from "./catalog";
 import type { BlockNode, InlineNode, TemplateDoc } from "./schema";
-
-const PSEUDO_LABELS = new Map<string, string>(
-  [...RECORD_PSEUDO, ...COMMENT_PSEUDO].map((p) => [p.code, p.label]),
-);
 
 /**
  * チップとブロックの表示名を、今のアプリのラベルに合わせる。
@@ -13,7 +9,7 @@ const PSEUDO_LABELS = new Map<string, string>(
 export const refreshLabels = (tpl: TemplateDoc, catalog: Catalog): TemplateDoc => {
   const tableLabels = new Map(catalog.tables.map((t) => [t.code, t.label]));
   const label = (code: string, fallback: string) =>
-    PSEUDO_LABELS.get(code) ?? catalog.byCode.get(code)?.label ?? fallback;
+    pseudoLabel(code) ?? catalog.byCode.get(code)?.label ?? fallback;
 
   const inline = (nodes: InlineNode[] | undefined) =>
     nodes?.map((n) =>
