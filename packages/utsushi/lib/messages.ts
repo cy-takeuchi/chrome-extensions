@@ -1,5 +1,8 @@
+/** manifest.json の commands と同じ名前 */
+const COMMANDS = ["copy-default", "open-palette", "download-files"] as const;
+
 /** background → content script */
-export type Command = "copy-default" | "open-palette" | "download-files";
+export type Command = (typeof COMMANDS)[number];
 export type CommandMessage = { type: "command"; command: Command };
 
 /** content script → background */
@@ -10,4 +13,4 @@ export type DownloadRequest = {
 export type DownloadResult = { ok: number; failed: string[] };
 
 export const isCommand = (c: string): c is Command =>
-  c === "copy-default" || c === "open-palette" || c === "download-files";
+  (COMMANDS as readonly string[]).includes(c);
