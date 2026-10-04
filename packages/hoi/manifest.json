@@ -1,6 +1,6 @@
 {
   "name": "hoi",
-  "description": "Add selected text from kintone and other pages to GitHub Projects as a draft issue with a link back",
+  "description": "kintone などの画面で選択したテキストを、元ページへのリンク付きで GitHub Projects に Draft Issue として登録する",
   "permissions": ["storage", "activeTab"],
   "commands": {
     "add-to-project": {
@@ -8,7 +8,7 @@
         "default": "Ctrl+Shift+G",
         "mac": "Command+Shift+G"
       },
-      "description": "Add selection to GitHub Projects"
+      "description": "選択したテキストを GitHub Projects に登録"
     }
   }
 }

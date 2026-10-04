@@ -20,7 +20,7 @@ const graphql = async <T>(
   })
 
   if (!response.ok) {
-    throw new Error(`GitHub API error: ${response.status}`)
+    throw new Error(`GitHub API エラー: HTTP ${response.status}`)
   }
 
   const json: GraphQLResponse<T> = await response.json()
@@ -31,7 +31,7 @@ const graphql = async <T>(
   }
 
   if (!json.data) {
-    throw new Error('No data returned from GitHub API')
+    throw new Error('GitHub API からデータが返りませんでした')
   }
 
   return json.data
@@ -86,7 +86,7 @@ export const getProjectId = async (
   const data = await graphql<ProjectResponse>(token, query, { owner, number: projectNumber })
   const project = data[field]?.projectV2
   if (!project) {
-    throw new Error(`Project not found: ${owner}/${projectNumber}`)
+    throw new Error(`Project が見つかりません: ${owner}/${projectNumber}`)
   }
   return project.id
 }

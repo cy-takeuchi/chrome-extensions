@@ -7,10 +7,10 @@ kintone のスレッドやレコードのコメントを選択した場合は、
 ## 機能
 
 - キーボードショートカットで起動（`Cmd+Shift+G` / `Ctrl+Shift+G`）
-- 選択テキストと元ページの URL を自動取得して Body に設定
+- 選択テキストと元ページの URL を自動取得して本文に設定
 - kintone のコメント（スペースのスレッド、レコード、通知画面）を選択した場合は、そのコメントのパーマリンクを設定
-- Title / Body の編集
-- Assignees の設定（自分を割り当てるかどうか）
+- タイトルと本文の編集
+- 担当者の設定（自分を担当者にするかどうか）
 
 ## インストール
 
@@ -39,17 +39,17 @@ Chrome ウェブストアには公開していないので、パッケージ化�
 3. 「Generate new token (classic)」をクリック
 4. 以下のスコープを選択:
    - `project` - Projects への読み書きアクセス
-   - `read:user` - ユーザー情報の読み取り（Assignees 用）
+   - `read:user` - ユーザー情報の読み取り（担当者の設定用）
 5. トークンを生成してコピー
 
 ### 2. 拡張機能の設定
 
 1. Chrome の拡張機能アイコンを右クリック → 「オプション」
 2. 「GitHub Personal Access Token」にトークンを入力
-3. 「GitHub Projects URL」に登録先の Project URL を入力
+3. 「GitHub Projects の URL」に登録先の Project の URL を入力
    - 例: `https://github.com/users/username/projects/1`
    - 例: `https://github.com/orgs/orgname/projects/1`
-4. 「Save Settings」をクリック
+4. 「保存」をクリック
 
 ## 使い方
 
@@ -58,10 +58,10 @@ Chrome ウェブストアには公開していないので、パッケージ化�
    - **Mac**: `Cmd + Shift + G`
    - **Windows/Linux**: `Ctrl + Shift + G`
 3. ダイアログが表示される
-4. Title を入力（必須）
-5. Body を編集（選択テキストが初期値）
-6. Assignees を選択
-7. 「Add to Project」をクリック
+4. タイトルを入力（必須）
+5. 本文を編集（選択テキストと URL が初期値）
+6. 担当者を選択
+7. 「Project に追加」をクリック
 
 ### ショートカットのカスタマイズ
 
@@ -69,7 +69,7 @@ Chrome ウェブストアには公開していないので、パッケージ化�
 
 ## 仕組み
 
-- Body には、選択したテキストと、いま開いているページの URL を入れます
+- 本文には、選択したテキストと、いま開いているページの URL を入れます
 - kintone の画面でコメントを選択した場合は、ページの URL の代わりに、そのコメントのパーマリンクを入れます。スペースのスレッド、レコード詳細、通知画面のコメントに対応しています
 - GitHub への登録は、オプション画面で設定したトークンを使って [GitHub GraphQL API](https://docs.github.com/ja/graphql) で行います。トークンは `chrome.storage.sync` に保存されます
 

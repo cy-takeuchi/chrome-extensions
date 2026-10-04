@@ -18,7 +18,7 @@ const App = () => {
   const handleSave = async () => {
     // Validate project URL
     if (projectUrl && !parseProjectUrl(projectUrl)) {
-      setMessage({ type: 'error', text: 'Invalid Project URL format' })
+      setMessage({ type: 'error', text: 'Project の URL の形式が正しくありません' })
       return
     }
 
@@ -27,9 +27,9 @@ const App = () => {
 
     try {
       await saveSettings({ githubToken: token, projectUrl })
-      setMessage({ type: 'success', text: 'Settings saved!' })
+      setMessage({ type: 'success', text: '保存しました' })
     } catch {
-      setMessage({ type: 'error', text: 'Failed to save settings' })
+      setMessage({ type: 'error', text: '保存できませんでした' })
     } finally {
       setSaving(false)
       setTimeout(() => setMessage(null), 3000)
@@ -40,7 +40,7 @@ const App = () => {
     <div className="container">
       <h1>hoi</h1>
       <p className="description">
-        Configure your GitHub Personal Access Token and Project URL to start adding items.
+        GitHub の Personal Access Token と、登録先の Project の URL を設定してください。
       </p>
 
       <form
@@ -52,8 +52,9 @@ const App = () => {
         <Field className="field">
           <Label className="label">GitHub Personal Access Token</Label>
           <Description className="hint">
-            Create a token at GitHub → Settings → Developer settings → Personal access tokens.
-            Required scopes: <code>project</code>, <code>read:user</code>
+            GitHub の Settings → Developer settings → Personal access tokens で作成します。
+            <br />
+            必要なスコープ: <code>project</code>, <code>read:user</code>
           </Description>
           <Input
             type="password"
@@ -65,9 +66,9 @@ const App = () => {
         </Field>
 
         <Field className="field">
-          <Label className="label">GitHub Projects URL</Label>
+          <Label className="label">GitHub Projects の URL</Label>
           <Description className="hint">
-            The URL of your GitHub Project (e.g., https://github.com/users/username/projects/1)
+            登録先の Project の URL（例: https://github.com/users/username/projects/1）
           </Description>
           <Input
             type="url"
@@ -80,7 +81,7 @@ const App = () => {
 
         <div className="actions">
           <Button type="submit" className="button primary" disabled={saving}>
-            {saving ? 'Saving...' : 'Save Settings'}
+            {saving ? '保存しています…' : '保存'}
           </Button>
           {message && <span className={`message ${message.type}`}>{message.text}</span>}
         </div>

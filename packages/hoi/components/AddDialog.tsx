@@ -38,7 +38,7 @@ function DialogFrame({ label, closable, onClose, children }: DialogFrameProps) {
         onKeyDown={(e) => closable && e.key === 'Enter' && onClose()}
         role="button"
         tabIndex={closable ? 0 : -1}
-        aria-label="Close dialog"
+        aria-label="閉じる"
       />
       <div className="tgp-dialog-container">{children}</div>
     </div>
@@ -97,13 +97,13 @@ export function AddDialog({
 
   if (isSuccess) {
     return (
-      <DialogFrame label="Added to Project" closable onClose={onClose}>
+      <DialogFrame label="Project に追加しました" closable onClose={onClose}>
         <div className="tgp-dialog-panel tgp-success-panel">
           <div className="tgp-success-icon">✓</div>
-          <h2 className="tgp-success-title">Added to Project!</h2>
-          <p className="tgp-success-message">The draft issue has been created successfully.</p>
+          <h2 className="tgp-success-title">Project に追加しました</h2>
+          <p className="tgp-success-message">Draft Issue を作成しました。</p>
           <button type="button" className="tgp-button primary" onClick={onClose}>
-            Close
+            閉じる
           </button>
         </div>
       </DialogFrame>
@@ -111,9 +111,9 @@ export function AddDialog({
   }
 
   return (
-    <DialogFrame label="Add to GitHub Projects" closable={!isLoading} onClose={onClose}>
+    <DialogFrame label="GitHub Projects に追加" closable={!isLoading} onClose={onClose}>
       <div className="tgp-dialog-panel">
-        <h2 className="tgp-dialog-title">Add to GitHub Projects</h2>
+        <h2 className="tgp-dialog-title">GitHub Projects に追加</h2>
 
         {errorMessage && (
           <div className="tgp-error-banner">
@@ -125,7 +125,7 @@ export function AddDialog({
         <form onSubmit={handleSubmit}>
           <div className="tgp-field">
             <label htmlFor="tgp-title" className="tgp-label">
-              Title
+              タイトル
             </label>
             <input
               ref={titleInputRef}
@@ -134,14 +134,14 @@ export function AddDialog({
               className="tgp-input"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter a title..."
+              placeholder="タイトルを入力"
               disabled={isLoading}
             />
           </div>
 
           <div className="tgp-field">
             <label htmlFor="tgp-body" className="tgp-label">
-              Body
+              本文
             </label>
             <textarea
               id="tgp-body"
@@ -149,14 +149,14 @@ export function AddDialog({
               value={body}
               onChange={(e) => setBody(e.target.value)}
               rows={6}
-              placeholder="Enter description..."
+              placeholder="説明を入力"
               disabled={isLoading}
             />
           </div>
 
           <div className="tgp-field">
-            <span className="tgp-label">Assignees</span>
-            <div className="tgp-radio-group" role="radiogroup" aria-label="Assignee options">
+            <span className="tgp-label">担当者</span>
+            <div className="tgp-radio-group" role="radiogroup" aria-label="担当者">
               <label className="tgp-radio">
                 <span className={`tgp-radio-option ${assignToSelf ? 'checked' : ''}`}>
                   <input
@@ -168,7 +168,7 @@ export function AddDialog({
                     className="tgp-radio-input"
                   />
                   <span className="tgp-radio-indicator" />
-                  Assign to myself
+                  自分を担当者にする
                 </span>
               </label>
               <label className="tgp-radio">
@@ -182,7 +182,7 @@ export function AddDialog({
                     className="tgp-radio-input"
                   />
                   <span className="tgp-radio-indicator" />
-                  Do not assign
+                  担当者なし
                 </span>
               </label>
             </div>
@@ -195,7 +195,7 @@ export function AddDialog({
               onClick={onClose}
               disabled={isLoading}
             >
-              Cancel
+              キャンセル
             </button>
             <button
               type="submit"
@@ -205,10 +205,10 @@ export function AddDialog({
               {isLoading ? (
                 <>
                   <span className="tgp-spinner" />
-                  Adding...
+                  追加しています…
                 </>
               ) : (
-                'Add to Project'
+                'Project に追加'
               )}
             </button>
           </div>

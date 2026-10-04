@@ -36,20 +36,20 @@ async function handleSubmitDraft(payload: DraftInput): Promise<SubmitDraftRespon
     if (!settings.githubToken) {
       return {
         success: false,
-        error: 'GitHub token not configured. Please set it in the extension options.',
+        error: 'GitHub のトークンが設定されていません。オプション画面で設定してください',
       }
     }
 
     if (!settings.projectUrl) {
       return {
         success: false,
-        error: 'Project URL not configured. Please set it in the extension options.',
+        error: 'Project の URL が設定されていません。オプション画面で設定してください',
       }
     }
 
     const projectInfo = parseProjectUrl(settings.projectUrl)
     if (!projectInfo) {
-      return { success: false, error: 'Invalid Project URL format.' }
+      return { success: false, error: 'Project の URL の形式が正しくありません' }
     }
 
     // Get user info if assigning to self
@@ -72,7 +72,7 @@ async function handleSubmitDraft(payload: DraftInput): Promise<SubmitDraftRespon
 
     return { success: true }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+    const errorMessage = error instanceof Error ? error.message : '不明なエラーが発生しました'
     console.error('Failed to submit draft:', errorMessage)
     return { success: false, error: errorMessage }
   }

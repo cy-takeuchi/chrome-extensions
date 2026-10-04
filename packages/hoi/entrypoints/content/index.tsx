@@ -88,7 +88,7 @@ const handleSubmit = async (data: DraftInput) => {
   } catch {
     updateDialogState({
       status: 'error',
-      errorMessage: 'Failed to communicate with extension. Please refresh the page.',
+      errorMessage: '拡張機能と通信できませんでした。ページを再読み込みしてください',
     })
     return
   }
@@ -98,7 +98,7 @@ const handleSubmit = async (data: DraftInput) => {
   } else {
     updateDialogState({
       status: 'error',
-      errorMessage: response?.error || 'An unknown error occurred',
+      errorMessage: response?.error || '不明なエラーが発生しました',
     })
   }
 }
