@@ -1,0 +1,16 @@
+{
+  "name": "site",
+  "description": "GitHub Pages で公開する拡張機能の紹介ページ",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "screenshots": "pnpm --filter hoi --filter utsushi build && op run --env-file=../packages/hoi/e2e/.env -- playwright test -c screenshots/playwright.config.ts",
+    "typecheck": "tsc --noEmit -p screenshots"
+  },
+  "devDependencies": {
+    "@kintone/rest-api-client": "",
+    "@playwright/test": "^1.63.0 ^6.2.1",
+    "@types/node": "^26.6.4",
+    "typescript": "~7.0.2"
+  }
+}
