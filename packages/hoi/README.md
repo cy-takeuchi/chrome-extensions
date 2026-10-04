@@ -16,11 +16,11 @@
 1. リポジトリをクローン
 
 ```bash
-git clone https://github.com/cy-takeuchi/hoi.git
-cd hoi
+git clone https://github.com/cy-takeuchi/chrome-extensions.git
+cd chrome-extensions
 ```
 
-2. 依存関係をインストール
+2. 依存関係をインストール（リポジトリのルートで実行）
 
 ```bash
 pnpm install
@@ -29,6 +29,7 @@ pnpm install
 3. ビルド
 
 ```bash
+cd packages/hoi
 pnpm run build
 ```
 
@@ -36,7 +37,7 @@ pnpm run build
    - `chrome://extensions` を開く
    - 右上の「デベロッパーモード」を有効化
    - 「パッケージ化されていない拡張機能を読み込む」をクリック
-   - `dist` フォルダを選択
+   - `packages/hoi/dist` フォルダを選択
 
 ## 初期設定
 

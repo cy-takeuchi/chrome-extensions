@@ -4,8 +4,11 @@
 
 ## インストール
 
+utsushi は [chrome-extensions](https://github.com/cy-takeuchi/chrome-extensions) モノレポの 1 パッケージです。依存関係はリポジトリのルートでインストールします。
+
 ```sh
-pnpm install
+pnpm install       # リポジトリのルートで実行
+cd packages/utsushi
 pnpm wxt prepare   # ~/.npmrc が ignore-scripts=true なら手で実行する
 pnpm build
 ```

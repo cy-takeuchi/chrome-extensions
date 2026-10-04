@@ -5,15 +5,20 @@
 ### 必要なツール
 
 - Node.js 22
-- pnpm 10
+- pnpm 12
 
 ### インストール
 
+hoi は [chrome-extensions](https://github.com/cy-takeuchi/chrome-extensions) モノレポの 1 パッケージです。依存関係はリポジトリのルートでまとめてインストールします。
+
 ```bash
-git clone https://github.com/cy-takeuchi/hoi.git
-cd hoi
+git clone https://github.com/cy-takeuchi/chrome-extensions.git
+cd chrome-extensions
 pnpm install
+cd packages/hoi
 ```
+
+以下のコマンドは `packages/hoi` で実行します。ルートからは `pnpm hoi <script>`（例: `pnpm hoi build`）でも実行できます。
 
 ## 開発コマンド一覧
 
@@ -126,7 +131,7 @@ test: テストの追加・修正
 chore: ビルド・CI 等の変更
 ```
 
-[release-please](https://github.com/googleapis/release-please) がコミットメッセージを元に自動でバージョニングと CHANGELOG 生成を行います。
+[release-please](https://github.com/googleapis/release-please) がコミットメッセージを元に自動でバージョニングと CHANGELOG 生成を行います。パッケージごとにリリースされ、`packages/hoi` 以下を変更したコミットだけが hoi のリリース（`hoi-vX.Y.Z`）に入ります。
 
 ## PR の出し方
 
