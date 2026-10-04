@@ -1,0 +1,11 @@
+{
+  "name": "chrome-extensions",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.6.0",
+  "scripts": {
+    "build": "pnpm -r build",
+    "hoi": "pnpm --filter hoi",
+    "utsushi": "pnpm --filter utsushi"
+  }
+}
