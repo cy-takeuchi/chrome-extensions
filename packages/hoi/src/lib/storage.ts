@@ -24,15 +24,12 @@ export const parseProjectUrl = (
 ): { owner: string; number: number; type: 'user' | 'org' } | null => {
   // https://github.com/users/username/projects/1
   // https://github.com/orgs/orgname/projects/1
-  const userMatch = url.match(/github\.com\/users\/([^/]+)\/projects\/(\d+)/)
-  if (userMatch) {
-    return { owner: userMatch[1], number: parseInt(userMatch[2], 10), type: 'user' }
-  }
+  const match = url.match(/github\.com\/(users|orgs)\/([^/]+)\/projects\/(\d+)/)
+  if (!match) return null
 
-  const orgMatch = url.match(/github\.com\/orgs\/([^/]+)\/projects\/(\d+)/)
-  if (orgMatch) {
-    return { owner: orgMatch[1], number: parseInt(orgMatch[2], 10), type: 'org' }
+  return {
+    owner: match[2],
+    number: parseInt(match[3], 10),
+    type: match[1] === 'users' ? 'user' : 'org',
   }
-
-  return null
 }

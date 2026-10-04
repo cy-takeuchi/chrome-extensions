@@ -56,53 +56,34 @@ export const getViewer = async (token: string): Promise<{ id: string; login: str
   return data.viewer
 }
 
-interface UserProjectResponse {
-  user: {
-    projectV2: {
-      id: string
-    }
-  }
-}
+type ProjectOwnerType = 'user' | 'org'
 
-interface OrgProjectResponse {
-  organization: {
-    projectV2: {
-      id: string
-    }
-  }
-}
+// GraphQL のルートフィールド名は user / organization
+const OWNER_FIELD = { user: 'user', org: 'organization' } as const satisfies Record<
+  ProjectOwnerType,
+  string
+>
+
+type ProjectResponse = Record<string, { projectV2: { id: string } }>
 
 export const getProjectId = async (
   token: string,
   owner: string,
   projectNumber: number,
-  type: 'user' | 'org',
+  type: ProjectOwnerType,
 ): Promise<string> => {
-  if (type === 'user') {
-    const query = `
-      query($owner: String!, $number: Int!) {
-        user(login: $owner) {
-          projectV2(number: $number) {
-            id
-          }
+  const field = OWNER_FIELD[type]
+  const query = `
+    query($owner: String!, $number: Int!) {
+      ${field}(login: $owner) {
+        projectV2(number: $number) {
+          id
         }
       }
-    `
-    const data = await graphql<UserProjectResponse>(token, query, { owner, number: projectNumber })
-    return data.user.projectV2.id
-  } else {
-    const query = `
-      query($owner: String!, $number: Int!) {
-        organization(login: $owner) {
-          projectV2(number: $number) {
-            id
-          }
-        }
-      }
-    `
-    const data = await graphql<OrgProjectResponse>(token, query, { owner, number: projectNumber })
-    return data.organization.projectV2.id
-  }
+    }
+  `
+  const data = await graphql<ProjectResponse>(token, query, { owner, number: projectNumber })
+  return data[field].projectV2.id
 }
 
 interface AddDraftIssueResponse {
