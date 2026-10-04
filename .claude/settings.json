@@ -1,5 +1,0 @@
-{
-  "enabledPlugins": {
-    "playwright-cli@playwright-cli": true
-  }
-}
