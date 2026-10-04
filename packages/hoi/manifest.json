@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "hoi",
+  "version": "2.0.1",
+  "description": "Add selected text to GitHub Projects as a draft issue",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "commands": {
+    "add-to-project": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+G",
+        "mac": "Command+Shift+G"
+      },
+      "description": "Add selection to GitHub Projects"
+    }
+  },
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "src/content/index.tsx"
+      ]
+    }
+  ],
+  "options_page": "src/options/index.html"
+}

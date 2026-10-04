@@ -1,0 +1,43 @@
+{
+  "name": "utsushi",
+  "description": "kintone のレコードとコメントをテンプレートに差し込んでクリップボードへコピーし、添付ファイルを一括ダウンロードする",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "build": "wxt build",
+    "zip": "wxt zip",
+    "compile": "tsc --noEmit",
+    "test": "vitest run",
+    "prepare": "wxt prepare",
+    "e2e": "node e2e/smoke.mjs"
+  },
+  "dependencies": {
+    "@tiptap/core": "^3.31.4",
+    "@tiptap/extension-document": "^3.31.4",
+    "@tiptap/extension-hard-break": "^3.31.4",
+    "@tiptap/extension-paragraph": "^3.31.4",
+    "@tiptap/extension-text": "^3.31.4",
+    "@tiptap/extensions": "^3.31.4",
+    "@tiptap/pm": "^3.31.4",
+    "@tiptap/react": "^3.31.4",
+    "@tiptap/suggestion": "^3.31.4",
+    "kisekae": "^0.1.2",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "turndown": "^7.2.4",
+    "turndown-plugin-gfm": "^1.0.2"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/turndown": "^5.0.6",
+    "@wxt-dev/module-react": "^1.2.2",
+    "happy-dom": "^20.14.5",
+    "playwright": "1.63.0",
+    "typescript": "~7.0.2",
+    "vitest": "^5.0.3",
+    "wxt": "^0.21.4"
+  }
+}
