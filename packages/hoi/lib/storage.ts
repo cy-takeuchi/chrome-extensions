@@ -11,12 +11,12 @@ const defaultSettings: Settings = {
 }
 
 export const getSettings = async (): Promise<Settings> => {
-  const result = await chrome.storage.sync.get(STORAGE_KEY)
+  const result = await browser.storage.sync.get(STORAGE_KEY)
   return { ...defaultSettings, ...(result[STORAGE_KEY] as Partial<Settings>) }
 }
 
 export const saveSettings = async (settings: Settings): Promise<void> => {
-  await chrome.storage.sync.set({ [STORAGE_KEY]: settings })
+  await browser.storage.sync.set({ [STORAGE_KEY]: settings })
 }
 
 export const parseProjectUrl = (
@@ -27,9 +27,10 @@ export const parseProjectUrl = (
   const match = url.match(/github\.com\/(users|orgs)\/([^/]+)\/projects\/(\d+)/)
   if (!match) return null
 
+  const [, ownerType, owner = '', number = ''] = match
   return {
-    owner: match[2],
-    number: parseInt(match[3], 10),
-    type: match[1] === 'users' ? 'user' : 'org',
+    owner,
+    number: parseInt(number, 10),
+    type: ownerType === 'users' ? 'user' : 'org',
   }
 }

@@ -1,6 +1,6 @@
 import { Button, Description, Field, Input, Label } from '@headlessui/react'
 import { useEffect, useState } from 'react'
-import { getSettings, parseProjectUrl, saveSettings } from '../lib/storage'
+import { getSettings, parseProjectUrl, saveSettings } from '@/lib/storage'
 
 const App = () => {
   const [token, setToken] = useState('')

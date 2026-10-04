@@ -25,8 +25,9 @@ const graphql = async <T>(
 
   const json: GraphQLResponse<T> = await response.json()
 
-  if (json.errors && json.errors.length > 0) {
-    throw new Error(json.errors[0].message)
+  const [firstError] = json.errors ?? []
+  if (firstError) {
+    throw new Error(firstError.message)
   }
 
   if (!json.data) {
@@ -83,7 +84,11 @@ export const getProjectId = async (
     }
   `
   const data = await graphql<ProjectResponse>(token, query, { owner, number: projectNumber })
-  return data[field].projectV2.id
+  const project = data[field]?.projectV2
+  if (!project) {
+    throw new Error(`Project not found: ${owner}/${projectNumber}`)
+  }
+  return project.id
 }
 
 interface AddDraftIssueResponse {

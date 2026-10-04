@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react'
-import type { DraftInput } from '../../lib/messages'
+import type { DraftInput } from '@/lib/messages'
 
 export type DialogStatus = 'idle' | 'loading' | 'success' | 'error'
 

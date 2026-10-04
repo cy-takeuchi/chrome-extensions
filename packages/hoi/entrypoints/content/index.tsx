@@ -1,17 +1,17 @@
 import { createRoot, type Root } from 'react-dom/client'
+import { AddDialog, type DialogStatus } from '@/components/AddDialog'
+import {
+  findActiveSelectionContext,
+  getKintoneCommentPermalink,
+  isKintonePage,
+} from '@/lib/kintonePermalink'
 import type {
   DraftInput,
   SubmitDraftMessage,
   SubmitDraftResponse,
   TriggerDialogMessage,
-} from '../lib/messages'
-import { AddDialog, type DialogStatus } from './components/AddDialog'
+} from '@/lib/messages'
 import dialogStyles from './dialog.css?inline'
-import {
-  findActiveSelectionContext,
-  getKintoneCommentPermalink,
-  isKintonePage,
-} from './lib/kintonePermalink'
 
 let shadowRoot: ShadowRoot | null = null
 let reactRoot: Root | null = null
@@ -78,28 +78,29 @@ const closeDialog = () => {
   })
 }
 
-const handleSubmit = (data: DraftInput) => {
+const handleSubmit = async (data: DraftInput) => {
   updateDialogState({ status: 'loading', errorMessage: undefined })
 
   const message: SubmitDraftMessage = { type: 'SUBMIT_DRAFT', payload: data }
-  chrome.runtime.sendMessage(message, (response?: SubmitDraftResponse) => {
-    if (chrome.runtime.lastError) {
-      updateDialogState({
-        status: 'error',
-        errorMessage: 'Failed to communicate with extension. Please refresh the page.',
-      })
-      return
-    }
+  let response: SubmitDraftResponse | undefined
+  try {
+    response = await browser.runtime.sendMessage(message)
+  } catch {
+    updateDialogState({
+      status: 'error',
+      errorMessage: 'Failed to communicate with extension. Please refresh the page.',
+    })
+    return
+  }
 
-    if (response?.success) {
-      updateDialogState({ status: 'success' })
-    } else {
-      updateDialogState({
-        status: 'error',
-        errorMessage: response?.error || 'An unknown error occurred',
-      })
-    }
-  })
+  if (response?.success) {
+    updateDialogState({ status: 'success' })
+  } else {
+    updateDialogState({
+      status: 'error',
+      errorMessage: response?.error || 'An unknown error occurred',
+    })
+  }
 }
 
 const renderDialog = () => {
@@ -136,14 +137,23 @@ const handleTriggerDialog = async (): Promise<void> => {
   showDialog(bodyWithUrl)
 }
 
-chrome.runtime.onMessage.addListener((message: TriggerDialogMessage, _sender, sendResponse) => {
-  if (message.type === 'TRIGGER_DIALOG') {
-    handleTriggerDialog().then(() => {
-      sendResponse({ success: true })
-    })
-    return true // Keep message channel open for async response
-  }
-  return false
-})
+export default defineContentScript({
+  matches: ['<all_urls>'],
+  // ダイアログの CSS は Shadow DOM 内に ?inline で読み込むため、ページには注入しない
+  cssInjectionMode: 'manual',
+  main() {
+    browser.runtime.onMessage.addListener(
+      (message: TriggerDialogMessage, _sender, sendResponse) => {
+        if (message.type === 'TRIGGER_DIALOG') {
+          handleTriggerDialog().then(() => {
+            sendResponse({ success: true })
+          })
+          return true // Keep message channel open for async response
+        }
+        return false
+      },
+    )
 
-console.log('hoi: Content script loaded')
+    console.log('hoi: Content script loaded')
+  },
+})

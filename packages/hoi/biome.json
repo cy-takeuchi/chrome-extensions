@@ -27,6 +27,14 @@
     }
   },
   "files": {
-    "includes": ["src/**", "e2e/**", "*.json", "!manifest.json", "*.ts"]
+    "includes": [
+      "entrypoints/**",
+      "components/**",
+      "lib/**",
+      "e2e/**",
+      "*.json",
+      "!manifest.json",
+      "*.ts"
+    ]
   }
 }

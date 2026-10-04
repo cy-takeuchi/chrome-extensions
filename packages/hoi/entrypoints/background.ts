@@ -1,30 +1,32 @@
-import { addDraftIssue, getProjectId, getViewer } from '../lib/github'
+import { addDraftIssue, getProjectId, getViewer } from '@/lib/github'
 import type {
   DraftInput,
   SubmitDraftMessage,
   SubmitDraftResponse,
   TriggerDialogMessage,
-} from '../lib/messages'
-import { getSettings, parseProjectUrl } from '../lib/storage'
+} from '@/lib/messages'
+import { getSettings, parseProjectUrl } from '@/lib/storage'
 
-chrome.commands.onCommand.addListener((command) => {
-  if (command === 'add-to-project') {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const tab = tabs[0]
-      if (tab?.id) {
-        const message: TriggerDialogMessage = { type: 'TRIGGER_DIALOG' }
-        chrome.tabs.sendMessage(tab.id, message, { frameId: 0 })
-      }
-    })
-  }
-})
+export default defineBackground(() => {
+  browser.commands.onCommand.addListener(async (command) => {
+    if (command !== 'add-to-project') return
 
-chrome.runtime.onMessage.addListener((message: SubmitDraftMessage, _sender, sendResponse) => {
-  if (message.type === 'SUBMIT_DRAFT') {
-    handleSubmitDraft(message.payload).then(sendResponse)
-    return true // Keep the message channel open for async response
-  }
-  return false
+    const [tab] = await browser.tabs.query({ active: true, currentWindow: true })
+    if (tab?.id) {
+      const message: TriggerDialogMessage = { type: 'TRIGGER_DIALOG' }
+      browser.tabs.sendMessage(tab.id, message, { frameId: 0 })
+    }
+  })
+
+  browser.runtime.onMessage.addListener((message: SubmitDraftMessage, _sender, sendResponse) => {
+    if (message.type === 'SUBMIT_DRAFT') {
+      handleSubmitDraft(message.payload).then(sendResponse)
+      return true // Keep the message channel open for async response
+    }
+    return false
+  })
+
+  console.log('hoi: Background service worker loaded')
 })
 
 async function handleSubmitDraft(payload: DraftInput): Promise<SubmitDraftResponse> {
@@ -75,5 +77,3 @@ async function handleSubmitDraft(payload: DraftInput): Promise<SubmitDraftRespon
     return { success: false, error: errorMessage }
   }
 }
-
-console.log('hoi: Background service worker loaded')
