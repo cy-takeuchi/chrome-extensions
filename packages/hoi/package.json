@@ -2,6 +2,17 @@
   "name": "hoi",
   "private": true,
   "version": "2.0.1",
+  "license": "MIT",
+  "author": "Yoshihiko Takeuchi",
+  "homepage": "https://github.com/cy-takeuchi/chrome-extensions/tree/main/packages/hoi#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cy-takeuchi/chrome-extensions.git",
+    "directory": "packages/hoi"
+  },
+  "bugs": {
+    "url": "https://github.com/cy-takeuchi/chrome-extensions/issues"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

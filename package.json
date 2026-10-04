@@ -1,6 +1,16 @@
 {
   "name": "chrome-extensions",
   "private": true,
+  "license": "MIT",
+  "author": "Yoshihiko Takeuchi",
+  "homepage": "https://github.com/cy-takeuchi/chrome-extensions#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cy-takeuchi/chrome-extensions.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cy-takeuchi/chrome-extensions/issues"
+  },
   "type": "module",
   "packageManager": "pnpm@12.6.0",
   "scripts": {

@@ -34,3 +34,7 @@ pnpm build              # すべてのパッケージをビルド
 ## リリース
 
 [release-please](https://github.com/googleapis/release-please) がパッケージごとにリリースを作ります。`main` に入ったコミットのうち、そのパッケージのディレクトリを変更したものがリリースに含まれ、タグは `hoi-vX.Y.Z` / `utsushi-vX.Y.Z` になります。コミットメッセージは [Conventional Commits](https://www.conventionalcommits.org/ja/) で書いてください。
+
+## ライセンス
+
+[MIT](LICENSE)
