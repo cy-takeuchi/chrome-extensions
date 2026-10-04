@@ -18,3 +18,11 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+
+# WXT
+.output/
+.wxt/
+
+# Playwright
+playwright-report/
+test-results/

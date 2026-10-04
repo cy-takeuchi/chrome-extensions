@@ -164,7 +164,11 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    devDependencies:
+      '@biomejs/biome':
+        specifier: ^2.5.15
+        version: 2.5.15
 
   packages/hoi:
     dependencies:
@@ -181,9 +185,6 @@ importers:
         specifier: ^19.3.0
         version: 19.3.0(react@19.3.0)
     devDependencies:
-      '@biomejs/biome':
-        specifier: ^2.5.15
-        version: 2.5.15
       '@kintone/rest-api-client':
         specifier: ^6.2.1
         version: 6.2.1(debug@4.4.3)
