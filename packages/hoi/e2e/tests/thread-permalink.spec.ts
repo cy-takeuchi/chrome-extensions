@@ -6,6 +6,7 @@ import {
   getKintoneUsername1,
   getSpaceTemplateId,
 } from '../helpers/kintone-client'
+import { getPermalinkFromSelection, selectContents } from '../helpers/permalink'
 
 test.describe('Thread Comment Permalink', () => {
   let spaceId: string | number
@@ -65,34 +66,10 @@ test.describe('Thread Comment Permalink', () => {
     await commentElement.waitFor({ state: 'visible', timeout: 10000 })
 
     // Select text in the comment
-    await commentElement.evaluate((el) => {
-      const range = document.createRange()
-      range.selectNodeContents(el)
-      const selection = window.getSelection()
-      selection?.removeAllRanges()
-      selection?.addRange(range)
-    })
+    await selectContents(commentElement)
 
-    // Extract permalink using the same logic as the extension:
-    // 1. Find the comment item containing the selection
-    // 2. Read the URL from the comment's datetime link
-    const permalink = await page.evaluate(() => {
-      const THREAD_COMMENT_BODY_SELECTOR = '.ck-content'
-      const THREAD_COMMENT_ITEM_SELECTOR = '[class*="_commentContent_"]'
-      const THREAD_PERMALINK_SELECTOR = 'a[class*="_createdAt_"]'
-
-      const selection = window.getSelection()
-      if (!selection?.toString().trim() || !selection.rangeCount) return null
-
-      const node = selection.getRangeAt(0).commonAncestorContainer
-      const el = node.nodeType === Node.TEXT_NODE ? node.parentElement : (node as Element)
-      const commentItem = el
-        ?.closest(THREAD_COMMENT_BODY_SELECTOR)
-        ?.closest(THREAD_COMMENT_ITEM_SELECTOR)
-      if (!commentItem) return null
-
-      return commentItem.querySelector<HTMLAnchorElement>(THREAD_PERMALINK_SELECTOR)?.href ?? null
-    })
+    // Extract permalink with the extension's own code
+    const permalink = await getPermalinkFromSelection(page)
 
     expect(permalink).not.toBeNull()
     expect(permalink).toContain(`/space/${spaceId}`)

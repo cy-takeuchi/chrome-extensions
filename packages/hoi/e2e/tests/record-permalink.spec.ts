@@ -7,6 +7,7 @@ import {
   getSpaceTemplateId,
   waitForAppDeployment,
 } from '../helpers/kintone-client'
+import { getPermalinkFromSelection, selectContents } from '../helpers/permalink'
 
 test.describe('Record Page Permalink', () => {
   let spaceId: string | number
@@ -97,46 +98,10 @@ test.describe('Record Page Permalink', () => {
     // Select text in the comment
     const commentElement = page.locator('.commentlist-body-gaia').first()
     await commentElement.waitFor({ state: 'visible' })
+    await selectContents(commentElement)
 
-    await commentElement.evaluate((el) => {
-      const range = document.createRange()
-      range.selectNodeContents(el)
-      const selection = window.getSelection()
-      selection?.removeAllRanges()
-      selection?.addRange(range)
-    })
-
-    // Extract permalink using the same logic as the extension
-    const permalink = await page.evaluate(() => {
-      const RECORD_COMMENT_BODY_SELECTOR = '.commentlist-body-gaia'
-      const RECORD_COMMENT_ITEM_SELECTOR = '.itemlist-item-head-gaia'
-      const RECORD_PERMALINK_SELECTOR = '.itemlist-datetime-gaia a'
-
-      const selection = window.getSelection()
-      if (!selection?.toString().trim() || !selection.rangeCount) return null
-
-      const range = selection.getRangeAt(0)
-      let node: Node | null = range.commonAncestorContainer
-      if (node.nodeType === Node.TEXT_NODE) {
-        node = node.parentElement
-      }
-
-      let commentBody: Element | null = null
-      while (node && node instanceof Element) {
-        if (node.matches(RECORD_COMMENT_BODY_SELECTOR)) {
-          commentBody = node
-          break
-        }
-        node = node.parentElement
-      }
-      if (!commentBody) return null
-
-      const commentItem = commentBody.closest(RECORD_COMMENT_ITEM_SELECTOR)
-      if (!commentItem) return null
-
-      const permalinkLink = commentItem.querySelector<HTMLAnchorElement>(RECORD_PERMALINK_SELECTOR)
-      return permalinkLink?.href ?? null
-    })
+    // Extract permalink with the extension's own code
+    const permalink = await getPermalinkFromSelection(page)
 
     expect(permalink).not.toBeNull()
     expect(permalink).toContain(`/k/${appId}/`)

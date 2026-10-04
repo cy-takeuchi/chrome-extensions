@@ -10,6 +10,7 @@ import {
   getSpaceTemplateId,
   waitForAppDeployment,
 } from '../helpers/kintone-client'
+import { getPermalinkFromSelection, selectContents } from '../helpers/permalink'
 
 test.describe('Notification Page Permalink', () => {
   let spaceId: string | number
@@ -164,25 +165,10 @@ test.describe('Notification Page Permalink', () => {
     await commentElement.waitFor({ state: 'visible', timeout: 10000 })
 
     // Select text in the comment inside iframe
-    await commentElement.evaluate((el) => {
-      const range = document.createRange()
-      range.selectNodeContents(el)
-      const selection = window.getSelection()
-      selection?.removeAllRanges()
-      selection?.addRange(range)
-    })
+    await selectContents(commentElement)
 
-    // Extract permalink using the same logic as the extension (inside iframe)
-    // Use commentElement.evaluate since FrameLocator doesn't have evaluate
-    const permalink = await commentElement.evaluate((el) => {
-      const THREAD_COMMENT_ITEM_SELECTOR = '[class*="_commentContent_"]'
-      const THREAD_PERMALINK_SELECTOR = 'a[class*="_createdAt_"]'
-
-      const commentItem = el.closest(THREAD_COMMENT_ITEM_SELECTOR)
-      if (!commentItem) return null
-
-      return commentItem.querySelector<HTMLAnchorElement>(THREAD_PERMALINK_SELECTOR)?.href ?? null
-    })
+    // Extract permalink with the extension's own code
+    const permalink = await getPermalinkFromSelection(page)
 
     expect(permalink).not.toBeNull()
     expect(permalink).toContain(`/space/${spaceId}`)
@@ -213,26 +199,10 @@ test.describe('Notification Page Permalink', () => {
     await commentElement.waitFor({ state: 'visible', timeout: 10000 })
 
     // Select text in the comment inside iframe
-    await commentElement.evaluate((el) => {
-      const range = document.createRange()
-      range.selectNodeContents(el)
-      const selection = window.getSelection()
-      selection?.removeAllRanges()
-      selection?.addRange(range)
-    })
+    await selectContents(commentElement)
 
-    // Extract permalink using the same logic as the extension (inside iframe)
-    // Use commentElement.evaluate since FrameLocator doesn't have evaluate
-    const permalink = await commentElement.evaluate((el) => {
-      const RECORD_COMMENT_ITEM_SELECTOR = '.itemlist-item-head-gaia'
-      const RECORD_PERMALINK_SELECTOR = '.itemlist-datetime-gaia a'
-
-      const commentItem = el.closest(RECORD_COMMENT_ITEM_SELECTOR)
-      if (!commentItem) return null
-
-      const permalinkLink = commentItem.querySelector<HTMLAnchorElement>(RECORD_PERMALINK_SELECTOR)
-      return permalinkLink?.href ?? null
-    })
+    // Extract permalink with the extension's own code
+    const permalink = await getPermalinkFromSelection(page)
 
     expect(permalink).not.toBeNull()
     expect(permalink).toContain(`/k/${appId}/`)
