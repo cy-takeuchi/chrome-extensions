@@ -1,5 +1,6 @@
 import type { RecordLocation } from "../kintone/location";
 import { recordUrl } from "../kintone/location";
+import { subtableRows } from "../kintone/record";
 import type { Comment, KintoneRecord, SubtableRow } from "../kintone/types";
 import type { Catalog } from "./catalog";
 import { formatDateTime, formatValue } from "./format";
@@ -57,15 +58,10 @@ export const renderTemplate = (tpl: TemplateDoc, ctx: RenderContext): string => 
     if (!meta.table) return formatValue(ctx.record[code], meta);
     if (scope.row && code in scope.row.value)
       return formatValue(scope.row.value[code], meta);
-    return rowsOf(meta.table.code)
+    return subtableRows(ctx.record, meta.table.code)
       .map((row) => formatValue(row.value[code], meta))
       .filter((v) => v !== "")
       .join(ROW_JOINER);
-  };
-
-  const rowsOf = (tableCode: string): SubtableRow[] => {
-    const fv = ctx.record[tableCode];
-    return fv?.type === "SUBTABLE" ? (fv.value as SubtableRow[]) : [];
   };
 
   const renderInline = (nodes: InlineNode[] | undefined, scope: Scope) =>
@@ -85,7 +81,7 @@ export const renderTemplate = (tpl: TemplateDoc, ctx: RenderContext): string => 
       const scopes: Scope[] =
         block.attrs.source === "comments"
           ? ctx.comments.map((comment) => ({ comment }))
-          : rowsOf(block.attrs.code).map((row) => ({ row }));
+          : subtableRows(ctx.record, block.attrs.code).map((row) => ({ row }));
       if (scopes.length === 0) return [];
       return [
         scopes.map((s) => renderBlocks(block.content, s).join("\n")).join("\n"),
