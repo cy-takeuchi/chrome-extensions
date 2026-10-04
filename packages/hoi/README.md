@@ -40,7 +40,7 @@ pnpm run build
    - `chrome://extensions` を開く
    - 右上の「デベロッパーモード」を有効化
    - 「パッケージ化されていない拡張機能を読み込む」をクリック
-   - `packages/hoi/dist` フォルダを選択
+   - `packages/hoi/.output/chrome-mv3` フォルダを選択
 
 ## 初期設定
 
@@ -82,7 +82,7 @@ pnpm run build
 ## 開発
 
 ```bash
-# 開発サーバー起動（HMR 対応）
+# 拡張機能を読み込んだブラウザを起動（変更すると自動でリロード）
 pnpm run dev
 
 # 本番ビルド
@@ -94,8 +94,8 @@ pnpm run typecheck
 
 ## 技術スタック
 
-- [Vite](https://vitejs.dev/) + [CRXJS](https://crxjs.dev/vite-plugin)
-- [React](https://react.dev/) 18
+- [WXT](https://wxt.dev/)
+- [React](https://react.dev/) 19
 - [Headless UI](https://headlessui.com/)
 - [TypeScript](https://www.typescriptlang.org/)
 - Chrome Extension Manifest V3

@@ -24,21 +24,24 @@ cd packages/hoi
 
 | コマンド | 説明 |
 |---------|------|
-| `pnpm dev` | 開発サーバー起動（HMR 対応） |
-| `pnpm build` | 本番ビルド |
-| `pnpm typecheck` | 型チェック（`src` と `e2e` 両方） |
+| `pnpm dev` | 拡張機能を読み込んだブラウザを起動（変更すると自動でリロード） |
+| `pnpm build` | 本番ビルド（`.output/chrome-mv3`） |
+| `pnpm zip` | 配布用 zip を作成 |
+| `pnpm typecheck` | 型チェック（拡張機能本体と `e2e` 両方） |
 | `pnpm biome:check` | Biome による lint / format チェック |
 | `pnpm biome:write` | Biome による lint / format の自動修正 |
 
 ## 拡張機能の動作確認
 
-1. `pnpm dev` で開発ビルドを実行
+`pnpm dev` を実行すると、拡張機能を読み込んだ Chrome が起動します。コードを変更すると自動でリビルド・リロードされます。
+
+普段使っている Chrome で確認する場合は、次の手順で読み込みます。
+
+1. `pnpm build` でビルド
 2. Chrome で `chrome://extensions` を開く
 3. 右上の「デベロッパーモード」を有効化
 4. 「パッケージ化されていない拡張機能を読み込む」をクリック
-5. `dist` フォルダを選択
-
-コードを変更すると HMR で自動的にリビルドされます。
+5. `.output/chrome-mv3` フォルダを選択
 
 ## E2E テスト
 
