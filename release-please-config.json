@@ -1,10 +1,13 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
-  "bootstrap-sha": "bd93e4688bcfea049ab16772029c71f1828bb8d7",
+  "bootstrap-sha": "7e7ddd1475019da3a5c390a95c5290ef1a800f81",
   "packages": {
-    ".": {
+    "packages/hoi": {
       "release-type": "node",
       "extra-files": ["manifest.json"]
+    },
+    "packages/utsushi": {
+      "release-type": "node"
     }
   }
 }

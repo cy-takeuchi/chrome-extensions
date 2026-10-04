@@ -1,0 +1,77 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      hoi_release_created: ${{ steps.release.outputs['packages/hoi--release_created'] }}
+      hoi_tag_name: ${{ steps.release.outputs['packages/hoi--tag_name'] }}
+      hoi_version: ${{ steps.release.outputs['packages/hoi--version'] }}
+      utsushi_release_created: ${{ steps.release.outputs['packages/utsushi--release_created'] }}
+      utsushi_tag_name: ${{ steps.release.outputs['packages/utsushi--tag_name'] }}
+      utsushi_version: ${{ steps.release.outputs['packages/utsushi--version'] }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  build-hoi:
+    needs: release-please
+    if: needs.release-please.outputs.hoi_release_created == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.release-please.outputs.hoi_tag_name }}
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - run: pnpm install
+      - run: pnpm hoi build
+
+      - name: Create zip
+        working-directory: packages/hoi/dist
+        run: zip -r "$GITHUB_WORKSPACE/hoi-${{ needs.release-please.outputs.hoi_version }}.zip" .
+
+      - name: Upload to Release
+        run: gh release upload ${{ needs.release-please.outputs.hoi_tag_name }} hoi-${{ needs.release-please.outputs.hoi_version }}.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-utsushi:
+    needs: release-please
+    if: needs.release-please.outputs.utsushi_release_created == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.release-please.outputs.utsushi_tag_name }}
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - run: pnpm install
+      - run: pnpm utsushi zip
+
+      - name: Upload to Release
+        run: gh release upload ${{ needs.release-please.outputs.utsushi_tag_name }} packages/utsushi/.output/utsushi-${{ needs.release-please.outputs.utsushi_version }}-chrome.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
