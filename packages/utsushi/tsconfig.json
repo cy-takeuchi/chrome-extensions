@@ -2,7 +2,8 @@
   "extends": "./.wxt/tsconfig.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "strict": true,
-    "noUncheckedIndexedAccess": true
-  }
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  "exclude": ["e2e", "node_modules", ".output"]
 }
