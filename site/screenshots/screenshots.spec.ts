@@ -1,4 +1,4 @@
-import { mkdtemp } from 'node:fs/promises'
+import { mkdir, mkdtemp, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -33,6 +33,11 @@ let page: Page
 let replacements: Replacement[]
 const workers = new Map<string, Worker>()
 
+const anonymizeText = (text: string) =>
+  [...replacements]
+    .sort(([a], [b]) => b.length - a.length)
+    .reduce((acc, [from, to]) => acc.split(from).join(to), text)
+
 const shot = async (target: Page, name: string) => {
   await anonymize(target, replacements)
   await target.screenshot({ path: path.join(OUT, `${name}.png`) })
@@ -65,6 +70,7 @@ const login = async () => {
 }
 
 test.beforeAll(async () => {
+  await mkdir(path.join(OUT, '../samples'), { recursive: true })
   data = await createSampleData()
 
   const host = new URL(baseUrl()).host
@@ -122,5 +128,80 @@ test('hoi', async () => {
   await options.locator('input[type=password]').fill('ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx')
   await options.locator('input[type=url]').fill('https://github.com/users/example/projects/1')
   await shot(options, 'hoi-options')
+  await options.close()
+})
+
+test('utsushi', async () => {
+  await page.goto(`${baseUrl()}/k/${data.appId}/show#record=${data.recordId}`)
+  await page.getByText('業務システム導入支援').first().waitFor()
+  const ui = page.locator('utsushi-root')
+  await ui.waitFor({ state: 'attached' })
+  await page.waitForTimeout(1000)
+  await page.bringToFront()
+  const send = (command: string) => sendToTab('utsushi', { type: 'command', command })
+  const toast = ui.locator('.toast')
+  const editor = ui.locator('.tiptap')
+
+  // プリセットが無いので、既定テンプレート入りの作成画面が開く
+  await send('copy-default')
+  await editor.waitFor()
+  await page.waitForTimeout(500)
+  await shot(page, 'utsushi-editor')
+
+  await ui.getByRole('button', { name: '保存してコピー' }).click()
+  await toast.filter({ hasText: 'コピーしました' }).waitFor()
+  await shot(page, 'utsushi-copied')
+  const copied = await page.evaluate(() => navigator.clipboard.readText())
+  await writeFile(path.join(OUT, '../samples/utsushi-copied.txt'), anonymizeText(copied))
+
+  // 2 つ目のプリセットを作りながら、@ の候補を出す
+  await send('open-palette')
+  await ui.locator('.palette').waitFor()
+  await page.keyboard.press('n')
+  await editor.waitFor()
+  await ui.locator('input.name').fill('チャット共有用')
+  await editor.click()
+  await page.keyboard.press('ControlOrMeta+a')
+  await page.keyboard.press('Backspace')
+  const insert = async (query: string, label: string) => {
+    await page.keyboard.type(query)
+    await ui.locator('.suggest-item.active').filter({ hasText: label }).waitFor()
+    await page.keyboard.press('Enter')
+  }
+  await page.keyboard.type('【')
+  await insert('@顧客', '顧客名')
+  await page.keyboard.type('】')
+  await insert('@案件', '案件名')
+  await page.keyboard.press('Enter')
+  await page.keyboard.type('金額: ')
+  await insert('@金額', '金額')
+  await page.keyboard.press('Enter')
+  await insert('@明細', '明細')
+  await page.keyboard.type('・')
+  await insert('@品名', '品名')
+  await page.keyboard.press('ArrowDown')
+  await page.keyboard.type('@')
+  await ui.locator('.suggest-item').first().waitFor()
+  await shot(page, 'utsushi-suggest')
+  await page.keyboard.type('レコードURL')
+  await ui.locator('.suggest-item.active').filter({ hasText: 'レコードURL' }).waitFor()
+  await page.keyboard.press('Enter')
+  await ui.getByRole('button', { name: '保存', exact: true }).click()
+  await toast.filter({ hasText: '保存しました' }).waitFor()
+
+  await send('open-palette')
+  await ui.locator('.palette').waitFor()
+  await shot(page, 'utsushi-palette')
+
+  await page.keyboard.press('d')
+  await ui.getByText('一括ダウンロードの対象').waitFor()
+  await shot(page, 'utsushi-download')
+  await page.keyboard.press('Escape')
+
+  const options = await context.newPage()
+  const id = new URL(workers.get('utsushi')?.url() ?? '').host
+  await options.goto(`chrome-extension://${id}/options.html`)
+  await options.getByText('案件管理').or(options.getByText('チャット共有用')).first().waitFor()
+  await shot(options, 'utsushi-options')
   await options.close()
 })
