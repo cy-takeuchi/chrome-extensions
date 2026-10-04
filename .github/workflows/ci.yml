@@ -36,6 +36,7 @@ jobs:
 
       - run: pnpm install
       - run: pnpm hoi typecheck
+      - run: pnpm hoi test
 
   utsushi:
     runs-on: ubuntu-latest
