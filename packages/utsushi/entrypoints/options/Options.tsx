@@ -10,6 +10,7 @@ import {
   removePreset,
   saveAppSettings,
 } from "@/lib/settings";
+import { formatDateTime } from "@/lib/template/format";
 
 type Entry = { key: AppKey; settings: AppSettings };
 
@@ -107,7 +108,7 @@ export const Options = () => {
                     {p.id === defaultPreset(entry.settings)?.id && (
                       <span className="badge">デフォルト</span>
                     )}
-                    <span className="muted"> 更新 {p.updatedAt.slice(0, 10)}</span>
+                    <span className="muted"> 更新 {formatDateTime(p.updatedAt).slice(0, 10)}</span>
                     <button
                       type="button"
                       className="link danger"
