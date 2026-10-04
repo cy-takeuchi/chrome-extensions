@@ -1,5 +1,6 @@
 {
   "name": "hoi",
+  "description": "kintone などの画面で選択したテキストを、元ページへのリンク付きで GitHub Projects に Draft Issue として登録する",
   "private": true,
   "version": "2.0.1",
   "license": "MIT",

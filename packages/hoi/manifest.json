@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "hoi",
   "version": "2.0.1",
-  "description": "Add selected text to GitHub Projects as a draft issue",
+  "description": "Add selected text from kintone and other pages to GitHub Projects as a draft issue with a link back",
   "permissions": [
     "storage",
     "activeTab"

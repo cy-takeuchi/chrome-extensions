@@ -4,7 +4,7 @@ kintone / cybozu まわりの Chrome 拡張機能をまとめたモノレポで�
 
 | パッケージ | 説明 |
 |---|---|
-| [hoi](packages/hoi) | ブラウザで選択したテキストを GitHub Projects に Draft Issue として登録する |
+| [hoi](packages/hoi) | kintone などの画面で選択したテキストを、元ページへのリンク付きで GitHub Projects に Draft Issue として登録する |
 | [utsushi](packages/utsushi) | kintone のレコードとコメントをテンプレートに差し込んでコピーし、添付ファイルを一括ダウンロードする |
 
 ## セットアップ

@@ -1,11 +1,14 @@
 # hoi
 
-ブラウザで選択したテキストを GitHub Projects に Draft Issue として登録する Chrome 拡張機能です。
+kintone などの画面で選択したテキストを、元ページへのリンク付きで GitHub Projects に Draft Issue として登録する Chrome 拡張機能です。
+
+kintone のスレッドやレコードのコメントを選択した場合は、一時的なページの URL ではなく、そのコメントのパーマリンクを付けます。
 
 ## 機能
 
 - キーボードショートカットで起動（`Cmd+Shift+G` / `Ctrl+Shift+G`）
-- 選択テキストを自動取得して Body に設定
+- 選択テキストと元ページの URL を自動取得して Body に設定
+- kintone のコメント（スペースのスレッド、レコード、通知画面）を選択した場合は、そのコメントのパーマリンクを設定
 - Title / Body の編集
 - Assignees の設定（自分を割り当てるかどうか）
 
