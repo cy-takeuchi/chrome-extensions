@@ -2,18 +2,30 @@
 
 **utsushi**（写し）は、kintone のレコード詳細画面で、レコードとコメントの内容をテンプレートに差し込んでクリップボードにコピーする Chrome 拡張です。添付ファイルの一括ダウンロードもできます。
 
+## 機能
+
+- レコードとコメントの内容をテンプレート（プリセット）に差し込んで、クリップボードにコピー
+- プリセットはアプリごとに複数作れる。`@` でフィールドを差し込むエディタ付き
+- 添付ファイルの一括ダウンロード
+- プリセットのエクスポート／インポート
+
 ## インストール
 
-utsushi は [chrome-extensions](https://github.com/cy-takeuchi/chrome-extensions) モノレポの 1 パッケージです。依存関係はリポジトリのルートでインストールします。
+Chrome ウェブストアには公開していないので、パッケージ化されていない拡張機能として読み込みます。
 
-```sh
-pnpm install       # リポジトリのルートで実行
-cd packages/utsushi
-pnpm wxt prepare   # ~/.npmrc が ignore-scripts=true なら手で実行する
-pnpm build
-```
+1. 拡張機能のファイルを用意する。次のどちらか
+   - [リリース](https://github.com/cy-takeuchi/chrome-extensions/releases)から `utsushi-X.Y.Z-chrome.zip` をダウンロードして展開する
+   - ソースからビルドする
 
-`chrome://extensions` でデベロッパーモードを有効にし、「パッケージ化されていない拡張機能を読み込む」で `.output/chrome-mv3` を選びます。
+     ```sh
+     git clone https://github.com/cy-takeuchi/chrome-extensions.git
+     cd chrome-extensions
+     pnpm install
+     pnpm utsushi build   # packages/utsushi/.output/chrome-mv3 にできる
+     ```
+
+2. Chrome で `chrome://extensions` を開き、右上の「デベロッパーモード」を有効にする
+3. 「パッケージ化されていない拡張機能を読み込む」で、展開したフォルダ（ビルドした場合は `packages/utsushi/.output/chrome-mv3`）を選ぶ
 
 ## 使い方
 
@@ -58,21 +70,8 @@ kintone のレコード詳細画面（`/k/{アプリID}/show#record={レコー�
 
 ## 開発
 
-```sh
-pnpm dev        # HMR 付きで起動
-pnpm test       # 単体テスト
-pnpm typecheck  # 型チェック
-pnpm biome:check  # lint / format チェック（biome:write で自動修正）
-pnpm build && CHROMIUM_PATH=/path/to/chromium pnpm test:e2e   # モックした kintone でのスモークテスト
-```
+[CONTRIBUTING.md](CONTRIBUTING.md) を見てください。リポジトリ共通のルールは[ルートの CONTRIBUTING.md](../../CONTRIBUTING.md) にあります。
 
-e2e は Playwright で拡張を読み込ませ、`https://example.cybozu.com` へのリクエストをモックに差し替えて動かします。ブランド版の Google Chrome は `--load-extension` を受け付けないので、Chrome for Testing / Chromium を `CHROMIUM_PATH` で指定してください。
+## ライセンス
 
-| ディレクトリ | 中身 |
-|---|---|
-| `lib/kintone` | URL の解析と REST API |
-| `lib/template` | テンプレートの形式・描画・検証・候補・既定テンプレート（エディタ非依存） |
-| `lib/settings.ts` | `chrome.storage.local` への保存 |
-| `components` | kintone の画面に出す UI（Shadow DOM 内の React） |
-| `components/editor` | TipTap のエディタ |
-| `entrypoints` | background / content script / オプション画面 |
+[MIT](../../LICENSE)

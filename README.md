@@ -7,37 +7,23 @@ kintone / cybozu まわりの Chrome 拡張機能をまとめたモノレポで�
 | [hoi](packages/hoi) | kintone などの画面で選択したテキストを、元ページへのリンク付きで GitHub Projects に Draft Issue として登録する |
 | [utsushi](packages/utsushi) | kintone のレコードとコメントをテンプレートに差し込んでコピーし、添付ファイルを一括ダウンロードする |
 
-## セットアップ
+## インストール
 
-必要なもの: Node.js 22 以上、pnpm 12
+各拡張機能の README を見てください。
+
+## 開発
+
+依存関係はルートの `pnpm install` でまとめて入ります。各パッケージのスクリプトはルートから `pnpm hoi <script>` / `pnpm utsushi <script>` でも実行できます。
 
 ```sh
-git clone https://github.com/cy-takeuchi/chrome-extensions.git
-cd chrome-extensions
 pnpm install
+pnpm hoi dev        # hoi を読み込んだブラウザを起動
+pnpm utsushi test   # utsushi の単体テスト
+pnpm build          # すべてのパッケージをビルド
+pnpm biome:check    # すべてのパッケージを lint / format チェック
 ```
 
-依存関係は [pnpm workspace](https://pnpm.io/workspaces) でまとめて管理しています。`pnpm install` はルートで実行してください。
-
-## コマンド
-
-各パッケージのスクリプトは、パッケージのディレクトリで実行するか、ルートから次の形で実行します。
-
-```sh
-pnpm hoi <script>       # 例: pnpm hoi build
-pnpm utsushi <script>   # 例: pnpm utsushi test
-pnpm build              # すべてのパッケージをビルド
-pnpm biome:check        # すべてのパッケージを lint / format チェック
-pnpm biome:write        # lint / format を自動修正
-```
-
-lint と format は [Biome](https://biomejs.dev/) で行います。共通の設定はルートの `biome.json` にあり、クォートとセミコロンの書き方だけ各パッケージの `biome.json` で上書きしています（hoi はシングルクォート・セミコロンなし、utsushi はダブルクォート・セミコロンあり）。
-
-使えるスクリプトは各パッケージの README を見てください。
-
-## リリース
-
-[release-please](https://github.com/googleapis/release-please) がパッケージごとにリリースを作ります。`main` に入ったコミットのうち、そのパッケージのディレクトリを変更したものがリリースに含まれ、タグは `hoi-vX.Y.Z` / `utsushi-vX.Y.Z` になります。コミットメッセージは [Conventional Commits](https://www.conventionalcommits.org/ja/) で書いてください。
+セットアップ、コマンド、コーディング規約、コミット規約、リリースの流れは [CONTRIBUTING.md](CONTRIBUTING.md) にあります。
 
 ## ライセンス
 

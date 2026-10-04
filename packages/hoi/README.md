@@ -14,33 +14,21 @@ kintone のスレッドやレコードのコメントを選択した場合は、
 
 ## インストール
 
-### 開発版
+Chrome ウェブストアには公開していないので、パッケージ化されていない拡張機能として読み込みます。
 
-1. リポジトリをクローン
+1. 拡張機能のファイルを用意する。次のどちらか
+   - [リリース](https://github.com/cy-takeuchi/chrome-extensions/releases)から `hoi-X.Y.Z-chrome.zip` をダウンロードして展開する
+   - ソースからビルドする
 
-```bash
-git clone https://github.com/cy-takeuchi/chrome-extensions.git
-cd chrome-extensions
-```
+     ```sh
+     git clone https://github.com/cy-takeuchi/chrome-extensions.git
+     cd chrome-extensions
+     pnpm install
+     pnpm hoi build   # packages/hoi/.output/chrome-mv3 にできる
+     ```
 
-2. 依存関係をインストール（リポジトリのルートで実行）
-
-```bash
-pnpm install
-```
-
-3. ビルド
-
-```bash
-cd packages/hoi
-pnpm run build
-```
-
-4. Chrome に読み込み
-   - `chrome://extensions` を開く
-   - 右上の「デベロッパーモード」を有効化
-   - 「パッケージ化されていない拡張機能を読み込む」をクリック
-   - `packages/hoi/.output/chrome-mv3` フォルダを選択
+2. Chrome で `chrome://extensions` を開き、右上の「デベロッパーモード」を有効にする
+3. 「パッケージ化されていない拡張機能を読み込む」で、展開したフォルダ（ビルドした場合は `packages/hoi/.output/chrome-mv3`）を選ぶ
 
 ## 初期設定
 
@@ -79,27 +67,16 @@ pnpm run build
 
 `chrome://extensions/shortcuts` でショートカットを変更できます。
 
+## 仕組み
+
+- Body には、選択したテキストと、いま開いているページの URL を入れます
+- kintone の画面でコメントを選択した場合は、ページの URL の代わりに、そのコメントのパーマリンクを入れます。スペースのスレッド、レコード詳細、通知画面のコメントに対応しています
+- GitHub への登録は、オプション画面で設定したトークンを使って [GitHub GraphQL API](https://docs.github.com/ja/graphql) で行います。トークンは `chrome.storage.sync` に保存されます
+
 ## 開発
 
-```bash
-# 拡張機能を読み込んだブラウザを起動（変更すると自動でリロード）
-pnpm run dev
-
-# 本番ビルド
-pnpm run build
-
-# 型チェック
-pnpm run typecheck
-```
-
-## 技術スタック
-
-- [WXT](https://wxt.dev/)
-- [React](https://react.dev/) 19
-- [Headless UI](https://headlessui.com/)
-- [TypeScript](https://www.typescriptlang.org/)
-- Chrome Extension Manifest V3
+[CONTRIBUTING.md](CONTRIBUTING.md) を見てください。リポジトリ共通のルールは[ルートの CONTRIBUTING.md](../../CONTRIBUTING.md) にあります。
 
 ## ライセンス
 
-MIT
+[MIT](../../LICENSE)
