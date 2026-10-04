@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hoi - 選択したテキストを GitHub Projects に登録</title>
+    <meta
+      name="description"
+      content="kintone などの画面で選択したテキストを、元ページへのリンク付きで GitHub Projects に Draft Issue として登録する Chrome 拡張機能です。"
+    />
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="site-title" href="../">kintone の Chrome 拡張機能</a>
+        <nav class="site-nav">
+          <a href="./" aria-current="page">hoi</a>
+          <a href="../utsushi/">utsushi</a>
+          <a href="https://github.com/cy-takeuchi/chrome-extensions">GitHub</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <h1>hoi</h1>
+        <p class="lead">
+          kintone などの画面で選択したテキストを、元ページへのリンク付きで GitHub Projects に Draft Issue として登録する Chrome 拡張機能です。
+        </p>
+        <div class="actions">
+          <a class="button" href="#install">インストール</a>
+          <a class="button secondary" href="privacy.html">プライバシーポリシー</a>
+        </div>
+      </section>
+
+      <figure class="screenshot">
+        <img
+          src="../images/hoi-dialog.png"
+          alt="kintone のスレッドでコメントを選択し、hoi のダイアログを開いたところ"
+          width="1280"
+          height="800"
+        />
+        <figcaption>kintone のスレッドでコメントを選択してショートカットを押すと、登録用のダイアログが開きます</figcaption>
+      </figure>
+
+      <h2>機能</h2>
+      <ul class="features">
+        <li>
+          <strong>ショートカットひとつで登録</strong>
+          テキストを選択して <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>G</kbd>（Windows は <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>G</kbd>）を押すだけで、登録用のダイアログが開きます。
+        </li>
+        <li>
+          <strong>元ページへのリンク付き</strong>
+          本文には、選択したテキストと、いま開いているページの URL が入ります。あとから元の情報にすぐ戻れます。
+        </li>
+        <li>
+          <strong>kintone のコメントはパーマリンク</strong>
+          スペースのスレッド、レコード詳細、通知画面でコメントを選択した場合は、そのコメントを直接開けるリンクを入れます。
+        </li>
+        <li>
+          <strong>担当者の設定</strong>
+          登録と同時に、自分を担当者にするかどうかを選べます。
+        </li>
+      </ul>
+
+      <h2 id="install">インストール</h2>
+      <ol>
+        <li>
+          <a href="https://github.com/cy-takeuchi/chrome-extensions/releases">GitHub のリリース</a>から
+          <code>hoi-X.Y.Z-chrome.zip</code> をダウンロードして展開します。
+        </li>
+        <li>Chrome で <code>chrome://extensions</code> を開き、右上の「デベロッパーモード」を有効にします。</li>
+        <li>「パッケージ化されていない拡張機能を読み込む」をクリックし、展開したフォルダを選びます。</li>
+      </ol>
+
+      <h2>初期設定</h2>
+      <h3>1. GitHub の Personal Access Token を作る</h3>
+      <ol>
+        <li>
+          GitHub の
+          <a href="https://github.com/settings/tokens">Settings → Developer settings → Personal access tokens → Tokens (classic)</a>
+          を開きます。
+        </li>
+        <li>「Generate new token (classic)」をクリックします。</li>
+        <li>
+          スコープは <code>project</code>（Projects の読み書き）と <code>read:user</code>（担当者の設定に使う自分の情報）を選びます。
+        </li>
+        <li>トークンを生成してコピーします。</li>
+      </ol>
+
+      <h3>2. 拡張機能に設定する</h3>
+      <p>
+        拡張機能のアイコンを右クリックして「オプション」を開き、トークンと、登録先の GitHub Projects の URL（例:
+        <code>https://github.com/users/username/projects/1</code>）を入れて保存します。
+      </p>
+      <figure class="screenshot">
+        <img src="../images/hoi-options.png" alt="hoi のオプション画面" width="1280" height="800" />
+        <figcaption>オプション画面</figcaption>
+      </figure>
+
+      <h2>使い方</h2>
+      <ol>
+        <li>Web ページ上でテキストを選択します。</li>
+        <li><kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>G</kbd>（Windows は <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>G</kbd>）を押します。</li>
+        <li>タイトルを入力し、必要なら本文と担当者を直します。</li>
+        <li>「Project に追加」をクリックします。</li>
+      </ol>
+      <p>ショートカットは <code>chrome://extensions/shortcuts</code> で変更できます。</p>
+
+      <h2>データの扱い</h2>
+      <p>
+        選択したテキストとページの URL は、「Project に追加」をクリックしたときにだけ、GitHub の API に送ります。それ以外のサーバーには送りません。トークンと Project の URL は、ブラウザの拡張機能用の保存領域（Chrome の同期の対象）に保存します。詳しくは<a href="privacy.html">プライバシーポリシー</a>を見てください。
+      </p>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <span>© 2026 Yoshihiko Takeuchi</span>
+        <a href="https://github.com/cy-takeuchi/chrome-extensions/tree/main/packages/hoi">ソースコード（MIT ライセンス）</a>
+        <a href="privacy.html">プライバシーポリシー</a>
+        <span>kintone はサイボウズ株式会社の登録商標です。</span>
+      </div>
+    </footer>
+  </body>
+</html>
