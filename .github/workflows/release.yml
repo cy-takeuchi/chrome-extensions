@@ -41,14 +41,10 @@ jobs:
           cache: 'pnpm'
 
       - run: pnpm install
-      - run: pnpm hoi build
-
-      - name: Create zip
-        working-directory: packages/hoi/dist
-        run: zip -r "$GITHUB_WORKSPACE/hoi-${{ needs.release-please.outputs.hoi_version }}.zip" .
+      - run: pnpm hoi zip
 
       - name: Upload to Release
-        run: gh release upload ${{ needs.release-please.outputs.hoi_tag_name }} hoi-${{ needs.release-please.outputs.hoi_version }}.zip
+        run: gh release upload ${{ needs.release-please.outputs.hoi_tag_name }} packages/hoi/.output/hoi-${{ needs.release-please.outputs.hoi_version }}-chrome.zip
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

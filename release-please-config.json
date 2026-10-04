@@ -3,8 +3,7 @@
   "bootstrap-sha": "7e7ddd1475019da3a5c390a95c5290ef1a800f81",
   "packages": {
     "packages/hoi": {
-      "release-type": "node",
-      "extra-files": ["manifest.json"]
+      "release-type": "node"
     },
     "packages/utsushi": {
       "release-type": "node"
