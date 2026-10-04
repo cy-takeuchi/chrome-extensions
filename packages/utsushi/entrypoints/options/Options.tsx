@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { formatDateTime } from "@/lib/datetime";
 import {
   type AppKey,
   type AppSettings,
@@ -10,7 +11,6 @@ import {
   removePreset,
   saveAppSettings,
 } from "@/lib/settings";
-import { formatDateTime } from "@/lib/template/format";
 
 type Entry = { key: AppKey; settings: AppSettings };
 
