@@ -1,5 +1,5 @@
 import { useMemo, useState, type KeyboardEvent } from "react";
-import { errorMessage, loadCatalog } from "@/lib/actions";
+import { errorMessage } from "@/lib/actions";
 import type { RecordLocation } from "@/lib/kintone/location";
 import {
   defaultPreset,
@@ -7,16 +7,14 @@ import {
   removePreset,
   saveAppSettings,
   upsertPreset,
-  type AppSettings,
   type Preset,
 } from "@/lib/settings";
-import type { Catalog } from "@/lib/template/catalog";
 import { buildDefaultTemplate } from "@/lib/template/defaultTemplate";
 import { refreshLabels } from "@/lib/template/refresh";
 import type { TemplateDoc } from "@/lib/template/schema";
 import { describeProblems, validateTemplate } from "@/lib/template/validate";
 import { TemplateEditor } from "./editor/TemplateEditor";
-import { useAsync } from "./useAsync";
+import { useAppData, type AppData } from "./useAppData";
 
 type Props = {
   loc: RecordLocation;
@@ -27,10 +25,7 @@ type Props = {
 };
 
 export const PresetEditor = ({ loc, presetId, onClose, onSaved }: Props) => {
-  const loaded = useAsync(
-    () => Promise.all([loadAppSettings(loc), loadCatalog(loc)]),
-    [loc.domain, loc.appId],
-  );
+  const loaded = useAppData(loc);
   return (
     <div className="backdrop">
       <div className="panel editor-panel" role="dialog" aria-label="プリセット編集">
@@ -47,8 +42,8 @@ export const PresetEditor = ({ loc, presetId, onClose, onSaved }: Props) => {
           <EditorBody
             loc={loc}
             presetId={presetId}
-            settings={loaded.value[0]}
-            catalog={loaded.value[1]}
+            settings={loaded.value.settings}
+            catalog={loaded.value.catalog}
             onClose={onClose}
             onSaved={onSaved}
           />
@@ -65,7 +60,7 @@ const EditorBody = ({
   catalog,
   onClose,
   onSaved,
-}: Props & { settings: AppSettings; catalog: Catalog }) => {
+}: Props & AppData) => {
   const existing = settings.presets.find((p) => p.id === presetId);
   const initial = useMemo(
     () =>

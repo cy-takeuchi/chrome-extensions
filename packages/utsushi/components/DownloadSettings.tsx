@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { errorMessage, loadCatalog } from "@/lib/actions";
+import { errorMessage } from "@/lib/actions";
 import { fileFields } from "@/lib/files";
 import type { RecordLocation } from "@/lib/kintone/location";
-import { loadAppSettings, saveAppSettings, type AppSettings } from "@/lib/settings";
-import type { Catalog } from "@/lib/template/catalog";
-import { useAsync } from "./useAsync";
+import { loadAppSettings, saveAppSettings } from "@/lib/settings";
+import { useAppData, type AppData } from "./useAppData";
 
 type Props = {
   loc: RecordLocation;
@@ -15,10 +14,7 @@ type Props = {
 
 /** アプリごとの「一括ダウンロードの対象にする添付ファイルフィールド」 */
 export const DownloadSettings = ({ loc, onClose, onSaved }: Props) => {
-  const loaded = useAsync(
-    () => Promise.all([loadAppSettings(loc), loadCatalog(loc)]),
-    [loc.domain, loc.appId],
-  );
+  const loaded = useAppData(loc);
   return (
     <div className="backdrop" onMouseDown={onClose}>
       <div
@@ -34,8 +30,8 @@ export const DownloadSettings = ({ loc, onClose, onSaved }: Props) => {
         {loaded.status === "ready" && (
           <Body
             loc={loc}
-            settings={loaded.value[0]}
-            catalog={loaded.value[1]}
+            settings={loaded.value.settings}
+            catalog={loaded.value.catalog}
             onClose={onClose}
             onSaved={onSaved}
           />
@@ -51,7 +47,7 @@ const Body = ({
   catalog,
   onClose,
   onSaved,
-}: Props & { settings: AppSettings; catalog: Catalog }) => {
+}: Props & AppData) => {
   const fields = fileFields(catalog);
   const [all, setAll] = useState(settings.downloadFieldCodes === null);
   const [codes, setCodes] = useState<Set<string>>(
