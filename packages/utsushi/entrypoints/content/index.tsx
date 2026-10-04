@@ -15,7 +15,8 @@ export default defineContentScript({
       },
     };
     browser.runtime.onMessage.addListener((message: CommandMessage) => {
-      if (message?.type === "command") listeners.forEach((l) => l(message.command));
+      if (message?.type !== "command") return;
+      for (const l of listeners) l(message.command);
     });
 
     const ui = await createShadowRootUi(ctx, {

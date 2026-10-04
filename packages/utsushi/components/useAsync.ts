@@ -17,6 +17,7 @@ export const useAsync = <T>(load: () => Promise<T>, deps: unknown[]): AsyncState
     return () => {
       alive = false;
     };
+    // biome-ignore lint/correctness/useExhaustiveDependencies: 呼び出し側が渡す deps で読み直す
   }, deps);
   return state;
 };

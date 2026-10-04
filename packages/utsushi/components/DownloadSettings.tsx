@@ -16,6 +16,7 @@ type Props = {
 export const DownloadSettings = ({ loc, onClose, onSaved }: Props) => {
   const loaded = useAppData(loc);
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: 背景のクリックで閉じる。キーボードでは Esc で閉じる
     <div className="backdrop" onMouseDown={onClose}>
       <div
         className="panel"
@@ -71,10 +72,12 @@ const Body = ({ loc, settings, catalog, onClose, onSaved }: Props & AppData) => 
   return (
     <>
       <label className="check block">
+        {/* biome-ignore lint/a11y/noAutofocus: 開いたらすぐキーボードで選べるようにする */}
         <input type="radio" checked={all} onChange={() => setAll(true)} autoFocus={all} />
         すべての添付ファイルフィールド
       </label>
       <label className="check block">
+        {/* biome-ignore lint/a11y/noAutofocus: 開いたらすぐキーボードで選べるようにする */}
         <input type="radio" checked={!all} onChange={() => setAll(false)} autoFocus={!all} />
         選んだフィールドだけ
       </label>

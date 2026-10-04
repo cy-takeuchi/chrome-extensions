@@ -17,6 +17,7 @@ export const Palette = ({ loc, onClose, onCopy, onEdit, onDownloadSettings }: Pr
   const settings = useAsync(() => loadAppSettings(loc), [loc.domain, loc.appId, reload]);
   const [selected, setSelected] = useState(0);
   const panelRef = useRef<HTMLDivElement>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: 読み込みが終わってパネルが描画されたらフォーカスする
   useEffect(() => panelRef.current?.focus(), [settings.status]);
 
   if (settings.status !== "ready") return null;
@@ -49,6 +50,7 @@ export const Palette = ({ loc, onClose, onCopy, onEdit, onDownloadSettings }: Pr
   };
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: 背景のクリックで閉じる。キーボードでは Esc で閉じる
     <div className="backdrop" onMouseDown={onClose}>
       <div
         className="panel palette"
@@ -65,6 +67,7 @@ export const Palette = ({ loc, onClose, onCopy, onEdit, onDownloadSettings }: Pr
         ) : (
           <ul className="preset-list">
             {presets.map((p, i) => (
+              // biome-ignore lint/a11y/useKeyWithClickEvents: キーボードではパネルの 1-9 / Enter でコピーする
               <li
                 key={p.id}
                 className={i === selected ? "preset active" : "preset"}

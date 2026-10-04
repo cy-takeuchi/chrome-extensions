@@ -57,10 +57,9 @@ export const PresetEditor = ({ loc, presetId, onClose, onSaved }: Props) => {
 
 const EditorBody = ({ loc, presetId, settings, catalog, onClose, onSaved }: Props & AppData) => {
   const existing = settings.presets.find((p) => p.id === presetId);
-  const initial = useMemo(
-    () => (existing ? refreshLabels(existing.template, catalog) : buildDefaultTemplate(catalog)),
-    // 開いた時点の内容で初期化する
-    [],
+  // 開いた時点の内容で初期化する
+  const [initial] = useState(() =>
+    existing ? refreshLabels(existing.template, catalog) : buildDefaultTemplate(catalog),
   );
   const [name, setName] = useState(existing?.name ?? `プリセット ${settings.presets.length + 1}`);
   const [makeDefault, setMakeDefault] = useState(
@@ -112,6 +111,7 @@ const EditorBody = ({ loc, presetId, settings, catalog, onClose, onSaved }: Prop
   };
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: 入力欄から上がってくる Esc / ⌘Enter をまとめて受ける
     <div className="editor-body" onKeyDown={onKeyDown}>
       <div className="panel-title">
         {existing ? "プリセットを編集" : "プリセットを作成"}（アプリ {loc.appId}）

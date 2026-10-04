@@ -26,6 +26,7 @@ export const collectFiles = (
 export const sanitizeFileName = (name: string): string => {
   const cleaned = name
     // 制御文字と、パスやファイル名に使えない文字
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: 制御文字を取り除くための正規表現
     .replace(/[\u0000-\u001f<>:"/\\|?*~]/g, "_")
     .replace(/^[.\s]+|[.\s]+$/g, "");
   return cleaned === "" ? "file" : cleaned;

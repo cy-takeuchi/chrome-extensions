@@ -18,9 +18,8 @@ export const Options = () => {
   const [message, setMessage] = useState("");
   const [shortcuts, setShortcuts] = useState<{ description?: string; shortcut?: string }[]>([]);
 
-  const reload = async () => setEntries(await loadAllSettings());
-
   useEffect(() => {
+    const reload = async () => setEntries(await loadAllSettings());
     void reload();
     browser.commands.getAll().then(setShortcuts);
     const onChange = () => void reload();

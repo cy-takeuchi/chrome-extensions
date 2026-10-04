@@ -61,17 +61,19 @@ const SuggestionPopup = ({ store }: { store: SuggestionStore }) => {
   const state = useSyncExternalStore(store.subscribe, store.get);
   const listRef = useRef<HTMLUListElement>(null);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: 選択が動いたら選択中の候補が見えるようにスクロールする
   useEffect(() => {
     listRef.current?.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: "nearest" });
   }, [state?.selected]);
 
-  if (!state || !state.rect) return null;
+  if (!state?.rect) return null;
   const { rect, items, selected, select } = state;
   const below = rect.bottom + 260 < window.innerHeight;
   return (
     <ul
       ref={listRef}
       className="suggest"
+      // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: エディタにフォーカスを残したまま出す候補一覧
       role="listbox"
       style={{
         left: Math.min(rect.left, window.innerWidth - 340),
@@ -80,8 +82,11 @@ const SuggestionPopup = ({ store }: { store: SuggestionStore }) => {
     >
       {items.length === 0 && <li className="suggest-empty">該当なし</li>}
       {items.map((c, i) => (
+        // biome-ignore lint/a11y/useFocusableInteractive: 候補はエディタの ↑↓ で選び、フォーカスは移さない
         <li
+          // biome-ignore lint/suspicious/noArrayIndexKey: 同じコードの候補が並ぶことがあるため順番も含める
           key={`${c.kind}:${c.kind === "field" ? c.code : c.attrs.code}:${i}`}
+          // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: 候補一覧の項目
           role="option"
           aria-selected={i === selected}
           className={i === selected ? "suggest-item active" : "suggest-item"}

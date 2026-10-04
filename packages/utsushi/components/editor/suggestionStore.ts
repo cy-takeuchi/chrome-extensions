@@ -11,7 +11,9 @@ export type SuggestionState = {
 export const createSuggestionStore = () => {
   let state: SuggestionState = null;
   const listeners = new Set<() => void>();
-  const emit = () => listeners.forEach((l) => l());
+  const emit = () => {
+    for (const l of listeners) l();
+  };
   return {
     get: () => state,
     set: (next: SuggestionState) => {

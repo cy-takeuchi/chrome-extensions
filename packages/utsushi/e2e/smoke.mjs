@@ -19,7 +19,7 @@ const downloadsDir = await mkdtemp(path.join(tmpdir(), "utsushi-dl-"));
 
 const context = await chromium.launchPersistentContext(userDataDir, {
   executablePath: process.env.CHROMIUM_PATH,
-  headless: process.env.HEADED ? false : true,
+  headless: !process.env.HEADED,
   args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`],
   permissions: ["clipboard-read", "clipboard-write"],
   acceptDownloads: true,
