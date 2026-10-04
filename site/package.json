@@ -10,6 +10,7 @@
   "devDependencies": {
     "@kintone/rest-api-client": "",
     "@playwright/test": "^1.63.0 ^6.2.1",
+    "@types/chrome": "^0.3.4",
     "@types/node": "^26.6.4",
     "typescript": "~7.0.2"
   }
