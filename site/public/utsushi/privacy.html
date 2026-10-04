@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>utsushi のプライバシーポリシー</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="site-title" href="../">kintone の Chrome 拡張機能</a>
+        <nav class="site-nav">
+          <a href="../hoi/">hoi</a>
+          <a href="./" aria-current="page">utsushi</a>
+          <a href="https://github.com/cy-takeuchi/chrome-extensions">GitHub</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <h1>utsushi のプライバシーポリシー</h1>
+        <p class="lead">最終更新日: 2026 年 10 月 5 日</p>
+      </section>
+
+      <p>
+        このページでは、Chrome 拡張機能「utsushi」（以下「本拡張機能」）が扱う情報と、その扱い方を説明します。
+      </p>
+
+      <h2>扱う情報</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>情報</th>
+            <th>使い道</th>
+            <th>保存・送信先</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>kintone のレコード、コメント、フォームの定義</td>
+            <td>テンプレートに差し込んでテキストにするため</td>
+            <td>
+              ショートカットを押したときに、開いている kintone から kintone の REST API で読み取ります。作ったテキストはクリップボードに書くだけで、本拡張機能の中には保存しません
+            </td>
+          </tr>
+          <tr>
+            <td>kintone のレコードの添付ファイル</td>
+            <td>一括ダウンロードのため</td>
+            <td>kintone から、パソコンのダウンロードフォルダに保存します</td>
+          </tr>
+          <tr>
+            <td>プリセット（テンプレート）とダウンロード設定</td>
+            <td>次回以降も同じ形式でコピーするため</td>
+            <td>
+              ブラウザの <code>chrome.storage.local</code>。kintone のドメインとアプリ ID ごとに保存します。同期はしません
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        kintone へのアクセスには、ブラウザでログイン中の kintone のセッションを使います。ID やパスワードを本拡張機能が扱うことはありません。
+      </p>
+
+      <h2>収集しない情報</h2>
+      <ul>
+        <li>kintone 以外のサイトでは動きません。</li>
+        <li>利用状況の計測（アクセス解析）や広告のための情報は収集しません。</li>
+        <li>開発者のサーバーはありません。読み取った情報を kintone 以外の第三者に送ることはありません。</li>
+      </ul>
+
+      <h2>権限の用途</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>権限</th>
+            <th>用途</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>https://*.cybozu.com/*</code>、<code>https://*.kintone.com/*</code></td>
+            <td>kintone の画面にプリセットの画面を表示し、REST API でレコードを読み取るため</td>
+          </tr>
+          <tr>
+            <td><code>clipboardWrite</code></td>
+            <td>作ったテキストをクリップボードに書くため</td>
+          </tr>
+          <tr>
+            <td><code>downloads</code></td>
+            <td>添付ファイルを一括ダウンロードするため</td>
+          </tr>
+          <tr>
+            <td><code>storage</code>、<code>unlimitedStorage</code></td>
+            <td>プリセットを保存するため。プリセットが多くなっても保存できるように容量の制限をなくしています</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>情報の削除</h2>
+      <p>
+        オプション画面から、プリセットをアプリごとに、またはすべて削除できます。本拡張機能をアンインストールすると、保存した情報はすべて削除されます。ダウンロードしたファイルとクリップボードの内容は、パソコン上で削除してください。
+      </p>
+
+      <h2>お問い合わせ</h2>
+      <p>
+        本ポリシーや本拡張機能についての質問は、
+        <a href="https://github.com/cy-takeuchi/chrome-extensions/issues">GitHub の Issues</a> にお寄せください。
+      </p>
+
+      <h2>改定</h2>
+      <p>本ポリシーを変更した場合は、このページで公開し、最終更新日を更新します。</p>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <span>© 2026 Yoshihiko Takeuchi</span>
+        <a href="https://github.com/cy-takeuchi/chrome-extensions/tree/main/packages/utsushi">ソースコード（MIT ライセンス）</a>
+        <span>kintone はサイボウズ株式会社の登録商標です。</span>
+      </div>
+    </footer>
+  </body>
+</html>
