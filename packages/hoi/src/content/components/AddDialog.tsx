@@ -1,13 +1,48 @@
-import { useEffect, useRef, useState } from 'react'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
 import type { DraftInput } from '../../lib/messages'
+
+export type DialogStatus = 'idle' | 'loading' | 'success' | 'error'
 
 interface AddDialogProps {
   isOpen: boolean
   initialBody: string
   onClose: () => void
   onSubmit: (data: DraftInput) => void
-  status?: 'idle' | 'loading' | 'success' | 'error'
+  status?: DialogStatus
   errorMessage?: string
+}
+
+interface DialogFrameProps {
+  label: string
+  /** false の間は背景クリックや Enter で閉じない */
+  closable: boolean
+  onClose: () => void
+  children: ReactNode
+}
+
+/**
+ * 背景とパネルの外枠。キーイベントはページ側のショートカットに渡さない
+ */
+function DialogFrame({ label, closable, onClose, children }: DialogFrameProps) {
+  return (
+    <div
+      className="tgp-dialog-root"
+      role="dialog"
+      aria-label={label}
+      onKeyDown={(e) => e.stopPropagation()}
+      onKeyUp={(e) => e.stopPropagation()}
+    >
+      <div
+        className="tgp-backdrop"
+        onClick={closable ? onClose : undefined}
+        onKeyDown={(e) => closable && e.key === 'Enter' && onClose()}
+        role="button"
+        tabIndex={closable ? 0 : -1}
+        aria-label="Close dialog"
+      />
+      <div className="tgp-dialog-container">{children}</div>
+    </div>
+  )
 }
 
 export function AddDialog({
@@ -62,155 +97,123 @@ export function AddDialog({
 
   if (isSuccess) {
     return (
-      <div
-        className="tgp-dialog-root"
-        role="dialog"
-        aria-label="Added to Project"
-        onKeyDown={(e) => e.stopPropagation()}
-        onKeyUp={(e) => e.stopPropagation()}
-      >
-        <div
-          className="tgp-backdrop"
-          onClick={onClose}
-          onKeyDown={(e) => e.key === 'Enter' && onClose()}
-          role="button"
-          tabIndex={0}
-          aria-label="Close dialog"
-        />
-        <div className="tgp-dialog-container">
-          <div className="tgp-dialog-panel tgp-success-panel">
-            <div className="tgp-success-icon">✓</div>
-            <h2 className="tgp-success-title">Added to Project!</h2>
-            <p className="tgp-success-message">The draft issue has been created successfully.</p>
-            <button type="button" className="tgp-button primary" onClick={onClose}>
-              Close
-            </button>
-          </div>
+      <DialogFrame label="Added to Project" closable onClose={onClose}>
+        <div className="tgp-dialog-panel tgp-success-panel">
+          <div className="tgp-success-icon">✓</div>
+          <h2 className="tgp-success-title">Added to Project!</h2>
+          <p className="tgp-success-message">The draft issue has been created successfully.</p>
+          <button type="button" className="tgp-button primary" onClick={onClose}>
+            Close
+          </button>
         </div>
-      </div>
+      </DialogFrame>
     )
   }
 
   return (
-    <div
-      className="tgp-dialog-root"
-      role="dialog"
-      aria-label="Add to GitHub Projects"
-      onKeyDown={(e) => e.stopPropagation()}
-      onKeyUp={(e) => e.stopPropagation()}
-    >
-      <div
-        className="tgp-backdrop"
-        onClick={isLoading ? undefined : onClose}
-        onKeyDown={(e) => !isLoading && e.key === 'Enter' && onClose()}
-        role="button"
-        tabIndex={isLoading ? -1 : 0}
-        aria-label="Close dialog"
-      />
-      <div className="tgp-dialog-container">
-        <div className="tgp-dialog-panel">
-          <h2 className="tgp-dialog-title">Add to GitHub Projects</h2>
+    <DialogFrame label="Add to GitHub Projects" closable={!isLoading} onClose={onClose}>
+      <div className="tgp-dialog-panel">
+        <h2 className="tgp-dialog-title">Add to GitHub Projects</h2>
 
-          {errorMessage && (
-            <div className="tgp-error-banner">
-              <span className="tgp-error-icon">!</span>
-              <span>{errorMessage}</span>
-            </div>
-          )}
+        {errorMessage && (
+          <div className="tgp-error-banner">
+            <span className="tgp-error-icon">!</span>
+            <span>{errorMessage}</span>
+          </div>
+        )}
 
-          <form onSubmit={handleSubmit}>
-            <div className="tgp-field">
-              <label htmlFor="tgp-title" className="tgp-label">
-                Title
+        <form onSubmit={handleSubmit}>
+          <div className="tgp-field">
+            <label htmlFor="tgp-title" className="tgp-label">
+              Title
+            </label>
+            <input
+              ref={titleInputRef}
+              id="tgp-title"
+              type="text"
+              className="tgp-input"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter a title..."
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="tgp-field">
+            <label htmlFor="tgp-body" className="tgp-label">
+              Body
+            </label>
+            <textarea
+              id="tgp-body"
+              className="tgp-textarea"
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              rows={6}
+              placeholder="Enter description..."
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="tgp-field">
+            <span className="tgp-label">Assignees</span>
+            <div className="tgp-radio-group" role="radiogroup" aria-label="Assignee options">
+              <label className="tgp-radio">
+                <span className={`tgp-radio-option ${assignToSelf ? 'checked' : ''}`}>
+                  <input
+                    type="radio"
+                    name="assignee"
+                    checked={assignToSelf}
+                    onChange={() => setAssignToSelf(true)}
+                    disabled={isLoading}
+                    className="tgp-radio-input"
+                  />
+                  <span className="tgp-radio-indicator" />
+                  Assign to myself
+                </span>
               </label>
-              <input
-                ref={titleInputRef}
-                id="tgp-title"
-                type="text"
-                className="tgp-input"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter a title..."
-                disabled={isLoading}
-              />
-            </div>
-
-            <div className="tgp-field">
-              <label htmlFor="tgp-body" className="tgp-label">
-                Body
+              <label className="tgp-radio">
+                <span className={`tgp-radio-option ${!assignToSelf ? 'checked' : ''}`}>
+                  <input
+                    type="radio"
+                    name="assignee"
+                    checked={!assignToSelf}
+                    onChange={() => setAssignToSelf(false)}
+                    disabled={isLoading}
+                    className="tgp-radio-input"
+                  />
+                  <span className="tgp-radio-indicator" />
+                  Do not assign
+                </span>
               </label>
-              <textarea
-                id="tgp-body"
-                className="tgp-textarea"
-                value={body}
-                onChange={(e) => setBody(e.target.value)}
-                rows={6}
-                placeholder="Enter description..."
-                disabled={isLoading}
-              />
             </div>
+          </div>
 
-            <div className="tgp-field">
-              <span className="tgp-label">Assignees</span>
-              <div className="tgp-radio-group" role="radiogroup" aria-label="Assignee options">
-                <label className="tgp-radio">
-                  <span className={`tgp-radio-option ${assignToSelf ? 'checked' : ''}`}>
-                    <input
-                      type="radio"
-                      name="assignee"
-                      checked={assignToSelf}
-                      onChange={() => setAssignToSelf(true)}
-                      disabled={isLoading}
-                      className="tgp-radio-input"
-                    />
-                    <span className="tgp-radio-indicator" />
-                    Assign to myself
-                  </span>
-                </label>
-                <label className="tgp-radio">
-                  <span className={`tgp-radio-option ${!assignToSelf ? 'checked' : ''}`}>
-                    <input
-                      type="radio"
-                      name="assignee"
-                      checked={!assignToSelf}
-                      onChange={() => setAssignToSelf(false)}
-                      disabled={isLoading}
-                      className="tgp-radio-input"
-                    />
-                    <span className="tgp-radio-indicator" />
-                    Do not assign
-                  </span>
-                </label>
-              </div>
-            </div>
-
-            <div className="tgp-actions">
-              <button
-                type="button"
-                className="tgp-button secondary"
-                onClick={onClose}
-                disabled={isLoading}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="tgp-button primary"
-                disabled={isLoading || !title.trim()}
-              >
-                {isLoading ? (
-                  <>
-                    <span className="tgp-spinner" />
-                    Adding...
-                  </>
-                ) : (
-                  'Add to Project'
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className="tgp-actions">
+            <button
+              type="button"
+              className="tgp-button secondary"
+              onClick={onClose}
+              disabled={isLoading}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="tgp-button primary"
+              disabled={isLoading || !title.trim()}
+            >
+              {isLoading ? (
+                <>
+                  <span className="tgp-spinner" />
+                  Adding...
+                </>
+              ) : (
+                'Add to Project'
+              )}
+            </button>
+          </div>
+        </form>
       </div>
-    </div>
+    </DialogFrame>
   )
 }

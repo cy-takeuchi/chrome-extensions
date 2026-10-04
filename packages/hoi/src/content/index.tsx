@@ -5,7 +5,7 @@ import type {
   SubmitDraftResponse,
   TriggerDialogMessage,
 } from '../lib/messages'
-import { AddDialog } from './components/AddDialog'
+import { AddDialog, type DialogStatus } from './components/AddDialog'
 import dialogStyles from './dialog.css?inline'
 import {
   findActiveSelectionContext,
@@ -19,7 +19,7 @@ let reactRoot: Root | null = null
 interface DialogState {
   isOpen: boolean
   initialBody: string
-  status: 'idle' | 'loading' | 'success' | 'error'
+  status: DialogStatus
   errorMessage?: string
 }
 
