@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import {
+  defaultPreset,
+  emptySettings,
   exportAll,
   importAll,
   loadAllSettings,
@@ -33,7 +35,7 @@ export const Options = () => {
 
   const deleteApp = async ({ key }: Entry) => {
     if (!confirm(`${key.domain} のアプリ ${key.appId} の設定をすべて削除しますか？`)) return;
-    await saveAppSettings(key, { presets: [], defaultPresetId: null, downloadFieldCodes: null });
+    await saveAppSettings(key, emptySettings());
   };
 
   const download = async () => {
@@ -103,7 +105,7 @@ export const Options = () => {
                 {entry.settings.presets.map((p) => (
                   <li key={p.id}>
                     {p.name}
-                    {p.id === (entry.settings.defaultPresetId ?? entry.settings.presets[0]?.id) && (
+                    {p.id === defaultPreset(entry.settings)?.id && (
                       <span className="badge">デフォルト</span>
                     )}
                     <span className="muted"> 更新 {p.updatedAt.slice(0, 10)}</span>

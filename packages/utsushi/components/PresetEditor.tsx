@@ -2,6 +2,7 @@ import { useMemo, useState, type KeyboardEvent } from "react";
 import { errorMessage, loadCatalog } from "@/lib/actions";
 import type { RecordLocation } from "@/lib/kintone/location";
 import {
+  defaultPreset,
   loadAppSettings,
   removePreset,
   saveAppSettings,
@@ -78,7 +79,7 @@ const EditorBody = ({
     existing?.name ?? `プリセット ${settings.presets.length + 1}`,
   );
   const [makeDefault, setMakeDefault] = useState(
-    existing ? existing.id === (settings.defaultPresetId ?? settings.presets[0]?.id) : settings.presets.length === 0,
+    existing ? existing.id === defaultPreset(settings)?.id : settings.presets.length === 0,
   );
   const [doc, setDoc] = useState<TemplateDoc>(initial);
   const [dirty, setDirty] = useState(false);

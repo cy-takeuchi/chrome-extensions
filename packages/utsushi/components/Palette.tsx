@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import type { RecordLocation } from "@/lib/kintone/location";
-import { loadAppSettings, saveAppSettings, type Preset } from "@/lib/settings";
+import { defaultPreset, loadAppSettings, saveAppSettings, type Preset } from "@/lib/settings";
 import { useAsync } from "./useAsync";
 
 type Props = {
@@ -20,7 +20,8 @@ export const Palette = ({ loc, onClose, onCopy, onEdit, onDownloadSettings }: Pr
   useEffect(() => panelRef.current?.focus(), [settings.status]);
 
   if (settings.status !== "ready") return null;
-  const { presets, defaultPresetId } = settings.value;
+  const { presets } = settings.value;
+  const defaultId = defaultPreset(settings.value)?.id;
   const current = presets[selected];
 
   const setDefault = async (preset: Preset) => {
@@ -72,7 +73,7 @@ export const Palette = ({ loc, onClose, onCopy, onEdit, onDownloadSettings }: Pr
               >
                 <span className="preset-key">{i < 9 ? i + 1 : ""}</span>
                 <span className="preset-name">{p.name}</span>
-                {p.id === (defaultPresetId ?? presets[0]?.id) && (
+                {p.id === defaultId && (
                   <span className="badge">デフォルト</span>
                 )}
                 <button
