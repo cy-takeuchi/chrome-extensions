@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
+import type { DraftInput } from '../../lib/messages'
 
 interface AddDialogProps {
   isOpen: boolean
   initialBody: string
   onClose: () => void
-  onSubmit: (data: { title: string; body: string; assignToSelf: boolean }) => void
+  onSubmit: (data: DraftInput) => void
   status?: 'idle' | 'loading' | 'success' | 'error'
   errorMessage?: string
 }

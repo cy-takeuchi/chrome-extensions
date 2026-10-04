@@ -1,37 +1,33 @@
 import { addDraftIssue, getProjectId, getViewer } from '../lib/github'
+import type {
+  DraftInput,
+  SubmitDraftMessage,
+  SubmitDraftResponse,
+  TriggerDialogMessage,
+} from '../lib/messages'
 import { getSettings, parseProjectUrl } from '../lib/storage'
-
-interface SubmitDraftPayload {
-  title: string
-  body: string
-  assignToSelf: boolean
-}
 
 chrome.commands.onCommand.addListener((command) => {
   if (command === 'add-to-project') {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tab = tabs[0]
       if (tab?.id) {
-        chrome.tabs.sendMessage(tab.id, { type: 'TRIGGER_DIALOG' }, { frameId: 0 })
+        const message: TriggerDialogMessage = { type: 'TRIGGER_DIALOG' }
+        chrome.tabs.sendMessage(tab.id, message, { frameId: 0 })
       }
     })
   }
 })
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message: SubmitDraftMessage, _sender, sendResponse) => {
   if (message.type === 'SUBMIT_DRAFT') {
-    handleSubmitDraft(message.payload, sender.tab?.id)
-      .then((result) => sendResponse(result))
-      .catch((error) => sendResponse({ success: false, error: error.message }))
+    handleSubmitDraft(message.payload).then(sendResponse)
     return true // Keep the message channel open for async response
   }
   return false
 })
 
-async function handleSubmitDraft(
-  payload: SubmitDraftPayload,
-  tabId?: number,
-): Promise<{ success: boolean; error?: string }> {
+async function handleSubmitDraft(payload: DraftInput): Promise<SubmitDraftResponse> {
   try {
     const settings = await getSettings()
 
@@ -72,20 +68,10 @@ async function handleSubmitDraft(
     // Create draft issue
     await addDraftIssue(settings.githubToken, projectId, payload.title, payload.body, assigneeIds)
 
-    // Notify content script of success
-    if (tabId) {
-      chrome.tabs.sendMessage(tabId, { type: 'RESULT', success: true })
-    }
-
     return { success: true }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
     console.error('Failed to submit draft:', errorMessage)
-
-    if (tabId) {
-      chrome.tabs.sendMessage(tabId, { type: 'RESULT', success: false, error: errorMessage })
-    }
-
     return { success: false, error: errorMessage }
   }
 }

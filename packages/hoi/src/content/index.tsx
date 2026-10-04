@@ -1,4 +1,10 @@
 import { createRoot, type Root } from 'react-dom/client'
+import type {
+  DraftInput,
+  SubmitDraftMessage,
+  SubmitDraftResponse,
+  TriggerDialogMessage,
+} from '../lib/messages'
 import { AddDialog } from './components/AddDialog'
 import dialogStyles from './dialog.css?inline'
 import {
@@ -72,10 +78,11 @@ const closeDialog = () => {
   })
 }
 
-const handleSubmit = (data: { title: string; body: string; assignToSelf: boolean }) => {
+const handleSubmit = (data: DraftInput) => {
   updateDialogState({ status: 'loading', errorMessage: undefined })
 
-  chrome.runtime.sendMessage({ type: 'SUBMIT_DRAFT', payload: data }, (response) => {
+  const message: SubmitDraftMessage = { type: 'SUBMIT_DRAFT', payload: data }
+  chrome.runtime.sendMessage(message, (response?: SubmitDraftResponse) => {
     if (chrome.runtime.lastError) {
       updateDialogState({
         status: 'error',
@@ -129,26 +136,14 @@ const handleTriggerDialog = async (): Promise<void> => {
   showDialog(bodyWithUrl)
 }
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message: TriggerDialogMessage, _sender, sendResponse) => {
   if (message.type === 'TRIGGER_DIALOG') {
     handleTriggerDialog().then(() => {
       sendResponse({ success: true })
     })
     return true // Keep message channel open for async response
   }
-  if (message.type === 'RESULT') {
-    // Handle result from background script (if needed for additional notifications)
-    if (message.success) {
-      updateDialogState({ status: 'success' })
-    } else {
-      updateDialogState({
-        status: 'error',
-        errorMessage: message.error || 'An unknown error occurred',
-      })
-    }
-    sendResponse({ received: true })
-  }
-  return true
+  return false
 })
 
 console.log('hoi: Content script loaded')
