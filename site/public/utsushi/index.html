@@ -41,11 +41,15 @@
           width="1280"
           height="800"
         />
-        <figcaption>レコード詳細画面でショートカットを押すと、プリセットの形式でレコードをコピーします</figcaption>
+        <figcaption>レコード詳細画面で <kbd>⌥</kbd> <kbd>⇧</kbd> <kbd>C</kbd> → <kbd>Enter</kbd> と押すと、いつもの形式でレコードをコピーします</figcaption>
       </figure>
 
       <h2>機能</h2>
       <ul class="features">
+        <li>
+          <strong>ショートカットひとつ</strong>
+          <kbd>⌥</kbd> <kbd>⇧</kbd> <kbd>C</kbd> でメニューを開き、<kbd>Enter</kbd> でいつもの形式でコピーします。添付ファイルのダウンロードも同じメニューから行えます。
+        </li>
         <li>
           <strong>テンプレートでコピー</strong>
           レコードのフィールドとコメントを、自分で決めた形式（プリセット）に差し込んでクリップボードにコピーします。チャットへの共有や、報告書の下書きに使えます。
@@ -96,8 +100,28 @@
             <td>その番号のプリセットでコピー</td>
           </tr>
           <tr>
+            <td><kbd>↑</kbd> <kbd>↓</kbd></td>
+            <td>プリセットを選ぶ</td>
+          </tr>
+          <tr>
+            <td><kbd>⌥</kbd> <kbd>↑</kbd> / <kbd>⌥</kbd> <kbd>↓</kbd></td>
+            <td>選んでいるプリセットを上下に動かす</td>
+          </tr>
+          <tr>
+            <td><kbd>e</kbd> / <kbd>n</kbd></td>
+            <td>選んでいるプリセットを編集 / 新規作成</td>
+          </tr>
+          <tr>
+            <td><kbd>Delete</kbd></td>
+            <td>選んでいるプリセットを削除（確認あり）</td>
+          </tr>
+          <tr>
             <td><kbd>d</kbd></td>
             <td>添付ファイルを一括ダウンロード</td>
+          </tr>
+          <tr>
+            <td><kbd>⇧</kbd> <kbd>D</kbd></td>
+            <td>ダウンロード設定</td>
           </tr>
           <tr>
             <td><kbd>Esc</kbd></td>
@@ -105,11 +129,13 @@
           </tr>
         </tbody>
       </table>
-      <p>ショートカットは <code>chrome://extensions/shortcuts</code> で変更できます。</p>
+      <p>
+        ショートカットは <code>chrome://extensions/shortcuts</code> で変更できます。プリセットの編集画面やダウンロード設定からは、<kbd>Esc</kbd> か「戻る」でメニューに戻ります。
+      </p>
 
       <h3>プリセットを作る</h3>
       <p>
-        はじめてコピーするときは、そのアプリの全フィールドを並べたテンプレートが入った作成画面が開きます。不要な行を消せば、そのまま使えます。
+        プリセットが無いアプリでメニューを開いて <kbd>Enter</kbd> を押すと（または <kbd>n</kbd>）、そのアプリの全フィールドを並べたテンプレートが入った作成画面が開きます。不要な行を消せば、そのまま使えます。
       </p>
       <figure class="screenshot">
         <img src="../images/utsushi-editor.png" alt="utsushi のプリセット作成画面" width="1280" height="800" />
@@ -163,14 +189,15 @@
 確認しました。明日、先方に送付します。 </code></pre>
       <!-- utsushi-copied:end -->
 
-      <h3>プリセットを切り替える</h3>
+      <h3>プリセットを並べ替える</h3>
       <p>
-        メニューでは、<kbd>↑</kbd> <kbd>↓</kbd> でプリセットを選び、<kbd>e</kbd> で編集、<kbd>n</kbd> で新規作成、<kbd>Delete</kbd> で削除します。
-        <kbd>⌥</kbd> <kbd>↑</kbd> <kbd>↓</kbd> か、行の左端のつまみのドラッグで並び替えられ、先頭のプリセットがメニューを開いた直後に選ばれます。
+        メニューを開いた直後は、先頭のプリセットが選ばれています。よく使うプリセットを先頭に置いておけば、<kbd>⌥</kbd> <kbd>⇧</kbd> <kbd>C</kbd> → <kbd>Enter</kbd> だけでコピーできます。
+        並べ替えは、行の左端のつまみをドラッグするか、<kbd>⌥</kbd> <kbd>↑</kbd> / <kbd>⌥</kbd> <kbd>↓</kbd> で行います。
       </p>
+      <p>各行の右端のボタンで、コピー・編集・削除もできます。</p>
       <figure class="screenshot">
         <img src="../images/utsushi-palette.png" alt="utsushi のメニュー" width="1280" height="800" />
-        <figcaption>メニュー</figcaption>
+        <figcaption>メニュー。プリセットの並べ替えと、添付ファイルのダウンロードもここから</figcaption>
       </figure>
 
       <h3>添付ファイルを一括ダウンロードする</h3>
