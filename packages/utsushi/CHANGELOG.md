@@ -17,11 +17,6 @@
 * **utsushi:** order presets in the menu instead of a default preset ([c99bf6a](https://github.com/cy-takeuchi/chrome-extensions/commit/c99bf6aecdf6eb7af9932a88c741f464cc4318d9))
 * **utsushi:** use icon buttons for copy, edit and delete in the menu ([4e31f9e](https://github.com/cy-takeuchi/chrome-extensions/commit/4e31f9ec53bf4818a18452711c503aa203ee4d1e))
 
-
-### Bug Fixes
-
-* **hoi:** open the dialog on tabs opened before the extension loaded ([2f817b9](https://github.com/cy-takeuchi/chrome-extensions/commit/2f817b92bdfcc623cefa60618e9252ca50c50992))
-
 ## [0.1.1](https://github.com/cy-takeuchi/chrome-extensions/compare/utsushi-v0.1.0...utsushi-v0.1.1) (2026-10-04)
 
 
