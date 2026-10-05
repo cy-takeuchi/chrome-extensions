@@ -203,19 +203,34 @@ assert.deepEqual(await presetNames(), ["要約", "プリセット 1"], "並び�
 await page.keyboard.press("Enter");
 await toast.filter({ hasText: "「要約」でコピーしました" }).waitFor();
 
-step("メニューの Delete で削除する（確認でキャンセルしたら残す）");
+step("つまみのドラッグで並び替える（つまみのクリックではコピーしない）");
 await send("open-menu");
 await host.locator(".palette").waitFor();
+const handles = host.locator(".drag-handle");
+await handles.nth(0).click();
+await page.waitForTimeout(300);
+assert.equal(await host.locator(".palette").count(), 1, "メニューは開いたまま");
+await handles.nth(1).dragTo(host.locator(".preset").nth(0));
+await host.locator(".preset").nth(0).filter({ hasText: "プリセット 1" }).waitFor();
+await page.keyboard.press("Escape");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+assert.deepEqual(await presetNames(), ["プリセット 1", "要約"], "並び順は保存される");
+
+step("メニューの Delete で削除する（確認でキャンセルしたら残す）");
 page.once("dialog", (d) => d.dismiss());
 await page.keyboard.press("Delete");
 await page.waitForTimeout(300);
-assert.deepEqual(await presetNames(), ["要約", "プリセット 1"]);
+assert.deepEqual(await presetNames(), ["プリセット 1", "要約"]);
 page.once("dialog", (d) => d.accept());
 await page.keyboard.press("Delete");
-await host.locator(".preset-name").filter({ hasText: "要約" }).waitFor({ state: "detached" });
-assert.deepEqual(await presetNames(), ["プリセット 1"]);
+await host
+  .locator(".preset-name")
+  .filter({ hasText: "プリセット 1" })
+  .waitFor({ state: "detached" });
+assert.deepEqual(await presetNames(), ["要約"]);
 await page.keyboard.press("Enter");
-await toast.filter({ hasText: "「プリセット 1」でコピーしました" }).waitFor();
+await toast.filter({ hasText: "「要約」でコピーしました" }).waitFor();
 
 await context.close();
 console.log("ok");

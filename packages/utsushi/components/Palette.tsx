@@ -35,6 +35,8 @@ export const Palette = ({
   // 開いた直後は先頭を選んでおき、Enter だけでコピーできるようにする
   const [selected, setSelected] = useState(0);
   const [dragging, setDragging] = useState<string | null>(null);
+  // つまみを押している行だけドラッグできるようにする。行のクリックはコピーなので
+  const [grabbed, setGrabbed] = useState<string | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -118,7 +120,7 @@ export const Palette = ({
                 className={["preset", i === selected && "active", p.id === dragging && "dragging"]
                   .filter(Boolean)
                   .join(" ")}
-                draggable
+                draggable={p.id === grabbed}
                 onDragStart={(e) => {
                   e.dataTransfer.effectAllowed = "move";
                   setDragging(p.id);
@@ -139,12 +141,26 @@ export const Palette = ({
                 onDragEnd={() => {
                   const id = dragging;
                   setDragging(null);
+                  setGrabbed(null);
                   const to = presets.findIndex((x) => x.id === id);
                   if (id) void update((s) => movePreset(s, id, to));
                 }}
                 onMouseEnter={() => !dragging && setSelected(i)}
-                onClick={() => onCopy(p)}
+                onClick={(e) => {
+                  // つまみのクリックではコピーしない
+                  if ((e.target as Element).closest(".drag-handle")) return;
+                  onCopy(p);
+                }}
               >
+                {/* biome-ignore lint/a11y/noStaticElementInteractions: マウスでの並び替え用。キーボードでは ⌥↑↓ */}
+                <span
+                  className="drag-handle"
+                  title="ドラッグで並び替え（⌥↑↓ でも）"
+                  onMouseDown={() => setGrabbed(p.id)}
+                  onMouseUp={() => setGrabbed(null)}
+                >
+                  <GripIcon />
+                </span>
                 <span className="preset-key">{i < 9 ? i + 1 : ""}</span>
                 <span className="preset-name">{p.name}</span>
                 <button
@@ -193,3 +209,13 @@ export const Palette = ({
     </div>
   );
 };
+
+/** 6 つの点のつまみ */
+const GripIcon = () => (
+  <svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true">
+    {[3, 8, 13].flatMap((y) => [
+      <circle key={`l${y}`} cx="2.5" cy={y} r="1.5" />,
+      <circle key={`r${y}`} cx="7.5" cy={y} r="1.5" />,
+    ])}
+  </svg>
+);

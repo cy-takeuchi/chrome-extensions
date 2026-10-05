@@ -199,6 +199,23 @@ input.name {
   opacity: 0.5;
 }
 
+.drag-handle {
+  display: flex;
+  padding: 2px;
+  margin: -2px 0;
+  color: #8c959f;
+  fill: currentColor;
+  cursor: grab;
+}
+
+.drag-handle:hover {
+  color: #424a53;
+}
+
+.preset.dragging .drag-handle {
+  cursor: grabbing;
+}
+
 .keys {
   margin-top: 12px;
   font-size: 12px;
