@@ -15,9 +15,11 @@ type Props = {
   catalog: Catalog;
   brokenCodes: ReadonlySet<string>;
   onChange: (doc: TemplateDoc) => void;
+  /** 候補を出していないときの Esc */
+  onEscape: () => void;
 };
 
-export const TemplateEditor = ({ initial, catalog, brokenCodes, onChange }: Props) => {
+export const TemplateEditor = ({ initial, catalog, brokenCodes, onChange, onEscape }: Props) => {
   const store = useMemo(createSuggestionStore, []);
   const catalogRef = useRef(catalog);
   catalogRef.current = catalog;
@@ -49,7 +51,17 @@ export const TemplateEditor = ({ initial, catalog, brokenCodes, onChange }: Prop
 
   return (
     <BrokenCodesContext.Provider value={brokenCodes}>
-      <div className="editor">
+      {/* ProseMirror は Esc を必ず preventDefault するので、エディタより先に受ける。
+          候補を出しているときの Esc は候補を閉じるのに使う */}
+      <div
+        className="editor"
+        onKeyDownCapture={(e) => {
+          if (e.key !== "Escape" || e.nativeEvent.isComposing || store.get() !== null) return;
+          e.preventDefault();
+          e.stopPropagation();
+          onEscape();
+        }}
+      >
         <EditorContent editor={editor} />
         <SuggestionPopup store={store} />
       </div>

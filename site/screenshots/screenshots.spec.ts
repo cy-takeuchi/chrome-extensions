@@ -161,8 +161,10 @@ test('utsushi', async () => {
   const toast = ui.locator('.toast')
   const editor = ui.locator('.tiptap')
 
-  // プリセットが無いので、既定テンプレート入りの作成画面が開く
-  await send('copy-default')
+  // プリセットが無いので、Enter で既定テンプレート入りの作成画面が開く
+  await send('open-menu')
+  await ui.locator('.palette').waitFor()
+  await page.keyboard.press('Enter')
   await editor.waitFor()
   await page.waitForTimeout(500)
   await shot(page, 'utsushi-editor')
@@ -174,7 +176,7 @@ test('utsushi', async () => {
   await embedSample('utsushi/index.html', 'utsushi-copied', anonymizeText(copied))
 
   // 2 つ目のプリセットを作りながら、@ の候補を出す
-  await send('open-palette')
+  await send('open-menu')
   await ui.locator('.palette').waitFor()
   await page.keyboard.press('n')
   await editor.waitFor()
@@ -208,11 +210,11 @@ test('utsushi', async () => {
   await ui.getByRole('button', { name: '保存', exact: true }).click()
   await toast.filter({ hasText: '保存しました' }).waitFor()
 
-  await send('open-palette')
+  await send('open-menu')
   await ui.locator('.palette').waitFor()
   await shot(page, 'utsushi-palette')
 
-  await page.keyboard.press('d')
+  await page.keyboard.press('Shift+D')
   await ui.getByText('一括ダウンロードの対象').waitFor()
   await ui.getByText('すべての添付ファイルフィールド').waitFor()
   await shot(page, 'utsushi-download')

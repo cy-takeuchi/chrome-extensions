@@ -3,7 +3,6 @@ import { formatDateTime } from "@/lib/datetime";
 import {
   type AppKey,
   type AppSettings,
-  defaultPreset,
   emptySettings,
   exportAll,
   importAll,
@@ -80,7 +79,8 @@ export const Options = () => {
         </table>
         <p className="muted">
           変更は <code>chrome://extensions/shortcuts</code> で行えます。
-          プリセットの作成・編集は、kintone のレコード詳細画面でパレットを開いて行います。
+          プリセットの作成・編集は、kintone
+          のレコード詳細画面で上のショートカットからメニューを開いて行います。
         </p>
       </section>
 
@@ -105,9 +105,6 @@ export const Options = () => {
                 {entry.settings.presets.map((p) => (
                   <li key={p.id}>
                     {p.name}
-                    {p.id === defaultPreset(entry.settings)?.id && (
-                      <span className="badge">デフォルト</span>
-                    )}
                     <span className="muted"> 更新 {formatDateTime(p.updatedAt).slice(0, 10)}</span>
                     <button
                       type="button"

@@ -97,13 +97,6 @@ button.danger {
   color: #cf222e;
 }
 
-button.link {
-  border: none;
-  background: none;
-  color: #1f6feb;
-  padding: 0 4px;
-}
-
 .actions,
 .palette-actions,
 .row {
@@ -150,7 +143,14 @@ input.name {
   padding: 0;
 }
 
-/* パレット */
+/* メニュー（Palette.tsx） */
+.section-title {
+  margin: 12px 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #656d76;
+}
+
 .preset-list {
   list-style: none;
   margin: 0;
@@ -180,12 +180,56 @@ input.name {
   flex: 1;
 }
 
-.badge {
-  font-size: 11px;
-  padding: 0 6px;
-  border-radius: 10px;
-  background: #1f6feb;
-  color: #fff;
+.preset.dragging {
+  opacity: 0.5;
+}
+
+.drag-handle {
+  display: flex;
+  padding: 2px;
+  margin: -2px 0;
+  color: #8c959f;
+  cursor: grab;
+}
+
+button.icon-button {
+  display: flex;
+  padding: 4px;
+  border-color: transparent;
+  background: none;
+}
+
+button.icon-button.copy {
+  color: #1f6feb;
+}
+
+button.icon-button.copy:hover:not(:disabled) {
+  background: #d0e7ff;
+}
+
+button.icon-button.edit {
+  color: #1a7f37;
+}
+
+button.icon-button.edit:hover:not(:disabled) {
+  background: #dafbe1;
+}
+
+button.icon-button.danger {
+  margin-left: 24px;
+  color: #cf222e;
+}
+
+button.icon-button.danger:hover:not(:disabled) {
+  background: #ffebe9;
+}
+
+.drag-handle:hover {
+  color: #424a53;
+}
+
+.preset.dragging .drag-handle {
+  cursor: grabbing;
 }
 
 .keys {

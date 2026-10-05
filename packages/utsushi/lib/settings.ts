@@ -10,8 +10,8 @@ export type Preset = {
 
 /** アプリ（ドメイン＋アプリID）ごとの設定 */
 export type AppSettings = {
+  /** メニューに出す順。先頭を最初に選んでおく */
   presets: Preset[];
-  defaultPresetId: string | null;
   /** ダウンロード対象の添付ファイルフィールド。`null` は全フィールド */
   downloadFieldCodes: string[] | null;
 };
@@ -24,41 +24,54 @@ const itemKey = ({ domain, appId }: AppKey) => `local:${PREFIX}${domain}:${appId
 
 export const emptySettings = (): AppSettings => ({
   presets: [],
-  defaultPresetId: null,
   downloadFieldCodes: null,
 });
 
-export const loadAppSettings = async (key: AppKey): Promise<AppSettings> =>
-  (await storage.getItem<AppSettings>(itemKey(key))) ?? emptySettings();
+/**
+ * 保存されている形をいまの形にそろえる。以前はデフォルトのプリセットを
+ * `defaultPresetId` で指定していたので、そのプリセットを先頭に移す
+ */
+const normalize = (raw: AppSettings & { defaultPresetId?: string | null }): AppSettings => {
+  const { defaultPresetId, ...settings } = raw;
+  const first = settings.presets.find((p) => p.id === defaultPresetId);
+  if (!first) return settings;
+  return { ...settings, presets: [first, ...settings.presets.filter((p) => p !== first)] };
+};
+
+export const loadAppSettings = async (key: AppKey): Promise<AppSettings> => {
+  const raw = await storage.getItem<AppSettings>(itemKey(key));
+  return raw ? normalize(raw) : emptySettings();
+};
 
 export const saveAppSettings = async (key: AppKey, settings: AppSettings): Promise<void> => {
   if (settings.presets.length === 0 && settings.downloadFieldCodes === null) {
     await storage.removeItem(itemKey(key));
     return;
   }
-  await storage.setItem(itemKey(key), settings);
+  await storage.setItem(itemKey(key), normalize(settings));
 };
 
-/** デフォルトのプリセット。指定が消えていれば先頭 */
-export const defaultPreset = (s: AppSettings): Preset | undefined =>
-  s.presets.find((p) => p.id === s.defaultPresetId) ?? s.presets[0];
-
-export const upsertPreset = (s: AppSettings, preset: Preset, makeDefault: boolean): AppSettings => {
+/** 既存なら置き換え、新規なら末尾に足す */
+export const upsertPreset = (s: AppSettings, preset: Preset): AppSettings => {
   const exists = s.presets.some((p) => p.id === preset.id);
   const presets = exists
     ? s.presets.map((p) => (p.id === preset.id ? preset : p))
     : [...s.presets, preset];
-  const defaultPresetId = makeDefault || presets.length === 1 ? preset.id : s.defaultPresetId;
-  return { ...s, presets, defaultPresetId };
+  return { ...s, presets };
 };
 
-export const removePreset = (s: AppSettings, id: string): AppSettings => {
-  const presets = s.presets.filter((p) => p.id !== id);
-  return {
-    ...s,
-    presets,
-    defaultPresetId: s.defaultPresetId === id ? (presets[0]?.id ?? null) : s.defaultPresetId,
-  };
+export const removePreset = (s: AppSettings, id: string): AppSettings => ({
+  ...s,
+  presets: s.presets.filter((p) => p.id !== id),
+});
+
+/** プリセットを `to` 番目に移す。範囲外なら端に寄せる */
+export const movePreset = (s: AppSettings, id: string, to: number): AppSettings => {
+  const preset = s.presets.find((p) => p.id === id);
+  if (!preset) return s;
+  const rest = s.presets.filter((p) => p.id !== id);
+  const i = Math.max(0, Math.min(to, rest.length));
+  return { ...s, presets: [...rest.slice(0, i), preset, ...rest.slice(i)] };
 };
 
 /** 全アプリの設定。オプション画面の一覧とエクスポートに使う */
@@ -76,7 +89,7 @@ export const loadAllSettings = async (): Promise<{ key: AppKey; settings: AppSet
   const all = await browser.storage.local.get(null);
   return Object.entries(all).flatMap(([raw, value]) => {
     const key = parseKey(raw);
-    return key ? [{ key, settings: value as AppSettings }] : [];
+    return key ? [{ key, settings: normalize(value as AppSettings) }] : [];
   });
 };
 

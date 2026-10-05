@@ -1,33 +1,75 @@
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import type { RecordLocation } from "@/lib/kintone/location";
-import { defaultPreset, loadAppSettings, type Preset, saveAppSettings } from "@/lib/settings";
-import { useAsync } from "./useAsync";
+import {
+  type AppSettings,
+  loadAppSettings,
+  movePreset,
+  type Preset,
+  removePreset,
+  saveAppSettings,
+} from "@/lib/settings";
+import { CopyIcon, EditIcon, GripIcon, TrashIcon } from "./icons";
 
 type Props = {
   loc: RecordLocation;
   onClose: () => void;
   onCopy: (preset: Preset) => void;
   onEdit: (presetId: string | null) => void;
+  onDownload: () => void;
   onDownloadSettings: () => void;
 };
 
-/** プリセット選択パレット。キーボードだけで完結させる */
-export const Palette = ({ loc, onClose, onCopy, onEdit, onDownloadSettings }: Props) => {
-  const [reload, setReload] = useState(0);
-  const settings = useAsync(() => loadAppSettings(loc), [loc.domain, loc.appId, reload]);
+/**
+ * ショートカットで開くメニュー。プリセットでのコピーと添付ファイルのダウンロードを選ぶ。
+ * プリセットの並び替えと削除もここでする。キーボードだけで完結させる
+ */
+export const Palette = ({
+  loc,
+  onClose,
+  onCopy,
+  onEdit,
+  onDownload,
+  onDownloadSettings,
+}: Props) => {
+  // 並び替えのたびに読み込み中の表示を挟まないよう、読み込んだ一覧を手元に持つ
+  const [presets, setPresets] = useState<Preset[] | null>(null);
+  // 開いた直後は先頭を選んでおき、Enter だけでコピーできるようにする
   const [selected, setSelected] = useState(0);
+  const [dragging, setDragging] = useState<string | null>(null);
+  // つまみを押している行だけドラッグできるようにする。行のクリックはコピーなので
+  const [grabbed, setGrabbed] = useState<string | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: 読み込みが終わってパネルが描画されたらフォーカスする
-  useEffect(() => panelRef.current?.focus(), [settings.status]);
 
-  if (settings.status !== "ready") return null;
-  const { presets } = settings.value;
-  const defaultId = defaultPreset(settings.value)?.id;
+  useEffect(() => {
+    void loadAppSettings(loc).then((s) => setPresets(s.presets));
+  }, [loc]);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: 読み込みが終わってパネルが描画されたらフォーカスする
+  useEffect(() => panelRef.current?.focus(), [presets === null]);
+
+  if (presets === null) return null;
   const current = presets[selected];
 
-  const setDefault = async (preset: Preset) => {
-    await saveAppSettings(loc, { ...settings.value, defaultPresetId: preset.id });
-    setReload((n) => n + 1);
+  /** 他のタブで変わっているかもしれないので、読み直してから変えて書く */
+  const update = async (change: (s: AppSettings) => AppSettings) => {
+    const next = change(await loadAppSettings(loc));
+    await saveAppSettings(loc, next);
+    setPresets(next.presets);
+    return next.presets;
+  };
+
+  const move = async (preset: Preset, to: number) => {
+    const next = await update((s) => movePreset(s, preset.id, to));
+    setSelected(next.findIndex((p) => p.id === preset.id));
+  };
+
+  const remove = async (preset: Preset) => {
+    if (!confirm(`「${preset.name}」を削除しますか？`)) {
+      panelRef.current?.focus();
+      return;
+    }
+    const next = await update((s) => removePreset(s, preset.id));
+    setSelected(Math.min(selected, Math.max(0, next.length - 1)));
+    panelRef.current?.focus();
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
@@ -37,13 +79,16 @@ export const Palette = ({ loc, onClose, onCopy, onEdit, onDownloadSettings }: Pr
     if (Number.isInteger(digit) && digit >= 1 && digit <= Math.min(n, 9)) {
       const p = presets[digit - 1];
       if (p) onCopy(p);
-    } else if (e.key === "ArrowDown" && n > 0) setSelected((selected + 1) % n);
+    } else if (e.key === "ArrowDown" && e.altKey && current) void move(current, selected + 1);
+    else if (e.key === "ArrowUp" && e.altKey && current) void move(current, selected - 1);
+    else if (e.key === "ArrowDown" && n > 0) setSelected((selected + 1) % n);
     else if (e.key === "ArrowUp" && n > 0) setSelected((selected - 1 + n) % n);
-    else if (e.key === "Enter" && current) onCopy(current);
+    else if (e.key === "Enter") current ? onCopy(current) : onEdit(null);
     else if (e.key === "e" && current) onEdit(current.id);
     else if (e.key === "n") onEdit(null);
-    else if (e.key === "s" && current) void setDefault(current);
-    else if (e.key === "d") onDownloadSettings();
+    else if ((e.key === "Delete" || e.key === "Backspace") && current) void remove(current);
+    else if (e.key === "d") onDownload();
+    else if (e.key === "D") onDownloadSettings();
     else if (e.key === "Escape") onClose();
     else return;
     e.preventDefault();
@@ -55,37 +100,105 @@ export const Palette = ({ loc, onClose, onCopy, onEdit, onDownloadSettings }: Pr
       <div
         className="panel palette"
         role="dialog"
-        aria-label="プリセット"
+        aria-label="utsushi"
         tabIndex={-1}
         ref={panelRef}
         onKeyDown={onKeyDown}
         onMouseDown={(e) => e.stopPropagation()}
       >
-        <div className="panel-title">プリセット（アプリ {loc.appId}）</div>
+        <div className="panel-title">
+          utsushi（アプリ {loc.appId} · レコード {loc.recordId}）
+        </div>
         {presets.length === 0 ? (
-          <p className="muted">プリセットがありません。n で作成します。</p>
+          <p className="muted">プリセットがありません。Enter か n で作成します。</p>
         ) : (
           <ul className="preset-list">
             {presets.map((p, i) => (
               // biome-ignore lint/a11y/useKeyWithClickEvents: キーボードではパネルの 1-9 / Enter でコピーする
               <li
                 key={p.id}
-                className={i === selected ? "preset active" : "preset"}
-                onMouseEnter={() => setSelected(i)}
-                onClick={() => onCopy(p)}
+                className={["preset", i === selected && "active", p.id === dragging && "dragging"]
+                  .filter(Boolean)
+                  .join(" ")}
+                draggable={p.id === grabbed}
+                onDragStart={(e) => {
+                  e.dataTransfer.effectAllowed = "move";
+                  setDragging(p.id);
+                }}
+                onDragOver={(e) => {
+                  if (!dragging) return;
+                  e.preventDefault();
+                  // 重なった行の位置へ動かす。保存はドロップしたときにする
+                  const from = presets.findIndex((x) => x.id === dragging);
+                  if (from === i) return;
+                  const next = [...presets];
+                  const [moved] = next.splice(from, 1);
+                  if (moved) next.splice(i, 0, moved);
+                  setPresets(next);
+                  setSelected(i);
+                }}
+                onDrop={(e) => e.preventDefault()}
+                onDragEnd={() => {
+                  const id = dragging;
+                  setDragging(null);
+                  setGrabbed(null);
+                  const to = presets.findIndex((x) => x.id === id);
+                  if (id) void update((s) => movePreset(s, id, to));
+                }}
+                onMouseEnter={() => !dragging && setSelected(i)}
+                onClick={(e) => {
+                  // つまみのクリックではコピーしない
+                  if ((e.target as Element).closest(".drag-handle")) return;
+                  onCopy(p);
+                }}
               >
+                {/* biome-ignore lint/a11y/noStaticElementInteractions: マウスでの並び替え用。キーボードでは ⌥↑↓ */}
+                <span
+                  className="drag-handle"
+                  title="ドラッグで並び替え（⌥↑↓ でも）"
+                  onMouseDown={() => setGrabbed(p.id)}
+                  onMouseUp={() => setGrabbed(null)}
+                >
+                  <GripIcon />
+                </span>
                 <span className="preset-key">{i < 9 ? i + 1 : ""}</span>
                 <span className="preset-name">{p.name}</span>
-                {p.id === defaultId && <span className="badge">デフォルト</span>}
                 <button
                   type="button"
-                  className="link"
+                  className="icon-button copy"
+                  aria-label="コピー"
+                  title="コピー（Enter）"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCopy(p);
+                  }}
+                >
+                  <CopyIcon />
+                </button>
+                <button
+                  type="button"
+                  className="icon-button edit"
+                  aria-label="編集"
+                  title="編集（e）"
                   onClick={(e) => {
                     e.stopPropagation();
                     onEdit(p.id);
                   }}
                 >
-                  編集
+                  <EditIcon />
+                </button>
+                {/* 押し間違えないよう、ほかのボタンから離して置く */}
+                <button
+                  type="button"
+                  className="icon-button danger"
+                  aria-label="削除"
+                  title="削除（Delete）"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    void remove(p);
+                  }}
+                >
+                  <TrashIcon />
                 </button>
               </li>
             ))}
@@ -95,12 +208,19 @@ export const Palette = ({ loc, onClose, onCopy, onEdit, onDownloadSettings }: Pr
           <button type="button" onClick={() => onEdit(null)}>
             新規作成
           </button>
+        </div>
+        <div className="section-title">添付ファイル</div>
+        <div className="palette-actions">
+          <button type="button" onClick={onDownload}>
+            ダウンロード
+          </button>
           <button type="button" onClick={onDownloadSettings}>
             DL設定
           </button>
         </div>
         <div className="keys">
-          1-9/Enter コピー · ↑↓ 選択 · e 編集 · n 新規 · s デフォルトにする · d DL設定 · Esc 閉じる
+          1-9/Enter コピー · ↑↓ 選択 · ⌥↑↓ 並び替え · e 編集 · n 新規 · Delete 削除 · d ダウンロード
+          · ⇧D DL設定 · Esc 閉じる
         </div>
       </div>
     </div>

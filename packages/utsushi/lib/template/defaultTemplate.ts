@@ -5,10 +5,11 @@ import { type BlockNode, doc, type FieldNode, field, loop, paragraph, text } fro
  * 新規プリセットの初期値。全フィールドをレイアウト順に「ラベル: 値」で並べ、
  * サブテーブルは繰り返しブロック、最後にコメントブロックを置く。
  * 利用者は不要な行を消すだけでプリセットを作れる。
+ * 行末がチップで終わるとドラッグで行を選びにくいので、チップの後ろに半角スペースを置く。
  */
 export const buildDefaultTemplate = (catalog: Catalog) => {
   const blocks: BlockNode[] = [
-    paragraph(text("レコード: "), pseudoField("$record.url")),
+    paragraph(text("レコード: "), pseudoField("$record.url"), text(" ")),
     paragraph(),
   ];
   let currentGroup: string | undefined;
@@ -24,6 +25,7 @@ export const buildDefaultTemplate = (catalog: Catalog) => {
         if (i > 0) row.push(text(" / "));
         row.push(text(`${c.label}: `), field(c.code, c.label));
       });
+      row.push(text(" "));
       blocks.push(
         paragraph(text(`【${f.table.label}】`)),
         loop({ source: "subtable", code: f.table.code, label: f.table.label }, paragraph(...row)),
@@ -35,7 +37,7 @@ export const buildDefaultTemplate = (catalog: Catalog) => {
       currentGroup = f.group;
       if (f.group) blocks.push(paragraph(text(`【${f.group}】`)));
     }
-    blocks.push(paragraph(text(`${f.label}: `), field(f.code, f.label)));
+    blocks.push(paragraph(text(`${f.label}: `), field(f.code, f.label), text(" ")));
   }
 
   blocks.push(
@@ -50,7 +52,7 @@ export const buildDefaultTemplate = (catalog: Catalog) => {
         pseudoField("$comment.date"),
         text("）"),
       ),
-      paragraph(pseudoField("$comment.body")),
+      paragraph(pseudoField("$comment.body"), text(" ")),
       paragraph(),
     ),
   );

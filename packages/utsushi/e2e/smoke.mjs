@@ -51,8 +51,10 @@ const shot = (name) =>
 // content script の読み込みを待つ
 await host.waitFor({ state: "attached" });
 
-step("プリセットが無ければ既定テンプレート入りのエディタが開く");
-await send("copy-default");
+step("プリセットが無ければ Enter で既定テンプレート入りのエディタが開く");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+await page.keyboard.press("Enter");
 const editor = host.locator(".tiptap");
 await editor.waitFor();
 const chips = await host.locator(".chip").allTextContents();
@@ -74,7 +76,7 @@ assert.match(text, /コメント12$/, "コメントは 2 ページ目まで取�
 assert.ok(text.indexOf("コメント1\n") < text.indexOf("コメント12"), "コメントは古い順");
 
 step("@ で差し込んだテンプレートを作る");
-await send("open-palette");
+await send("open-menu");
 await host.locator(".palette").waitFor();
 await page.keyboard.press("n");
 await editor.waitFor();
@@ -109,29 +111,56 @@ await toast.filter({ hasText: "「要約」でコピーしました" }).waitFor(
 text = await clipboard();
 assert.equal(
   text,
-  "件名は見積もり依頼 です。\n* りんご を確認\n* みかん を確認\n全品名: りんご, みかん ",
+  "件名は見積もり依頼 です。\n* りんご を確認\n* みかん を確認\n全品名: りんご, みかん",
 );
 
-step("パレットから番号でコピー（デフォルトは 1 番目のまま）");
-await send("open-palette");
+const presetNames = () => host.locator(".preset-name").allTextContents();
+
+step("メニューから番号でコピー（新しいプリセットは末尾に並ぶ）");
+await send("open-menu");
 await host.locator(".palette").waitFor();
-assert.equal(await host.locator(".preset .badge").count(), 1);
+assert.deepEqual(await presetNames(), ["プリセット 1", "要約"]);
 await shot("3-palette");
 await page.keyboard.press("2");
 await toast.filter({ hasText: "「要約」でコピーしました" }).waitFor();
 
+step("メニューを開いて Enter で先頭のプリセットでコピー");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+await page.keyboard.press("Enter");
+await toast.filter({ hasText: "「プリセット 1」でコピーしました" }).waitFor();
+
+step("同じショートカットをもう一度押すとメニューが閉じる");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+await send("open-menu");
+await host.locator(".palette").waitFor({ state: "detached" });
+
 step("コメントを使わないテンプレートではコメント API を呼ばない");
 apiLog.length = 0;
-await send("open-palette");
+await send("open-menu");
 await host.locator(".palette").waitFor();
 await page.keyboard.press("2");
 await toast.filter({ hasText: "「要約」でコピーしました" }).waitFor();
 assert.ok(!apiLog.some((l) => l.includes("comments")), apiLog.join("\n"));
 
-step("DL設定で仕様書だけにしてダウンロード");
-await send("open-palette");
+step("DL設定から Esc と「戻る」でメニューに戻る");
+await send("open-menu");
 await host.locator(".palette").waitFor();
-await page.keyboard.press("d");
+await page.keyboard.press("Shift+D");
+await host.getByText("一括ダウンロードの対象").waitFor();
+await page.keyboard.press("Escape");
+await host.locator(".palette").waitFor();
+await page.keyboard.press("Shift+D");
+await host.getByRole("button", { name: "戻る" }).click();
+await host.locator(".palette").waitFor();
+await page.keyboard.press("Escape");
+await host.locator(".palette").waitFor({ state: "detached" });
+
+step("DL設定で仕様書だけにしてダウンロード");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+await page.keyboard.press("Shift+D");
 await host.getByText("選んだフィールドだけ").click();
 await host.getByRole("checkbox", { name: "添付 · attachments" }).uncheck();
 const downloads = [];
@@ -142,6 +171,66 @@ await toast.filter({ hasText: /ダウンロードを開始しました|失敗/ }
 console.log(`  toast: ${await toast.textContent()}`);
 const fileRequests = apiLog.filter((l) => l.includes("file.json"));
 console.log(`  file.json requests: ${fileRequests.join(", ") || "(なし)"}`);
+
+step("メニューの d でそのままダウンロード");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+await page.keyboard.press("d");
+await toast.filter({ hasText: "1 件のダウンロードを開始しました" }).waitFor();
+
+step("プリセット編集から「戻る」と Esc でメニューに戻る");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+await page.keyboard.press("e");
+await editor.waitFor();
+await host.getByRole("button", { name: "戻る" }).click();
+await host.locator(".palette").waitFor();
+await page.keyboard.press("e");
+await editor.waitFor();
+await page.keyboard.press("Escape");
+await host.locator(".palette").waitFor();
+
+step("⌥↓ で並び替えると、先頭が開いた直後の選択になる");
+await page.keyboard.press("Alt+ArrowDown");
+// 動かしたプリセットは選んだまま
+await host.locator(".preset.active").nth(0).filter({ hasText: "プリセット 1" }).waitFor();
+await host.locator(".preset").nth(1).filter({ hasText: "プリセット 1" }).waitFor();
+assert.deepEqual(await presetNames(), ["要約", "プリセット 1"]);
+await page.keyboard.press("Escape");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+assert.deepEqual(await presetNames(), ["要約", "プリセット 1"], "並び順は保存される");
+await page.keyboard.press("Enter");
+await toast.filter({ hasText: "「要約」でコピーしました" }).waitFor();
+
+step("つまみのドラッグで並び替える（つまみのクリックではコピーしない）");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+const handles = host.locator(".drag-handle");
+await handles.nth(0).click();
+await page.waitForTimeout(300);
+assert.equal(await host.locator(".palette").count(), 1, "メニューは開いたまま");
+await handles.nth(1).dragTo(host.locator(".preset").nth(0));
+await host.locator(".preset").nth(0).filter({ hasText: "プリセット 1" }).waitFor();
+await page.keyboard.press("Escape");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+assert.deepEqual(await presetNames(), ["プリセット 1", "要約"], "並び順は保存される");
+
+step("メニューの Delete で削除する（確認でキャンセルしたら残す）");
+page.once("dialog", (d) => d.dismiss());
+await page.keyboard.press("Delete");
+await page.waitForTimeout(300);
+assert.deepEqual(await presetNames(), ["プリセット 1", "要約"]);
+page.once("dialog", (d) => d.accept());
+await page.keyboard.press("Delete");
+await host
+  .locator(".preset-name")
+  .filter({ hasText: "プリセット 1" })
+  .waitFor({ state: "detached" });
+assert.deepEqual(await presetNames(), ["要約"]);
+await page.keyboard.press("Enter");
+await toast.filter({ hasText: "「要約」でコピーしました" }).waitFor();
 
 await context.close();
 console.log("ok");
