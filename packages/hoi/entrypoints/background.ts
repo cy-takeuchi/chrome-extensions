@@ -13,8 +13,7 @@ export default defineBackground(() => {
 
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true })
     if (tab?.id) {
-      const message: TriggerDialogMessage = { type: 'TRIGGER_DIALOG' }
-      browser.tabs.sendMessage(tab.id, message, { frameId: 0 })
+      await triggerDialog(tab.id)
     }
   })
 
@@ -28,6 +27,33 @@ export default defineBackground(() => {
 
   console.log('hoi: Background service worker loaded')
 })
+
+/**
+ * タブの content script にダイアログを開かせる。
+ * 拡張機能の読み込み・リロード前から開いていたタブには content script がないので、
+ * そのときは注入してから送り直す（ショートカットで activeTab の権限が付いている）
+ */
+async function triggerDialog(tabId: number): Promise<void> {
+  const message: TriggerDialogMessage = { type: 'TRIGGER_DIALOG' }
+  try {
+    await browser.tabs.sendMessage(tabId, message, { frameId: 0 })
+    return
+  } catch {
+    // content script がまだない
+  }
+
+  try {
+    await browser.scripting.executeScript({
+      target: { tabId, frameIds: [0] },
+      files: ['/content-scripts/content.js'],
+    })
+    await browser.tabs.sendMessage(tabId, message, { frameId: 0 })
+  } catch (error) {
+    // chrome:// のページなど、content script を入れられないページ
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.warn('hoi: このページではダイアログを開けません:', errorMessage)
+  }
+}
 
 async function handleSubmitDraft(payload: DraftInput): Promise<SubmitDraftResponse> {
   try {
