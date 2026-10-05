@@ -142,6 +142,19 @@ await page.keyboard.press("2");
 await toast.filter({ hasText: "「要約」でコピーしました" }).waitFor();
 assert.ok(!apiLog.some((l) => l.includes("comments")), apiLog.join("\n"));
 
+step("DL設定から Esc と「戻る」でメニューに戻る");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+await page.keyboard.press("Shift+D");
+await host.getByText("一括ダウンロードの対象").waitFor();
+await page.keyboard.press("Escape");
+await host.locator(".palette").waitFor();
+await page.keyboard.press("Shift+D");
+await host.getByRole("button", { name: "戻る" }).click();
+await host.locator(".palette").waitFor();
+await page.keyboard.press("Escape");
+await host.locator(".palette").waitFor({ state: "detached" });
+
 step("DL設定で仕様書だけにしてダウンロード");
 await send("open-menu");
 await host.locator(".palette").waitFor();

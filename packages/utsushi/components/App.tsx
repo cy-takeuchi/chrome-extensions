@@ -102,10 +102,15 @@ export const App = ({ commands }: { commands: CommandSource }) => {
         <DownloadSettings
           loc={view.loc}
           onClose={() => setView(null)}
+          onBack={() => setView({ kind: "palette", loc: view.loc })}
           onSaved={(andDownload) => {
-            setView(null);
-            if (andDownload) void download(view.loc);
-            else show("ok", "ダウンロード設定を保存しました");
+            if (andDownload) {
+              setView(null);
+              void download(view.loc);
+            } else {
+              setView({ kind: "palette", loc: view.loc });
+              show("ok", "ダウンロード設定を保存しました");
+            }
           }}
         />
       )}

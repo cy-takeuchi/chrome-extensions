@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { errorMessage } from "@/lib/actions";
 import { fileFields } from "@/lib/files";
 import type { RecordLocation } from "@/lib/kintone/location";
@@ -8,22 +8,29 @@ import { type AppData, useAppData } from "./useAppData";
 type Props = {
   loc: RecordLocation;
   onClose: () => void;
+  /** メニューに戻る */
+  onBack: () => void;
   /** 保存後。`download` なら続けてダウンロードする */
   onSaved: (download: boolean) => void;
 };
 
 /** アプリごとの「一括ダウンロードの対象にする添付ファイルフィールド」 */
-export const DownloadSettings = ({ loc, onClose, onSaved }: Props) => {
+export const DownloadSettings = ({ loc, onClose, onBack, onSaved }: Props) => {
   const loaded = useAppData(loc);
+  const panelRef = useRef<HTMLDivElement>(null);
+  // 読み込み中でも Esc で戻れるように、まずパネルにフォーカスする。読み込み後はラジオボタンに移る
+  useEffect(() => panelRef.current?.focus(), []);
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: 背景のクリックで閉じる。キーボードでは Esc で閉じる
+    // biome-ignore lint/a11y/noStaticElementInteractions: 背景のクリックで閉じる。キーボードでは Esc でメニューに戻る
     <div className="backdrop" onMouseDown={onClose}>
       <div
         className="panel"
         role="dialog"
         aria-label="ダウンロード設定"
+        tabIndex={-1}
+        ref={panelRef}
         onMouseDown={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.key === "Escape" && onClose()}
+        onKeyDown={(e) => e.key === "Escape" && onBack()}
       >
         <div className="panel-title">一括ダウンロードの対象（アプリ {loc.appId}）</div>
         {loaded.status === "loading" && <p className="muted">読み込んでいます…</p>}
@@ -34,6 +41,7 @@ export const DownloadSettings = ({ loc, onClose, onSaved }: Props) => {
             settings={loaded.value.settings}
             catalog={loaded.value.catalog}
             onClose={onClose}
+            onBack={onBack}
             onSaved={onSaved}
           />
         )}
@@ -42,7 +50,7 @@ export const DownloadSettings = ({ loc, onClose, onSaved }: Props) => {
   );
 };
 
-const Body = ({ loc, settings, catalog, onClose, onSaved }: Props & AppData) => {
+const Body = ({ loc, settings, catalog, onBack, onSaved }: Props & AppData) => {
   const fields = fileFields(catalog);
   const [all, setAll] = useState(settings.downloadFieldCodes === null);
   const [codes, setCodes] = useState<Set<string>>(
@@ -62,8 +70,8 @@ const Body = ({ loc, settings, catalog, onClose, onSaved }: Props & AppData) => 
       <>
         <p className="muted">このアプリには添付ファイルフィールドがありません。</p>
         <div className="actions">
-          <button type="button" onClick={onClose}>
-            閉じる
+          <button type="button" onClick={onBack}>
+            戻る
           </button>
         </div>
       </>
@@ -105,10 +113,10 @@ const Body = ({ loc, settings, catalog, onClose, onSaved }: Props & AppData) => 
         ))}
       </ul>
       <div className="actions">
-        <span className="spacer" />
-        <button type="button" onClick={onClose}>
-          キャンセル
+        <button type="button" onClick={onBack}>
+          戻る
         </button>
+        <span className="spacer" />
         <button type="button" onClick={() => save(false)}>
           保存
         </button>
