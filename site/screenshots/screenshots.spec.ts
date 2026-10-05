@@ -207,18 +207,20 @@ test('utsushi', async () => {
   await page.keyboard.type('レコードURL')
   await ui.locator('.suggest-item.active').filter({ hasText: 'レコードURL' }).waitFor()
   await page.keyboard.press('Enter')
+  // 保存するとメニューに戻る（ショートカットをもう一度送るとメニューが閉じる）
   await ui.getByRole('button', { name: '保存', exact: true }).click()
   await toast.filter({ hasText: '保存しました' }).waitFor()
-
-  await send('open-menu')
-  await ui.locator('.palette').waitFor()
+  await ui.locator('.palette .preset').nth(1).waitFor()
+  await page.mouse.move(0, 0)
   await shot(page, 'utsushi-palette')
 
   await page.keyboard.press('Shift+D')
   await ui.getByText('一括ダウンロードの対象').waitFor()
   await ui.getByText('すべての添付ファイルフィールド').waitFor()
   await shot(page, 'utsushi-download')
+  // Esc でメニューに戻る
   await page.keyboard.press('Escape')
+  await ui.locator('.palette').waitFor()
 
   const options = await context.newPage()
   const id = new URL(workers.get('utsushi')?.url() ?? '').host
