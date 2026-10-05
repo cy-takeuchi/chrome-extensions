@@ -76,26 +76,32 @@
       <p>初期設定は不要です。kintone にログインしていれば、そのまま使えます。</p>
 
       <h2>使い方</h2>
-      <p>kintone のレコード詳細画面で、次のショートカットを使います（Windows は <kbd>⌥</kbd> の代わりに <kbd>Alt</kbd>）。</p>
+      <p>
+        kintone のレコード詳細画面で <kbd>⌥</kbd> <kbd>⇧</kbd> <kbd>C</kbd>（Windows は <kbd>Alt</kbd> <kbd>Shift</kbd> <kbd>C</kbd>）を押すとメニューが開きます。もう一度押すと閉じます。メニューでは次のキーを使います。
+      </p>
       <table>
         <thead>
           <tr>
-            <th>ショートカット</th>
+            <th>キー</th>
             <th>動作</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><kbd>⌥</kbd> <kbd>⇧</kbd> <kbd>C</kbd></td>
-            <td>デフォルトのプリセットでコピー。プリセットが無ければ作成画面を開く</td>
+            <td><kbd>Enter</kbd></td>
+            <td>選んでいるプリセットでコピー。開いた直後はデフォルトのプリセットを選んでいる。プリセットが無ければ作成画面を開く</td>
           </tr>
           <tr>
-            <td><kbd>⌥</kbd> <kbd>⇧</kbd> <kbd>P</kbd></td>
-            <td>プリセットの一覧（パレット）を開く</td>
+            <td><kbd>1</kbd>〜<kbd>9</kbd></td>
+            <td>その番号のプリセットでコピー</td>
           </tr>
           <tr>
-            <td><kbd>⌥</kbd> <kbd>⇧</kbd> <kbd>D</kbd></td>
+            <td><kbd>d</kbd></td>
             <td>添付ファイルを一括ダウンロード</td>
+          </tr>
+          <tr>
+            <td><kbd>Esc</kbd></td>
+            <td>閉じる</td>
           </tr>
         </tbody>
       </table>
@@ -159,17 +165,17 @@
 
       <h3>プリセットを切り替える</h3>
       <p>
-        パレットでは、番号キーか <kbd>Enter</kbd> でコピー、<kbd>e</kbd> で編集、<kbd>n</kbd> で新規作成、<kbd>s</kbd> でデフォルトに設定、<kbd>d</kbd> でダウンロード設定を開きます。
+        メニューでは、<kbd>↑</kbd> <kbd>↓</kbd> でプリセットを選び、<kbd>e</kbd> で編集、<kbd>n</kbd> で新規作成、<kbd>s</kbd> でデフォルトに設定します。
       </p>
       <figure class="screenshot">
-        <img src="../images/utsushi-palette.png" alt="utsushi のプリセット選択パレット" width="1280" height="800" />
-        <figcaption>プリセット選択パレット</figcaption>
+        <img src="../images/utsushi-palette.png" alt="utsushi のメニュー" width="1280" height="800" />
+        <figcaption>メニュー</figcaption>
       </figure>
 
       <h3>添付ファイルを一括ダウンロードする</h3>
       <p>
-        <kbd>⌥</kbd> <kbd>⇧</kbd> <kbd>D</kbd> で、レコードの添付ファイルを
-        <code>ダウンロード/kintone/{アプリID}-{レコードID}/</code> に保存します。対象のフィールドは、パレットの <kbd>d</kbd> からアプリごとに選べます。コメントの添付ファイルは対象外です。
+        メニューの <kbd>d</kbd> で、レコードの添付ファイルを
+        <code>ダウンロード/kintone/{アプリID}-{レコードID}/</code> に保存します。対象のフィールドは、メニューの <kbd>⇧</kbd> <kbd>D</kbd> からアプリごとに選べます。コメントの添付ファイルは対象外です。
       </p>
       <figure class="screenshot">
         <img src="../images/utsushi-download.png" alt="utsushi のダウンロード設定" width="1280" height="800" />

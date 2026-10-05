@@ -114,7 +114,7 @@ assert.equal(
   "件名は見積もり依頼 です。\n* りんご を確認\n* みかん を確認\n全品名: りんご, みかん ",
 );
 
-step("パレットから番号でコピー（デフォルトは 1 番目のまま）");
+step("メニューから番号でコピー（デフォルトは 1 番目のまま）");
 await send("open-menu");
 await host.locator(".palette").waitFor();
 assert.equal(await host.locator(".preset .badge").count(), 1);

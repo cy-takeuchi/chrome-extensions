@@ -11,7 +11,7 @@
 | `entrypoints/background.ts` | ショートカットの受付と添付ファイルのダウンロード |
 | `entrypoints/content` | kintone の画面に UI を出す（Shadow DOM 内の React） |
 | `entrypoints/options` | オプション画面（プリセットの一覧・削除、エクスポート／インポート） |
-| `components` | パレット、プリセット編集、DL 設定、トースト |
+| `components` | メニュー（`Palette.tsx`）、プリセット編集、DL 設定、トースト |
 | `components/editor` | TipTap のテンプレートエディタ |
 | `lib/kintone` | URL の解析、REST API、レコードの値の取り出し |
 | `lib/template` | テンプレートの形式・描画・検証・候補・既定テンプレート（エディタ非依存） |
