@@ -8,6 +8,7 @@ import {
   removePreset,
   saveAppSettings,
 } from "@/lib/settings";
+import { CopyIcon, EditIcon, GripIcon, TrashIcon } from "./icons";
 
 type Props = {
   loc: RecordLocation;
@@ -108,7 +109,6 @@ export const Palette = ({
         <div className="panel-title">
           utsushi（アプリ {loc.appId} · レコード {loc.recordId}）
         </div>
-        <div className="section-title">コピー</div>
         {presets.length === 0 ? (
           <p className="muted">プリセットがありません。Enter か n で作成します。</p>
         ) : (
@@ -165,23 +165,40 @@ export const Palette = ({
                 <span className="preset-name">{p.name}</span>
                 <button
                   type="button"
-                  className="link"
+                  className="icon-button"
+                  aria-label="コピー"
+                  title="コピー（Enter）"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCopy(p);
+                  }}
+                >
+                  <CopyIcon />
+                </button>
+                <button
+                  type="button"
+                  className="icon-button"
+                  aria-label="編集"
+                  title="編集（e）"
                   onClick={(e) => {
                     e.stopPropagation();
                     onEdit(p.id);
                   }}
                 >
-                  編集
+                  <EditIcon />
                 </button>
+                {/* 押し間違えないよう、ほかのボタンから離して置く */}
                 <button
                   type="button"
-                  className="link danger"
+                  className="icon-button danger"
+                  aria-label="削除"
+                  title="削除（Delete）"
                   onClick={(e) => {
                     e.stopPropagation();
                     void remove(p);
                   }}
                 >
-                  削除
+                  <TrashIcon />
                 </button>
               </li>
             ))}
@@ -209,13 +226,3 @@ export const Palette = ({
     </div>
   );
 };
-
-/** 6 つの点のつまみ */
-const GripIcon = () => (
-  <svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true">
-    {[3, 8, 13].flatMap((y) => [
-      <circle key={`l${y}`} cx="2.5" cy={y} r="1.5" />,
-      <circle key={`r${y}`} cx="7.5" cy={y} r="1.5" />,
-    ])}
-  </svg>
-);

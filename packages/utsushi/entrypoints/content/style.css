@@ -97,17 +97,6 @@ button.danger {
   color: #cf222e;
 }
 
-button.link {
-  border: none;
-  background: none;
-  color: #1f6feb;
-  padding: 0 4px;
-}
-
-button.link.danger {
-  color: #cf222e;
-}
-
 .actions,
 .palette-actions,
 .row {
@@ -162,10 +151,6 @@ input.name {
   color: #656d76;
 }
 
-.panel-title + .section-title {
-  margin-top: 0;
-}
-
 .preset-list {
   list-style: none;
   margin: 0;
@@ -204,8 +189,29 @@ input.name {
   padding: 2px;
   margin: -2px 0;
   color: #8c959f;
-  fill: currentColor;
   cursor: grab;
+}
+
+button.icon-button {
+  display: flex;
+  padding: 4px;
+  border-color: transparent;
+  background: none;
+  color: #656d76;
+}
+
+button.icon-button:hover:not(:disabled) {
+  background: #d0e7ff;
+  color: #1f6feb;
+}
+
+button.icon-button.danger {
+  margin-left: 24px;
+}
+
+button.icon-button.danger:hover:not(:disabled) {
+  background: #ffebe9;
+  color: #cf222e;
 }
 
 .drag-handle:hover {
