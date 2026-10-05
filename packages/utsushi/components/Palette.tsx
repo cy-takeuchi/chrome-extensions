@@ -8,14 +8,25 @@ type Props = {
   onClose: () => void;
   onCopy: (preset: Preset) => void;
   onEdit: (presetId: string | null) => void;
+  onDownload: () => void;
   onDownloadSettings: () => void;
 };
 
-/** プリセット選択パレット。キーボードだけで完結させる */
-export const Palette = ({ loc, onClose, onCopy, onEdit, onDownloadSettings }: Props) => {
+/**
+ * ショートカットで開くメニュー。プリセットでのコピーと添付ファイルのダウンロードを選ぶ。
+ * キーボードだけで完結させる
+ */
+export const Palette = ({
+  loc,
+  onClose,
+  onCopy,
+  onEdit,
+  onDownload,
+  onDownloadSettings,
+}: Props) => {
   const [reload, setReload] = useState(0);
   const settings = useAsync(() => loadAppSettings(loc), [loc.domain, loc.appId, reload]);
-  const [selected, setSelected] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   // biome-ignore lint/correctness/useExhaustiveDependencies: 読み込みが終わってパネルが描画されたらフォーカスする
   useEffect(() => panelRef.current?.focus(), [settings.status]);
@@ -23,7 +34,14 @@ export const Palette = ({ loc, onClose, onCopy, onEdit, onDownloadSettings }: Pr
   if (settings.status !== "ready") return null;
   const { presets } = settings.value;
   const defaultId = defaultPreset(settings.value)?.id;
-  const current = presets[selected];
+  // 開いた直後はデフォルトのプリセットを選んでおき、Enter だけでコピーできるようにする
+  const active =
+    selected ??
+    Math.max(
+      0,
+      presets.findIndex((p) => p.id === defaultId),
+    );
+  const current = presets[active];
 
   const setDefault = async (preset: Preset) => {
     await saveAppSettings(loc, { ...settings.value, defaultPresetId: preset.id });
@@ -37,13 +55,14 @@ export const Palette = ({ loc, onClose, onCopy, onEdit, onDownloadSettings }: Pr
     if (Number.isInteger(digit) && digit >= 1 && digit <= Math.min(n, 9)) {
       const p = presets[digit - 1];
       if (p) onCopy(p);
-    } else if (e.key === "ArrowDown" && n > 0) setSelected((selected + 1) % n);
-    else if (e.key === "ArrowUp" && n > 0) setSelected((selected - 1 + n) % n);
-    else if (e.key === "Enter" && current) onCopy(current);
+    } else if (e.key === "ArrowDown" && n > 0) setSelected((active + 1) % n);
+    else if (e.key === "ArrowUp" && n > 0) setSelected((active - 1 + n) % n);
+    else if (e.key === "Enter") current ? onCopy(current) : onEdit(null);
     else if (e.key === "e" && current) onEdit(current.id);
     else if (e.key === "n") onEdit(null);
     else if (e.key === "s" && current) void setDefault(current);
-    else if (e.key === "d") onDownloadSettings();
+    else if (e.key === "d") onDownload();
+    else if (e.key === "D") onDownloadSettings();
     else if (e.key === "Escape") onClose();
     else return;
     e.preventDefault();
@@ -55,22 +74,25 @@ export const Palette = ({ loc, onClose, onCopy, onEdit, onDownloadSettings }: Pr
       <div
         className="panel palette"
         role="dialog"
-        aria-label="プリセット"
+        aria-label="utsushi"
         tabIndex={-1}
         ref={panelRef}
         onKeyDown={onKeyDown}
         onMouseDown={(e) => e.stopPropagation()}
       >
-        <div className="panel-title">プリセット（アプリ {loc.appId}）</div>
+        <div className="panel-title">
+          utsushi（アプリ {loc.appId} · レコード {loc.recordId}）
+        </div>
+        <div className="section-title">コピー</div>
         {presets.length === 0 ? (
-          <p className="muted">プリセットがありません。n で作成します。</p>
+          <p className="muted">プリセットがありません。Enter か n で作成します。</p>
         ) : (
           <ul className="preset-list">
             {presets.map((p, i) => (
               // biome-ignore lint/a11y/useKeyWithClickEvents: キーボードではパネルの 1-9 / Enter でコピーする
               <li
                 key={p.id}
-                className={i === selected ? "preset active" : "preset"}
+                className={i === active ? "preset active" : "preset"}
                 onMouseEnter={() => setSelected(i)}
                 onClick={() => onCopy(p)}
               >
@@ -95,12 +117,19 @@ export const Palette = ({ loc, onClose, onCopy, onEdit, onDownloadSettings }: Pr
           <button type="button" onClick={() => onEdit(null)}>
             新規作成
           </button>
+        </div>
+        <div className="section-title">添付ファイル</div>
+        <div className="palette-actions">
+          <button type="button" onClick={onDownload}>
+            ダウンロード
+          </button>
           <button type="button" onClick={onDownloadSettings}>
             DL設定
           </button>
         </div>
         <div className="keys">
-          1-9/Enter コピー · ↑↓ 選択 · e 編集 · n 新規 · s デフォルトにする · d DL設定 · Esc 閉じる
+          1-9/Enter コピー · ↑↓ 選択 · e 編集 · n 新規 · s デフォルトにする · d ダウンロード · ⇧D
+          DL設定 · Esc 閉じる
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { copyWithPreset, downloadAttachments, type Outcome } from "@/lib/actions";
 import { parseRecordLocation, type RecordLocation } from "@/lib/kintone/location";
 import type { Command } from "@/lib/messages";
-import { defaultPreset, loadAppSettings, type Preset } from "@/lib/settings";
+import type { Preset } from "@/lib/settings";
 import { DownloadSettings } from "./DownloadSettings";
 import { Palette } from "./Palette";
 import { PresetEditor } from "./PresetEditor";
@@ -48,10 +48,11 @@ export const App = ({ commands }: { commands: CommandSource }) => {
   viewRef.current = view;
 
   const handle = useCallback(
-    async (command: Command) => {
+    (_command: Command) => {
       const current = viewRef.current;
       if (current?.kind === "editor" || current?.kind === "download") return;
-      if (current?.kind === "palette" && command === "open-palette") {
+      // もう一度押したら閉じる
+      if (current?.kind === "palette") {
         setView(null);
         return;
       }
@@ -60,24 +61,12 @@ export const App = ({ commands }: { commands: CommandSource }) => {
         show("error", "レコード詳細画面で使ってください");
         return;
       }
-      setView(null);
-      if (command === "open-palette") {
-        setView({ kind: "palette", loc });
-      } else if (command === "download-files") {
-        await download(loc);
-      } else {
-        const preset = defaultPreset(await loadAppSettings(loc));
-        if (preset) await copy(loc, preset);
-        else {
-          show("info", "このアプリにはまだプリセットがありません。作成してください");
-          setView({ kind: "editor", loc, presetId: null });
-        }
-      }
+      setView({ kind: "palette", loc });
     },
-    [copy, download, show],
+    [show],
   );
 
-  useEffect(() => commands.subscribe((c) => void handle(c)), [commands, handle]);
+  useEffect(() => commands.subscribe(handle), [commands, handle]);
 
   return (
     <>
@@ -90,6 +79,10 @@ export const App = ({ commands }: { commands: CommandSource }) => {
             void copy(view.loc, p);
           }}
           onEdit={(presetId) => setView({ kind: "editor", loc: view.loc, presetId })}
+          onDownload={() => {
+            setView(null);
+            void download(view.loc);
+          }}
           onDownloadSettings={() => setView({ kind: "download", loc: view.loc })}
         />
       )}

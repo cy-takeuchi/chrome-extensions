@@ -1,5 +1,5 @@
 /** manifest.json の commands と同じ名前 */
-const COMMANDS = ["copy-default", "open-palette", "download-files"] as const;
+const COMMANDS = ["open-menu"] as const;
 
 /** background → content script */
 export type Command = (typeof COMMANDS)[number];

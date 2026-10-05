@@ -4,17 +4,9 @@
   "permissions": ["storage", "downloads", "unlimitedStorage", "clipboardWrite"],
   "host_permissions": ["https://*.cybozu.com/*", "https://*.kintone.com/*"],
   "commands": {
-    "copy-default": {
+    "open-menu": {
       "suggested_key": { "default": "Alt+Shift+C" },
-      "description": "デフォルトのプリセットでコピー"
-    },
-    "open-palette": {
-      "suggested_key": { "default": "Alt+Shift+P" },
-      "description": "プリセット選択パレットを開く"
-    },
-    "download-files": {
-      "suggested_key": { "default": "Alt+Shift+D" },
-      "description": "添付ファイルを一括ダウンロード"
+      "description": "メニューを開く（コピー・ダウンロード）"
     }
   }
 }

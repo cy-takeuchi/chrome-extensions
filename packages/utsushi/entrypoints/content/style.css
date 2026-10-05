@@ -151,6 +151,17 @@ input.name {
 }
 
 /* パレット */
+.section-title {
+  margin: 12px 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #656d76;
+}
+
+.panel-title + .section-title {
+  margin-top: 0;
+}
+
 .preset-list {
   list-style: none;
   margin: 0;

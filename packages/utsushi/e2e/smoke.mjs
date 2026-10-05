@@ -51,8 +51,10 @@ const shot = (name) =>
 // content script の読み込みを待つ
 await host.waitFor({ state: "attached" });
 
-step("プリセットが無ければ既定テンプレート入りのエディタが開く");
-await send("copy-default");
+step("プリセットが無ければ Enter で既定テンプレート入りのエディタが開く");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+await page.keyboard.press("Enter");
 const editor = host.locator(".tiptap");
 await editor.waitFor();
 const chips = await host.locator(".chip").allTextContents();
@@ -74,7 +76,7 @@ assert.match(text, /コメント12$/, "コメントは 2 ページ目まで取�
 assert.ok(text.indexOf("コメント1\n") < text.indexOf("コメント12"), "コメントは古い順");
 
 step("@ で差し込んだテンプレートを作る");
-await send("open-palette");
+await send("open-menu");
 await host.locator(".palette").waitFor();
 await page.keyboard.press("n");
 await editor.waitFor();
@@ -113,25 +115,37 @@ assert.equal(
 );
 
 step("パレットから番号でコピー（デフォルトは 1 番目のまま）");
-await send("open-palette");
+await send("open-menu");
 await host.locator(".palette").waitFor();
 assert.equal(await host.locator(".preset .badge").count(), 1);
 await shot("3-palette");
 await page.keyboard.press("2");
 await toast.filter({ hasText: "「要約」でコピーしました" }).waitFor();
 
+step("メニューを開いて Enter でデフォルトのプリセットでコピー");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+await page.keyboard.press("Enter");
+await toast.filter({ hasText: /「(?!要約).+」でコピーしました/ }).waitFor();
+
+step("同じショートカットをもう一度押すとメニューが閉じる");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+await send("open-menu");
+await host.locator(".palette").waitFor({ state: "detached" });
+
 step("コメントを使わないテンプレートではコメント API を呼ばない");
 apiLog.length = 0;
-await send("open-palette");
+await send("open-menu");
 await host.locator(".palette").waitFor();
 await page.keyboard.press("2");
 await toast.filter({ hasText: "「要約」でコピーしました" }).waitFor();
 assert.ok(!apiLog.some((l) => l.includes("comments")), apiLog.join("\n"));
 
 step("DL設定で仕様書だけにしてダウンロード");
-await send("open-palette");
+await send("open-menu");
 await host.locator(".palette").waitFor();
-await page.keyboard.press("d");
+await page.keyboard.press("Shift+D");
 await host.getByText("選んだフィールドだけ").click();
 await host.getByRole("checkbox", { name: "添付 · attachments" }).uncheck();
 const downloads = [];
@@ -142,6 +156,12 @@ await toast.filter({ hasText: /ダウンロードを開始しました|失敗/ }
 console.log(`  toast: ${await toast.textContent()}`);
 const fileRequests = apiLog.filter((l) => l.includes("file.json"));
 console.log(`  file.json requests: ${fileRequests.join(", ") || "(なし)"}`);
+
+step("メニューの d でそのままダウンロード");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+await page.keyboard.press("d");
+await toast.filter({ hasText: "1 件のダウンロードを開始しました" }).waitFor();
 
 await context.close();
 console.log("ok");
