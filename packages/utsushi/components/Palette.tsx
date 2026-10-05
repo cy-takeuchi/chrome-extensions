@@ -165,7 +165,7 @@ export const Palette = ({
                 <span className="preset-name">{p.name}</span>
                 <button
                   type="button"
-                  className="icon-button"
+                  className="icon-button copy"
                   aria-label="コピー"
                   title="コピー（Enter）"
                   onClick={(e) => {
@@ -177,7 +177,7 @@ export const Palette = ({
                 </button>
                 <button
                   type="button"
-                  className="icon-button"
+                  className="icon-button edit"
                   aria-label="編集"
                   title="編集（e）"
                   onClick={(e) => {

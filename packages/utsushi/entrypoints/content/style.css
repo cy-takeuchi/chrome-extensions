@@ -197,21 +197,31 @@ button.icon-button {
   padding: 4px;
   border-color: transparent;
   background: none;
-  color: #656d76;
 }
 
-button.icon-button:hover:not(:disabled) {
-  background: #d0e7ff;
+button.icon-button.copy {
   color: #1f6feb;
+}
+
+button.icon-button.copy:hover:not(:disabled) {
+  background: #d0e7ff;
+}
+
+button.icon-button.edit {
+  color: #1a7f37;
+}
+
+button.icon-button.edit:hover:not(:disabled) {
+  background: #dafbe1;
 }
 
 button.icon-button.danger {
   margin-left: 24px;
+  color: #cf222e;
 }
 
 button.icon-button.danger:hover:not(:disabled) {
   background: #ffebe9;
-  color: #cf222e;
 }
 
 .drag-handle:hover {
