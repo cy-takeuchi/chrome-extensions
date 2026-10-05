@@ -104,6 +104,10 @@ button.link {
   padding: 0 4px;
 }
 
+button.link.danger {
+  color: #cf222e;
+}
+
 .actions,
 .palette-actions,
 .row {
@@ -191,12 +195,8 @@ input.name {
   flex: 1;
 }
 
-.badge {
-  font-size: 11px;
-  padding: 0 6px;
-  border-radius: 10px;
-  background: #1f6feb;
-  color: #fff;
+.preset.dragging {
+  opacity: 0.5;
 }
 
 .keys {

@@ -90,11 +90,15 @@ export const App = ({ commands }: { commands: CommandSource }) => {
         <PresetEditor
           loc={view.loc}
           presetId={view.presetId}
-          onClose={() => setView(null)}
+          onBack={() => setView({ kind: "palette", loc: view.loc })}
           onSaved={(preset, andCopy) => {
-            setView(null);
-            if (andCopy) void copy(view.loc, preset);
-            else show("ok", `「${preset.name}」を保存しました`);
+            if (andCopy) {
+              setView(null);
+              void copy(view.loc, preset);
+            } else {
+              setView({ kind: "palette", loc: view.loc });
+              show("ok", `「${preset.name}」を保存しました`);
+            }
           }}
         />
       )}

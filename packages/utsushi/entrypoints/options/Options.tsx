@@ -3,7 +3,6 @@ import { formatDateTime } from "@/lib/datetime";
 import {
   type AppKey,
   type AppSettings,
-  defaultPreset,
   emptySettings,
   exportAll,
   importAll,
@@ -106,9 +105,6 @@ export const Options = () => {
                 {entry.settings.presets.map((p) => (
                   <li key={p.id}>
                     {p.name}
-                    {p.id === defaultPreset(entry.settings)?.id && (
-                      <span className="badge">デフォルト</span>
-                    )}
                     <span className="muted"> 更新 {formatDateTime(p.updatedAt).slice(0, 10)}</span>
                     <button
                       type="button"

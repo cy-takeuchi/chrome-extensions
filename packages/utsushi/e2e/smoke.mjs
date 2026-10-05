@@ -114,19 +114,21 @@ assert.equal(
   "件名は見積もり依頼 です。\n* りんご を確認\n* みかん を確認\n全品名: りんご, みかん",
 );
 
-step("メニューから番号でコピー（デフォルトは 1 番目のまま）");
+const presetNames = () => host.locator(".preset-name").allTextContents();
+
+step("メニューから番号でコピー（新しいプリセットは末尾に並ぶ）");
 await send("open-menu");
 await host.locator(".palette").waitFor();
-assert.equal(await host.locator(".preset .badge").count(), 1);
+assert.deepEqual(await presetNames(), ["プリセット 1", "要約"]);
 await shot("3-palette");
 await page.keyboard.press("2");
 await toast.filter({ hasText: "「要約」でコピーしました" }).waitFor();
 
-step("メニューを開いて Enter でデフォルトのプリセットでコピー");
+step("メニューを開いて Enter で先頭のプリセットでコピー");
 await send("open-menu");
 await host.locator(".palette").waitFor();
 await page.keyboard.press("Enter");
-await toast.filter({ hasText: /「(?!要約).+」でコピーしました/ }).waitFor();
+await toast.filter({ hasText: "「プリセット 1」でコピーしました" }).waitFor();
 
 step("同じショートカットをもう一度押すとメニューが閉じる");
 await send("open-menu");
@@ -175,6 +177,45 @@ await send("open-menu");
 await host.locator(".palette").waitFor();
 await page.keyboard.press("d");
 await toast.filter({ hasText: "1 件のダウンロードを開始しました" }).waitFor();
+
+step("プリセット編集から「戻る」と Esc でメニューに戻る");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+await page.keyboard.press("e");
+await editor.waitFor();
+await host.getByRole("button", { name: "戻る" }).click();
+await host.locator(".palette").waitFor();
+await page.keyboard.press("e");
+await editor.waitFor();
+await page.keyboard.press("Escape");
+await host.locator(".palette").waitFor();
+
+step("⌥↓ で並び替えると、先頭が開いた直後の選択になる");
+await page.keyboard.press("Alt+ArrowDown");
+// 動かしたプリセットは選んだまま
+await host.locator(".preset.active").nth(0).filter({ hasText: "プリセット 1" }).waitFor();
+await host.locator(".preset").nth(1).filter({ hasText: "プリセット 1" }).waitFor();
+assert.deepEqual(await presetNames(), ["要約", "プリセット 1"]);
+await page.keyboard.press("Escape");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+assert.deepEqual(await presetNames(), ["要約", "プリセット 1"], "並び順は保存される");
+await page.keyboard.press("Enter");
+await toast.filter({ hasText: "「要約」でコピーしました" }).waitFor();
+
+step("メニューの Delete で削除する（確認でキャンセルしたら残す）");
+await send("open-menu");
+await host.locator(".palette").waitFor();
+page.once("dialog", (d) => d.dismiss());
+await page.keyboard.press("Delete");
+await page.waitForTimeout(300);
+assert.deepEqual(await presetNames(), ["要約", "プリセット 1"]);
+page.once("dialog", (d) => d.accept());
+await page.keyboard.press("Delete");
+await host.locator(".preset-name").filter({ hasText: "要約" }).waitFor({ state: "detached" });
+assert.deepEqual(await presetNames(), ["プリセット 1"]);
+await page.keyboard.press("Enter");
+await toast.filter({ hasText: "「プリセット 1」でコピーしました" }).waitFor();
 
 await context.close();
 console.log("ok");
