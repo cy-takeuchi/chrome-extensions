@@ -63,11 +63,20 @@ export const renderTemplate = (tpl: TemplateDoc, ctx: RenderContext): string => 
       .join(ROW_JOINER);
   };
 
+  /**
+   * 行末（段落の末尾か改行の直前）にあるテンプレートの文字は、末尾の空白を落とす。
+   * エディタではチップの後ろに空白を置くので、それをコピーに持ち込まない。値の中の空白は残す
+   */
   const renderInline = (nodes: InlineNode[] | undefined, scope: Scope) =>
     (nodes ?? [])
-      .map((n) =>
-        n.type === "text" ? n.text : n.type === "hardBreak" ? "\n" : fieldText(n.attrs.code, scope),
-      )
+      .map((n, i, all) => {
+        if (n.type === "hardBreak") return "\n";
+        if (n.type !== "text") return fieldText(n.attrs.code, scope);
+        const next = all[i + 1];
+        return next === undefined || next.type === "hardBreak"
+          ? n.text.replace(/[ \t]+$/, "")
+          : n.text;
+      })
       .join("");
 
   const renderBlocks = (blocks: BlockNode[], scope: Scope): string[] =>

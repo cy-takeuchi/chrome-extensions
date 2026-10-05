@@ -111,7 +111,7 @@ await toast.filter({ hasText: "「要約」でコピーしました" }).waitFor(
 text = await clipboard();
 assert.equal(
   text,
-  "件名は見積もり依頼 です。\n* りんご を確認\n* みかん を確認\n全品名: りんご, みかん ",
+  "件名は見積もり依頼 です。\n* りんご を確認\n* みかん を確認\n全品名: りんご, みかん",
 );
 
 step("メニューから番号でコピー（デフォルトは 1 番目のまま）");

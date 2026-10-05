@@ -33,6 +33,14 @@ describe("renderTemplate", () => {
     expect(renderTemplate(tpl, ctx)).toBe("件名は見積もり依頼です\n状態: 処理中");
   });
 
+  it("行末の空白は落とし、値の空白と行の途中の空白は残す", () => {
+    const tpl = doc(
+      paragraph(text("件名: "), field("subject", "件名"), text(" ")),
+      paragraph(field("subject", "件名"), text(" "), { type: "hardBreak" }, text("次の行  ")),
+    );
+    expect(renderTemplate(tpl, ctx)).toBe("件名: 見積もり依頼\n見積もり依頼\n次の行");
+  });
+
   it("リッチエディターは Markdown になる", () => {
     const tpl = doc(paragraph(field("body", "本文")));
     expect(renderTemplate(tpl, ctx)).toBe("至急**対応**\n\n-   A\n-   B");
@@ -105,6 +113,15 @@ describe("renderTemplate", () => {
 });
 
 describe("buildDefaultTemplate", () => {
+  it("行末をチップで終わらせない（後ろの半角スペースでドラッグして行を選びやすくする）", () => {
+    for (const block of buildDefaultTemplate(catalog).content) {
+      const paragraphs = block.type === "loop" ? block.content : [block];
+      for (const p of paragraphs) {
+        if (p.type === "paragraph") expect(p.content?.at(-1)?.type).not.toBe("field");
+      }
+    }
+  });
+
   it("全フィールドを並べた初期値がそのまま描画できる", () => {
     const out = renderTemplate(buildDefaultTemplate(catalog), ctx);
     expect(out).toBe(
