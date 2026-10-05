@@ -2,7 +2,7 @@
   "name": "utsushi",
   "description": "kintone のレコードとコメントをテンプレートに差し込んでクリップボードへコピーし、添付ファイルを一括ダウンロードする",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.2.0",
   "license": "MIT",
   "author": "Yoshihiko Takeuchi",
   "homepage": "https://github.com/cy-takeuchi/chrome-extensions/tree/main/packages/utsushi#readme",
