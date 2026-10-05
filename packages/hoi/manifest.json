@@ -1,7 +1,7 @@
 {
   "name": "hoi",
   "description": "kintone などの画面で選択したテキストを、元ページへのリンク付きで GitHub Projects に Draft Issue として登録する",
-  "permissions": ["storage", "activeTab"],
+  "permissions": ["storage", "activeTab", "scripting"],
   "commands": {
     "add-to-project": {
       "suggested_key": {
