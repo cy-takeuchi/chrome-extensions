@@ -8,7 +8,7 @@
 
 | ディレクトリ | 中身 |
 |---|---|
-| `entrypoints/background.ts` | ショートカットの受付と添付ファイルのダウンロード |
+| `entrypoints/background.ts` | ショートカットとツールバーのアイコンの受付、添付ファイルのダウンロード |
 | `entrypoints/content` | kintone の画面に UI を出す（Shadow DOM 内の React） |
 | `entrypoints/options` | オプション画面（プリセットの一覧・削除、エクスポート／インポート） |
 | `components` | メニュー（`Palette.tsx`）、プリセット編集、DL 設定、トースト |
@@ -20,6 +20,7 @@
 | `lib/settings.ts` | `chrome.storage.local` への保存 |
 | `lib/messages.ts` | background と content script の間のメッセージ |
 | `e2e` | モックした kintone でのスモークテスト |
+| `assets/icon.svg` | アイコンの元画像。`public/icon/*.png` は `scripts/render-icons.mjs` で書き出す |
 
 ## 技術スタック
 
