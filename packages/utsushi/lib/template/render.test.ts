@@ -4,6 +4,7 @@ import { buildCatalog } from "./catalog";
 import { buildDefaultTemplate } from "./defaultTemplate";
 import { renderTemplate, TemplateError } from "./render";
 import { doc, field, loop, paragraph, text } from "./schema";
+import { describeProblems } from "./validate";
 
 const catalog = buildCatalog(form);
 const ctx = { location, catalog, record, comments };
@@ -144,6 +145,25 @@ describe("buildDefaultTemplate", () => {
         "",
         "■ 鈴木（2026-10-02 09:30）",
         "お願いします",
+      ].join("\n"),
+    );
+  });
+});
+
+describe("describeProblems", () => {
+  it("見つからないフィールドは、原因と直し方を添えて 1 文にまとめる", () => {
+    expect(
+      describeProblems([
+        { code: "kpb_lookup", label: "KBP", reason: "missing" },
+        { code: "old", label: "旧", reason: "missing" },
+        { code: "$comment.body", label: "本文", reason: "outside-comments" },
+      ]),
+    ).toBe(
+      [
+        "「KBP」(kpb_lookup)、「旧」(old) がアプリに見つかりません。" +
+          "アプリの設定でフィールドが削除されたか、フィールドコードが変わったようです。" +
+          "赤く表示された箇所を消して、@ で差し込み直してください。",
+        "「本文」はコメントブロックの中でしか使えません。",
       ].join("\n"),
     );
   });
