@@ -80,7 +80,7 @@ export const Options = () => {
         <p className="muted">
           変更は <code>chrome://extensions/shortcuts</code> で行えます。
           プリセットの作成・編集は、kintone
-          のレコード詳細画面で上のショートカットからメニューを開いて行います。
+          のレコード詳細画面で上のショートカットかツールバーのアイコンからメニューを開いて行います。
         </p>
       </section>
 
