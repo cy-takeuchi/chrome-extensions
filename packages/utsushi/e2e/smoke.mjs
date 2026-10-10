@@ -232,5 +232,27 @@ assert.deepEqual(await presetNames(), ["要約"]);
 await page.keyboard.press("Enter");
 await toast.filter({ hasText: "「要約」でコピーしました" }).waitFor();
 
+step("ツールバーのアイコンは kintone の画面でだけ押せる");
+{
+  // kintone 以外のタブは URL が読めない（tabs 権限が無い）ので undefined になる
+  const enabled = () =>
+    worker.evaluate(async () => {
+      const state = {};
+      for (const t of await chrome.tabs.query({}))
+        state[t.url ?? "other"] = await chrome.action.isEnabled(t.id);
+      return state;
+    });
+  const kintone = `${ORIGIN}/k/12/show#record=34`;
+  const other = await context.newPage();
+  await other.goto("about:blank");
+  assert.deepEqual(await enabled(), { [kintone]: true, other: false });
+  // 同じタブで kintone を開くと押せるようになり、離れると押せなくなる
+  await other.goto(`${ORIGIN}/k/12/show#record=35`);
+  assert.equal((await enabled())[`${ORIGIN}/k/12/show#record=35`], true);
+  await other.goto("about:blank");
+  assert.deepEqual(await enabled(), { [kintone]: true, other: false });
+  await other.close();
+}
+
 await context.close();
 console.log("ok");
