@@ -53,11 +53,18 @@ export const validateTemplate = (tpl: TemplateDoc, catalog: Catalog): Problem[] 
   return problems;
 };
 
-export const describeProblems = (problems: Problem[]): string =>
-  problems
-    .map((p) =>
-      p.reason === "missing"
-        ? `「${p.label}」(${p.code}) がアプリにありません`
-        : `「${p.label}」はコメントブロックの中でしか使えません`,
-    )
-    .join("\n");
+/** 利用者向けの説明。原因と直し方まで書く */
+export const describeProblems = (problems: Problem[]): string => {
+  const lines: string[] = [];
+  const missing = problems.filter((p) => p.reason === "missing");
+  if (missing.length > 0)
+    lines.push(
+      `${missing.map((p) => `「${p.label}」(${p.code})`).join("、")} がアプリに見つかりません。` +
+        "アプリの設定でフィールドが削除されたか、フィールドコードが変わったようです。" +
+        "赤く表示された箇所を消して、@ で差し込み直してください。",
+    );
+  for (const p of problems)
+    if (p.reason === "outside-comments")
+      lines.push(`「${p.label}」はコメントブロックの中でしか使えません。`);
+  return lines.join("\n");
+};
