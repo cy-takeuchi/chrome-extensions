@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.0](https://github.com/cy-takeuchi/chrome-extensions/compare/utsushi-v0.2.0...utsushi-v0.3.0) (2026-10-10)
+
+
+### Features
+
+* **utsushi:** add an icon ([8aeea17](https://github.com/cy-takeuchi/chrome-extensions/commit/8aeea175373191774a2c866bd763e17db6611440))
+* **utsushi:** explain missing fields in the preset error ([218d751](https://github.com/cy-takeuchi/chrome-extensions/commit/218d7514f5c59e95069bf9bf02a4b546e450c5c1))
+* **utsushi:** gray out the toolbar icon outside kintone ([df35676](https://github.com/cy-takeuchi/chrome-extensions/commit/df3567681c378f43e475ffc15a8365379ab0fc85))
+* **utsushi:** open the menu from the toolbar icon ([4e4e2bf](https://github.com/cy-takeuchi/chrome-extensions/commit/4e4e2bf030383e8c3fd6239284d139953130a3b5))
+
 ## [0.2.0](https://github.com/cy-takeuchi/chrome-extensions/compare/utsushi-v0.1.1...utsushi-v0.2.0) (2026-10-05)
 
 
