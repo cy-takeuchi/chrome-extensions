@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hayame - YouTube の無音区間を自動で倍速</title>
+    <meta
+      name="description"
+      content="YouTube の動画で、人が喋っていない区間だけを自動で速く再生して間を詰める Chrome 拡張機能です。標準の Picture-in-Picture もショートカットで開けます。"
+    />
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="site-title" href="../">Chrome 拡張機能</a>
+        <nav class="site-nav">
+          <a href="./" aria-current="page">hayame</a>
+          <a href="../hoi/">hoi</a>
+          <a href="../utsushi/">utsushi</a>
+          <a href="https://github.com/cy-takeuchi/chrome-extensions">GitHub</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <h1>hayame</h1>
+        <p class="lead">
+          YouTube の動画で、人が喋っていない区間だけを自動で速く再生して、間を詰める Chrome 拡張機能です。Chrome 標準の Picture-in-Picture もショートカットで開けます。
+        </p>
+        <div class="actions">
+          <a class="button" href="#install">インストール</a>
+          <a class="button secondary" href="privacy.html">プライバシーポリシー</a>
+        </div>
+      </section>
+
+      <figure class="screenshot">
+        <img
+          src="../images/hayame-popup.png"
+          alt="hayame のポップアップ。設定と、いまの音量・しきい値・判定・速度が出ている"
+          width="1280"
+          height="800"
+        />
+        <figcaption>ポップアップで設定を変えられ、いまの判定と速度をリアルタイムで見られます</figcaption>
+      </figure>
+
+      <h2>機能</h2>
+      <ul class="features">
+        <li>
+          <strong>無音だけを倍速</strong>
+          音がほぼない区間だけを無音速度（既定 3 倍）で再生し、話し始めたらすぐ元の速度に戻します。
+        </li>
+        <li>
+          <strong>しきい値は自動</strong>
+          直近 30 秒の音量から、その動画の「静かなときの音量」を推定して、無音のしきい値を決めます。
+        </li>
+        <li>
+          <strong>いつもの速度はそのまま</strong>
+          YouTube で 1.5 倍などに変えた速度を基準にして、無音の間だけ速くします。
+        </li>
+        <li>
+          <strong><kbd>⌥</kbd> <kbd>P</kbd> で Picture-in-Picture</strong>
+          再生中の動画を Chrome 標準の Picture-in-Picture で開きます。PiP 中も無音の倍速は効きます。
+        </li>
+        <li>
+          <strong>失敗したら止まる</strong>
+          音声が取れないときは倍速にせず、元の速度のまま、ツールバーのアイコンに <code>!</code> を出します。再生音を消すことはありません。
+        </li>
+      </ul>
+
+      <h2 id="install">インストール</h2>
+      <ol>
+        <li>
+          <a href="https://github.com/cy-takeuchi/chrome-extensions/releases">GitHub のリリース</a>から
+          <code>hayame-X.Y.Z-chrome.zip</code> をダウンロードして展開します。
+        </li>
+        <li>Chrome で <code>chrome://extensions</code> を開き、右上の「デベロッパーモード」を有効にします。</li>
+        <li>「パッケージ化されていない拡張機能を読み込む」をクリックし、展開したフォルダを選びます。</li>
+      </ol>
+      <p>初期設定は不要です。YouTube で動画を再生すると、そのまま動きます。</p>
+
+      <h2>使い方</h2>
+      <p>
+        YouTube（<code>www.youtube.com</code>）で動画を再生すると、自動で動きます。速度は YouTube の画面でいつもどおり変えられます。
+      </p>
+
+      <h3>ポップアップ</h3>
+      <p>ツールバーの hayame のアイコンを押すと開きます。</p>
+      <table>
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>既定</th>
+            <th>説明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ON / OFF</td>
+            <td>ON</td>
+            <td>OFF にすると元の速度に戻して止まる</td>
+          </tr>
+          <tr>
+            <td>無音速度</td>
+            <td>3 倍</td>
+            <td>無音の間の速度。Chrome は 4 倍を超えると音声を消すので、4 倍まで</td>
+          </tr>
+          <tr>
+            <td>しきい値</td>
+            <td>+6 dB</td>
+            <td>静かなときの音量にこれを足した値を下回ると、無音の候補にする。上げると無音と判定しやすくなる</td>
+          </tr>
+          <tr>
+            <td>最短時間</td>
+            <td>300 ms</td>
+            <td>しきい値を下回る状態がこれだけ続いたら無音にする</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>下半分には、いまの音量・しきい値・判定・速度がリアルタイムで出ます。</p>
+
+      <h3>アイコンのバッジ</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>バッジ</th>
+            <th>状態</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>ON</code>（緑）</td>
+            <td>動作中</td>
+          </tr>
+          <tr>
+            <td><code>3x</code>（青）</td>
+            <td>無音を倍速中。数字はいまの速度</td>
+          </tr>
+          <tr>
+            <td><code>!</code>（赤）</td>
+            <td>音声が取れず、倍速していない。理由はアイコンにカーソルを載せるか、ポップアップで見られる</td>
+          </tr>
+          <tr>
+            <td><code>OFF</code>（灰）</td>
+            <td>OFF</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Picture-in-Picture</h3>
+      <p>
+        <kbd>⌥</kbd> <kbd>P</kbd>（Windows は <kbd>Alt</kbd> <kbd>P</kbd>）で、再生中の動画（複数あれば一番大きいもの）を Picture-in-Picture で開きます。もう一度押すと戻ります。YouTube 以外のサイトでも使えます。ショートカットは <code>chrome://extensions/shortcuts</code> で変更できます。
+      </p>
+
+      <h3>うまく動かないとき</h3>
+      <ul>
+        <li>アイコンが <code>!</code> で「AudioContext が suspended」と出るときは、ページを一度クリックすると動き出します（ブラウザの自動再生の制限のため）。</li>
+        <li>ミュート中は判定しません。</li>
+        <li>話し始めを検知するまでのわずかな遅れで、話の頭が少し詰まって聞こえることがあります。</li>
+      </ul>
+
+      <h2>データの扱い</h2>
+      <p>
+        動画の音声は、ブラウザの中で音量を測るためだけに使い、保存も送信もしません。YouTube の画面の構造や内部のデータには触れず、Web 標準の API だけを使います。設定はブラウザの拡張機能用の保存領域に保存します。詳しくは<a href="privacy.html">プライバシーポリシー</a>を見てください。
+      </p>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <span>© 2026 Yoshihiko Takeuchi</span>
+        <a href="https://github.com/cy-takeuchi/chrome-extensions/tree/main/packages/hayame">ソースコード（MIT ライセンス）</a>
+        <a href="privacy.html">プライバシーポリシー</a>
+        <span>YouTube は Google LLC の商標です。</span>
+      </div>
+    </footer>
+  </body>
+</html>

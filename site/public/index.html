@@ -3,18 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>kintone の Chrome 拡張機能</title>
+    <title>Chrome 拡張機能</title>
     <meta
       name="description"
-      content="kintone での作業を助ける Chrome 拡張機能、hoi と utsushi の紹介ページです。"
+      content="kintone での作業や YouTube の視聴を助ける Chrome 拡張機能、hayame・hoi・utsushi の紹介ページです。"
     />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <header class="site-header">
       <div class="container">
-        <a class="site-title" href="./">kintone の Chrome 拡張機能</a>
+        <a class="site-title" href="./">Chrome 拡張機能</a>
         <nav class="site-nav">
+          <a href="hayame/">hayame</a>
           <a href="hoi/">hoi</a>
           <a href="utsushi/">utsushi</a>
           <a href="https://github.com/cy-takeuchi/chrome-extensions">GitHub</a>
@@ -24,13 +25,24 @@
 
     <main class="container">
       <section class="hero">
-        <h1>kintone の作業を、もう少し楽に</h1>
+        <h1>毎日の作業を、もう少し楽に</h1>
         <p class="lead">
-          kintone のコメントやレコードを、ほかのツールへ手早く持ち出すための Chrome 拡張機能です。どちらも無料で、ソースコードを公開しています。
+          kintone のコメントやレコードを手早く持ち出したり、YouTube の動画を詰めて見たりするための Chrome 拡張機能です。どれも無料で、ソースコードを公開しています。
         </p>
       </section>
 
       <div class="cards">
+        <article class="card">
+          <a href="hayame/"><img src="images/hayame-popup.png" alt="hayame のポップアップ" width="1280" height="800" /></a>
+          <div class="card-body">
+            <h2>hayame</h2>
+            <p>
+              YouTube の動画で、人が喋っていない区間だけを自動で速く再生して、間を詰めます。Chrome 標準の Picture-in-Picture もショートカットで開けます。
+            </p>
+            <div class="actions"><a class="button" href="hayame/">詳しく見る</a></div>
+          </div>
+        </article>
+
         <article class="card">
           <a href="hoi/"><img src="images/hoi-dialog.png" alt="hoi のダイアログ" width="1280" height="800" /></a>
           <div class="card-body">
@@ -59,7 +71,7 @@
       <div class="container">
         <span>© 2026 Yoshihiko Takeuchi</span>
         <a href="https://github.com/cy-takeuchi/chrome-extensions">ソースコード（MIT ライセンス）</a>
-        <span>kintone はサイボウズ株式会社の登録商標です。</span>
+        <span>kintone はサイボウズ株式会社の登録商標です。YouTube は Google LLC の商標です。</span>
       </div>
     </footer>
   </body>
