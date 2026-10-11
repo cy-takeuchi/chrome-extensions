@@ -95,9 +95,8 @@ chore: ビルド・CI 等の変更
 
 [release-please](https://github.com/googleapis/release-please) がコミットメッセージを元に、パッケージごとにバージョンと CHANGELOG を更新します。
 
-- hayame はまだ release-please に登録していません（ソースからビルドして使います）
 - そのパッケージのディレクトリを変更したコミットだけが、そのパッケージのリリースに入ります
-- タグは `hoi-vX.Y.Z` / `utsushi-vX.Y.Z` で、リリースには `wxt zip` で作った zip を添付します
+- タグは `hayame-vX.Y.Z` / `hoi-vX.Y.Z` / `utsushi-vX.Y.Z` で、リリースには `wxt zip` で作った zip を添付します
 - `feat` でマイナー、`fix` でパッチが上がります。1.0.0 未満の間は、破壊的変更でもマイナーが上がります
 - バージョンは各パッケージの `package.json` にだけ書きます。`manifest.json` の `version` はビルド時に WXT が入れます
 

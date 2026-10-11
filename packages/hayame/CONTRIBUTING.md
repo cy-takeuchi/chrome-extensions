@@ -1,6 +1,6 @@
 # hayame の開発
 
-セットアップ、コマンド、コーディング規約、コミット規約はリポジトリ共通です。[ルートの CONTRIBUTING.md](../../CONTRIBUTING.md) を見てください。ここには hayame 固有のことを書きます。
+セットアップ、コマンド、コーディング規約、コミット規約、リリースはリポジトリ共通です。[ルートの CONTRIBUTING.md](../../CONTRIBUTING.md) を見てください。ここには hayame 固有のことを書きます。
 
 コマンドは `packages/hayame` で実行します。ルートからは `pnpm hayame <script>`（例: `pnpm hayame test`）でも実行できます。
 

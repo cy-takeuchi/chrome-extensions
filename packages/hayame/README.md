@@ -13,19 +13,21 @@
 
 ## インストール
 
-Chrome ウェブストアには公開していないので、ソースからビルドして、パッケージ化されていない拡張機能として読み込みます。
+Chrome ウェブストアには公開していないので、パッケージ化されていない拡張機能として読み込みます。
 
-1. ビルドする
+1. 拡張機能のファイルを用意する。次のどちらか
+   - [リリース](https://github.com/cy-takeuchi/chrome-extensions/releases)から `hayame-X.Y.Z-chrome.zip` をダウンロードして展開する
+   - ソースからビルドする
 
-   ```sh
-   git clone https://github.com/cy-takeuchi/chrome-extensions.git
-   cd chrome-extensions
-   pnpm install
-   pnpm hayame build   # packages/hayame/.output/chrome-mv3 にできる
-   ```
+     ```sh
+     git clone https://github.com/cy-takeuchi/chrome-extensions.git
+     cd chrome-extensions
+     pnpm install
+     pnpm hayame build   # packages/hayame/.output/chrome-mv3 にできる
+     ```
 
 2. Chrome で `chrome://extensions` を開き、右上の「デベロッパーモード」を有効にする
-3. 「パッケージ化されていない拡張機能を読み込む」で `packages/hayame/.output/chrome-mv3` を選ぶ
+3. 「パッケージ化されていない拡張機能を読み込む」で、展開したフォルダ（ビルドした場合は `packages/hayame/.output/chrome-mv3`）を選ぶ
 
 ## 使い方
 
