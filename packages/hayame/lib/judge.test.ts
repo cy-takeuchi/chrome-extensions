@@ -59,6 +59,16 @@ describe("SilenceJudge", () => {
     });
   });
 
+  it("途中で音が取れなくなったら、ノイズの底の期間より短い 30 秒で気づく", () => {
+    const judge = new SilenceJudge({ offsetDb: 6, minSilenceMs: 300 });
+    const clock = { ms: 0 };
+    for (let i = 0; i < 6; i++) warm(judge, clock);
+    expect(feed(judge, clock, -100, 31_000)).toMatchObject({
+      phase: "no-signal",
+      judgement: "speech",
+    });
+  });
+
   it("interrupt で判定だけ発話に戻し、統計は残す", () => {
     const judge = new SilenceJudge({ offsetDb: 6, minSilenceMs: 300 });
     const clock = { ms: 0 };

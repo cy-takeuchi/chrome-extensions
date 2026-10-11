@@ -32,6 +32,28 @@ describe("NoiseFloor", () => {
     expect(floor.percentile(0)).toBe(-20);
   });
 
+  it("上限に達するまでは、集まった分をすべて使う", () => {
+    const floor = new NoiseFloor({ windowSec: 300, minSec: 5 });
+    // 30 秒の窓なら発話だけになるが、上限 300 秒なので最初の無音も残る
+    fill(floor, -70, 40);
+    fill(floor, -20, 200, 0.5);
+    expect(floor.durationSec).toBeCloseTo(240);
+    expect(floor.percentile(0.1)).toBe(-70);
+    // 上限を超えたら古いものから捨てる
+    fill(floor, -20, 101, 0.5);
+    expect(floor.durationSec).toBeCloseTo(300, 0);
+    expect(floor.percentile(0)).toBe(-20);
+  });
+
+  it("0.1 dB 刻みにそろえる。範囲外は端に寄せる", () => {
+    const floor = new NoiseFloor({ windowSec: 30, minSec: 0.5 });
+    fill(floor, -70.04, 1);
+    expect(floor.percentile(0.5)).toBe(-70);
+    floor.reset();
+    fill(floor, -200, 1);
+    expect(floor.percentile(0.5)).toBe(-100);
+  });
+
   it("サンプル数ではなく、表す長さで重みを付ける", () => {
     const floor = new NoiseFloor({ windowSec: 30, minSec: 5 });
     // 発話 9 秒を 0.1 秒刻みで 90 回、無音 3 秒を倍速にして 0.3 秒刻みで 10 回
