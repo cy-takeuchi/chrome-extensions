@@ -47,6 +47,10 @@ section {
   margin-top: 6px;
 }
 
+.slider input {
+  min-width: 0;
+}
+
 .slider output {
   text-align: right;
   font-variant-numeric: tabular-nums;
