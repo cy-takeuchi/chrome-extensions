@@ -1,40 +1,40 @@
-import { Button, Description, Field, Input, Label } from '@headlessui/react'
-import { useEffect, useState } from 'react'
-import { getSettings, parseProjectUrl, saveSettings } from '@/lib/storage'
+import { Button, Description, Field, Input, Label } from "@headlessui/react";
+import { useEffect, useState } from "react";
+import { getSettings, parseProjectUrl, saveSettings } from "@/lib/storage";
 
 const App = () => {
-  const [token, setToken] = useState('')
-  const [projectUrl, setProjectUrl] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [token, setToken] = useState("");
+  const [projectUrl, setProjectUrl] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
     getSettings().then((settings) => {
-      setToken(settings.githubToken)
-      setProjectUrl(settings.projectUrl)
-    })
-  }, [])
+      setToken(settings.githubToken);
+      setProjectUrl(settings.projectUrl);
+    });
+  }, []);
 
   const handleSave = async () => {
     // Validate project URL
     if (projectUrl && !parseProjectUrl(projectUrl)) {
-      setMessage({ type: 'error', text: 'Project の URL の形式が正しくありません' })
-      return
+      setMessage({ type: "error", text: "Project の URL の形式が正しくありません" });
+      return;
     }
 
-    setSaving(true)
-    setMessage(null)
+    setSaving(true);
+    setMessage(null);
 
     try {
-      await saveSettings({ githubToken: token, projectUrl })
-      setMessage({ type: 'success', text: '保存しました' })
+      await saveSettings({ githubToken: token, projectUrl });
+      setMessage({ type: "success", text: "保存しました" });
     } catch {
-      setMessage({ type: 'error', text: '保存できませんでした' })
+      setMessage({ type: "error", text: "保存できませんでした" });
     } finally {
-      setSaving(false)
-      setTimeout(() => setMessage(null), 3000)
+      setSaving(false);
+      setTimeout(() => setMessage(null), 3000);
     }
-  }
+  };
 
   return (
     <div className="container">
@@ -45,8 +45,8 @@ const App = () => {
 
       <form
         onSubmit={(e) => {
-          e.preventDefault()
-          handleSave()
+          e.preventDefault();
+          handleSave();
         }}
       >
         <Field className="field">
@@ -81,13 +81,13 @@ const App = () => {
 
         <div className="actions">
           <Button type="submit" className="button primary" disabled={saving}>
-            {saving ? '保存しています…' : '保存'}
+            {saving ? "保存しています…" : "保存"}
           </Button>
           {message && <span className={`message ${message.type}`}>{message.text}</span>}
         </div>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
