@@ -4,7 +4,8 @@
   "bump-minor-pre-major": true,
   "packages": {
     "packages/hayame": {
-      "release-type": "node"
+      "release-type": "node",
+      "initial-version": "0.1.0"
     },
     "packages/hoi": {
       "release-type": "node"
