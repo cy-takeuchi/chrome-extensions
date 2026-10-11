@@ -1,110 +1,110 @@
-import { createRoot, type Root } from 'react-dom/client'
-import { AddDialog, type DialogStatus } from '@/components/AddDialog'
+import { createRoot, type Root } from "react-dom/client";
+import { AddDialog, type DialogStatus } from "@/components/AddDialog";
 import {
   findActiveSelectionContext,
   getKintoneCommentPermalink,
   isKintonePage,
-} from '@/lib/kintonePermalink'
+} from "@/lib/kintonePermalink";
 import type {
   DraftInput,
   SubmitDraftMessage,
   SubmitDraftResponse,
   TriggerDialogMessage,
-} from '@/lib/messages'
-import dialogStyles from './dialog.css?inline'
+} from "@/lib/messages";
+import dialogStyles from "./dialog.css?inline";
 
-let shadowRoot: ShadowRoot | null = null
-let reactRoot: Root | null = null
+let shadowRoot: ShadowRoot | null = null;
+let reactRoot: Root | null = null;
 
 interface DialogState {
-  isOpen: boolean
-  initialBody: string
-  status: DialogStatus
-  errorMessage?: string
+  isOpen: boolean;
+  initialBody: string;
+  status: DialogStatus;
+  errorMessage?: string;
 }
 
 let dialogState: DialogState = {
   isOpen: false,
-  initialBody: '',
-  status: 'idle',
-}
+  initialBody: "",
+  status: "idle",
+};
 
 const getOrCreateShadowContainer = (): ShadowRoot => {
-  if (shadowRoot) return shadowRoot
+  if (shadowRoot) return shadowRoot;
 
-  const container = document.createElement('div')
-  container.id = 'hoi-root'
-  document.body.appendChild(container)
+  const container = document.createElement("div");
+  container.id = "hoi-root";
+  document.body.appendChild(container);
 
-  shadowRoot = container.attachShadow({ mode: 'open' })
+  shadowRoot = container.attachShadow({ mode: "open" });
 
   // Inject styles into shadow DOM
-  const styleEl = document.createElement('style')
-  styleEl.textContent = dialogStyles
-  shadowRoot.appendChild(styleEl)
+  const styleEl = document.createElement("style");
+  styleEl.textContent = dialogStyles;
+  shadowRoot.appendChild(styleEl);
 
   // Create mount point for React
-  const mountPoint = document.createElement('div')
-  mountPoint.id = 'tgp-mount'
-  shadowRoot.appendChild(mountPoint)
+  const mountPoint = document.createElement("div");
+  mountPoint.id = "tgp-mount";
+  shadowRoot.appendChild(mountPoint);
 
-  reactRoot = createRoot(mountPoint)
+  reactRoot = createRoot(mountPoint);
 
-  return shadowRoot
-}
+  return shadowRoot;
+};
 
 const updateDialogState = (updates: Partial<DialogState>) => {
-  dialogState = { ...dialogState, ...updates }
-  renderDialog()
-}
+  dialogState = { ...dialogState, ...updates };
+  renderDialog();
+};
 
 const showDialog = (selectedText: string) => {
-  if (dialogState.isOpen) return
+  if (dialogState.isOpen) return;
 
-  getOrCreateShadowContainer()
+  getOrCreateShadowContainer();
   updateDialogState({
     isOpen: true,
     initialBody: selectedText,
-    status: 'idle',
+    status: "idle",
     errorMessage: undefined,
-  })
-}
+  });
+};
 
 const closeDialog = () => {
   updateDialogState({
     isOpen: false,
-    status: 'idle',
+    status: "idle",
     errorMessage: undefined,
-  })
-}
+  });
+};
 
 const handleSubmit = async (data: DraftInput) => {
-  updateDialogState({ status: 'loading', errorMessage: undefined })
+  updateDialogState({ status: "loading", errorMessage: undefined });
 
-  const message: SubmitDraftMessage = { type: 'SUBMIT_DRAFT', payload: data }
-  let response: SubmitDraftResponse | undefined
+  const message: SubmitDraftMessage = { type: "SUBMIT_DRAFT", payload: data };
+  let response: SubmitDraftResponse | undefined;
   try {
-    response = await browser.runtime.sendMessage(message)
+    response = await browser.runtime.sendMessage(message);
   } catch {
     updateDialogState({
-      status: 'error',
-      errorMessage: '拡張機能と通信できませんでした。ページを再読み込みしてください',
-    })
-    return
+      status: "error",
+      errorMessage: "拡張機能と通信できませんでした。ページを再読み込みしてください",
+    });
+    return;
   }
 
   if (response?.success) {
-    updateDialogState({ status: 'success' })
+    updateDialogState({ status: "success" });
   } else {
     updateDialogState({
-      status: 'error',
-      errorMessage: response?.error || '不明なエラーが発生しました',
-    })
+      status: "error",
+      errorMessage: response?.error || "不明なエラーが発生しました",
+    });
   }
-}
+};
 
 const renderDialog = () => {
-  if (!reactRoot) return
+  if (!reactRoot) return;
 
   reactRoot.render(
     <AddDialog
@@ -115,45 +115,45 @@ const renderDialog = () => {
       onClose={closeDialog}
       onSubmit={handleSubmit}
     />,
-  )
-}
+  );
+};
 
 const handleTriggerDialog = async (): Promise<void> => {
-  let selectedText = window.getSelection()?.toString() || ''
-  let url = window.location.href
+  let selectedText = window.getSelection()?.toString() || "";
+  let url = window.location.href;
 
   if (isKintonePage(url)) {
-    const ctx = findActiveSelectionContext()
+    const ctx = findActiveSelectionContext();
     if (ctx) {
-      selectedText = ctx.selection.toString()
-      const permalink = await getKintoneCommentPermalink(ctx)
+      selectedText = ctx.selection.toString();
+      const permalink = await getKintoneCommentPermalink(ctx);
       if (permalink) {
-        url = permalink
+        url = permalink;
       }
     }
   }
 
-  const bodyWithUrl = selectedText ? `${selectedText}\n\n${url}` : url
-  showDialog(bodyWithUrl)
-}
+  const bodyWithUrl = selectedText ? `${selectedText}\n\n${url}` : url;
+  showDialog(bodyWithUrl);
+};
 
 export default defineContentScript({
-  matches: ['<all_urls>'],
+  matches: ["<all_urls>"],
   // ダイアログの CSS は Shadow DOM 内に ?inline で読み込むため、ページには注入しない
-  cssInjectionMode: 'manual',
+  cssInjectionMode: "manual",
   main() {
     browser.runtime.onMessage.addListener(
       (message: TriggerDialogMessage, _sender, sendResponse) => {
-        if (message.type === 'TRIGGER_DIALOG') {
+        if (message.type === "TRIGGER_DIALOG") {
           handleTriggerDialog().then(() => {
-            sendResponse({ success: true })
-          })
-          return true // Keep message channel open for async response
+            sendResponse({ success: true });
+          });
+          return true; // Keep message channel open for async response
         }
-        return false
+        return false;
       },
-    )
+    );
 
-    console.log('hoi: Content script loaded')
+    console.log("hoi: Content script loaded");
   },
-})
+});

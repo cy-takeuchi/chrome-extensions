@@ -1,23 +1,23 @@
-import { type ReactNode, useEffect, useRef, useState } from 'react'
-import type { DraftInput } from '@/lib/messages'
+import { type ReactNode, useEffect, useRef, useState } from "react";
+import type { DraftInput } from "@/lib/messages";
 
-export type DialogStatus = 'idle' | 'loading' | 'success' | 'error'
+export type DialogStatus = "idle" | "loading" | "success" | "error";
 
 interface AddDialogProps {
-  isOpen: boolean
-  initialBody: string
-  onClose: () => void
-  onSubmit: (data: DraftInput) => void
-  status?: DialogStatus
-  errorMessage?: string
+  isOpen: boolean;
+  initialBody: string;
+  onClose: () => void;
+  onSubmit: (data: DraftInput) => void;
+  status?: DialogStatus;
+  errorMessage?: string;
 }
 
 interface DialogFrameProps {
-  label: string
+  label: string;
   /** false の間は背景クリックや Enter で閉じない */
-  closable: boolean
-  onClose: () => void
-  children: ReactNode
+  closable: boolean;
+  onClose: () => void;
+  children: ReactNode;
 }
 
 /**
@@ -35,14 +35,14 @@ function DialogFrame({ label, closable, onClose, children }: DialogFrameProps) {
       <div
         className="tgp-backdrop"
         onClick={closable ? onClose : undefined}
-        onKeyDown={(e) => closable && e.key === 'Enter' && onClose()}
+        onKeyDown={(e) => closable && e.key === "Enter" && onClose()}
         role="button"
         tabIndex={closable ? 0 : -1}
         aria-label="閉じる"
       />
       <div className="tgp-dialog-container">{children}</div>
     </div>
-  )
+  );
 }
 
 export function AddDialog({
@@ -50,50 +50,50 @@ export function AddDialog({
   initialBody,
   onClose,
   onSubmit,
-  status = 'idle',
+  status = "idle",
   errorMessage,
 }: AddDialogProps) {
-  const [title, setTitle] = useState('')
-  const [body, setBody] = useState(initialBody)
-  const [assignToSelf, setAssignToSelf] = useState(true)
-  const titleInputRef = useRef<HTMLInputElement>(null)
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState(initialBody);
+  const [assignToSelf, setAssignToSelf] = useState(true);
+  const titleInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isOpen) {
-      setTitle('')
-      setBody(initialBody)
-      setAssignToSelf(true)
-      setTimeout(() => titleInputRef.current?.focus(), 0)
+      setTitle("");
+      setBody(initialBody);
+      setAssignToSelf(true);
+      setTimeout(() => titleInputRef.current?.focus(), 0);
     }
-  }, [isOpen, initialBody])
+  }, [isOpen, initialBody]);
 
   useEffect(() => {
-    if (status === 'success') {
-      const timer = setTimeout(onClose, 600)
-      return () => clearTimeout(timer)
+    if (status === "success") {
+      const timer = setTimeout(onClose, 600);
+      return () => clearTimeout(timer);
     }
-  }, [status, onClose])
+  }, [status, onClose]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen && status !== 'loading') {
-        onClose()
+      if (e.key === "Escape" && isOpen && status !== "loading") {
+        onClose();
       }
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, status, onClose])
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, status, onClose]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (status === 'loading') return
-    onSubmit({ title, body, assignToSelf })
-  }
+    e.preventDefault();
+    if (status === "loading") return;
+    onSubmit({ title, body, assignToSelf });
+  };
 
-  const isLoading = status === 'loading'
-  const isSuccess = status === 'success'
+  const isLoading = status === "loading";
+  const isSuccess = status === "success";
 
   if (isSuccess) {
     return (
@@ -107,7 +107,7 @@ export function AddDialog({
           </button>
         </div>
       </DialogFrame>
-    )
+    );
   }
 
   return (
@@ -158,7 +158,7 @@ export function AddDialog({
             <span className="tgp-label">担当者</span>
             <div className="tgp-radio-group" role="radiogroup" aria-label="担当者">
               <label className="tgp-radio">
-                <span className={`tgp-radio-option ${assignToSelf ? 'checked' : ''}`}>
+                <span className={`tgp-radio-option ${assignToSelf ? "checked" : ""}`}>
                   <input
                     type="radio"
                     name="assignee"
@@ -172,7 +172,7 @@ export function AddDialog({
                 </span>
               </label>
               <label className="tgp-radio">
-                <span className={`tgp-radio-option ${!assignToSelf ? 'checked' : ''}`}>
+                <span className={`tgp-radio-option ${!assignToSelf ? "checked" : ""}`}>
                   <input
                     type="radio"
                     name="assignee"
@@ -208,12 +208,12 @@ export function AddDialog({
                   追加しています…
                 </>
               ) : (
-                'Project に追加'
+                "Project に追加"
               )}
             </button>
           </div>
         </form>
       </div>
     </DialogFrame>
-  )
+  );
 }
