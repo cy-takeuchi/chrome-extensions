@@ -18,6 +18,7 @@ export type Status = {
   note: string | null;
   phase: JudgePhase | null;
   rmsDb: number | null;
+  speechDb: number | null;
   floorDb: number | null;
   thresholdDb: number | null;
   judgement: Judgement | null;
@@ -30,6 +31,7 @@ export const emptyStatus = (analysis: Analysis, note: string | null = null): Sta
   note,
   phase: null,
   rmsDb: null,
+  speechDb: null,
   floorDb: null,
   thresholdDb: null,
   judgement: null,

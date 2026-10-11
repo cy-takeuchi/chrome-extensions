@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { STATUS_PORT, type StatusMessage } from "@/lib/messages";
+import { type LogMessage, type LogRequest, STATUS_PORT, type StatusMessage } from "@/lib/messages";
 import {
   DEFAULT_SETTINGS,
   LIMITS,
@@ -10,24 +10,51 @@ import {
 } from "@/lib/settings";
 import type { Status } from "@/lib/status";
 
-/** アクティブなタブの content script に繋ぎ、状態を受け取る。YouTube 以外では null のまま */
+/** CSV をファイルとして保存する */
+const saveCsv = (csv: string) => {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `hayame-log-${stamp}.csv`;
+  a.click();
+  // すぐ解放すると保存が始まる前に消えることがあるので、少し待つ
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+
+/**
+ * アクティブなタブの content script に繋ぎ、状態を受け取る。YouTube 以外では null のまま。
+ * requestLog で直近の計測を CSV で受け取り、保存する
+ */
 const useStatus = () => {
   const [status, setStatus] = useState<Status | null>(null);
+  const [port, setPort] = useState<Browser.runtime.Port | null>(null);
   useEffect(() => {
     let port: Browser.runtime.Port | null = null;
     browser.tabs.query({ active: true, currentWindow: true }).then(([tab]) => {
       if (tab?.id === undefined) return;
       port = browser.tabs.connect(tab.id, { name: STATUS_PORT });
-      port.onMessage.addListener((m: StatusMessage) => setStatus(m.status));
+      setPort(port);
+      port.onMessage.addListener((m: StatusMessage | LogMessage) => {
+        if (m.type === "status") setStatus(m.status);
+        else saveCsv(m.csv);
+      });
       // 受け手がいなければすぐ切れる。lastError を読んで警告を出さないようにする
       port.onDisconnect.addListener(() => {
         void browser.runtime.lastError;
         setStatus(null);
+        setPort(null);
       });
     });
     return () => port?.disconnect();
   }, []);
-  return status;
+  const requestLog = () => {
+    const request: LogRequest = { type: "log" };
+    port?.postMessage(request);
+  };
+  return [status, requestLog] as const;
 };
 
 const useSettings = () => {
@@ -83,7 +110,7 @@ const Slider = ({
 
 export const Popup = () => {
   const [settings, update] = useSettings();
-  const status = useStatus();
+  const [status, requestLog] = useStatus();
 
   return (
     <main>
@@ -143,6 +170,8 @@ export const Popup = () => {
             </dd>
             <dt>RMS</dt>
             <dd>{db(status.rmsDb)}</dd>
+            <dt>声の大きさ</dt>
+            <dd>{db(status.speechDb)}</dd>
             <dt>ノイズの底</dt>
             <dd>{db(status.floorDb)}</dd>
             <dt>しきい値</dt>
@@ -152,6 +181,11 @@ export const Popup = () => {
             <dt>基準速度</dt>
             <dd>{rate(status.baseRate)}</dd>
           </dl>
+        )}
+        {status !== null && (
+          <button type="button" className="log" onClick={requestLog}>
+            ログを保存（直近 2 分の計測を CSV で）
+          </button>
         )}
       </section>
     </main>

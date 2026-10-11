@@ -1,6 +1,7 @@
 import { SilenceJudge } from "../judge";
 import { ConflictGuard, RateTracker, targetRate } from "../rateTracker";
 import { rmsDb } from "../rms";
+import type { LogEntry } from "../sampleLog";
 import type { Settings } from "../settings";
 import { emptyStatus, type Status } from "../status";
 
@@ -17,6 +18,9 @@ const TICK_MS = 40;
 const SETTLE_MS = 200;
 /** 1 回のサンプルの重みの上限（秒）。タイマーが間引かれても統計が偏りすぎないように */
 const MAX_SAMPLE_SEC = 0.5;
+/** 声の主な帯域（Hz）。これより低い音（空調・風・ハム）と高い音（ヒスノイズ）を除いて測る */
+const VOICE_LOW_HZ = 300;
+const VOICE_HIGH_HZ = 3400;
 
 const errorMessage = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
@@ -39,6 +43,9 @@ const pausedReason = (video: HTMLVideoElement): string | null => {
 export class VideoSession {
   private readonly abort = new AbortController();
   private readonly analyser: AnalyserNode;
+  /** 声の帯域だけを通した音を測る。解析専用の経路なので、再生音には影響しない */
+  private readonly voiceFilters: BiquadFilterNode[];
+  private readonly voiceAnalyser: AnalyserNode;
   private readonly buffer: Float32Array<ArrayBuffer>;
   private readonly judge: SilenceJudge;
   private readonly rate: RateTracker;
@@ -58,9 +65,18 @@ export class VideoSession {
     readonly video: HTMLVideoElement,
     private readonly audio: AudioContext,
     private settings: Settings,
+    private readonly onSample: (entry: LogEntry) => void = () => {},
   ) {
     this.analyser = audio.createAnalyser();
     this.analyser.fftSize = 2048;
+    this.voiceAnalyser = audio.createAnalyser();
+    this.voiceAnalyser.fftSize = 2048;
+    this.voiceFilters = [
+      new BiquadFilterNode(audio, { type: "highpass", frequency: VOICE_LOW_HZ }),
+      new BiquadFilterNode(audio, { type: "lowpass", frequency: VOICE_HIGH_HZ }),
+    ];
+    const [highpass, lowpass] = this.voiceFilters;
+    highpass?.connect(lowpass as BiquadFilterNode).connect(this.voiceAnalyser);
     this.buffer = new Float32Array(this.analyser.fftSize);
     this.judge = new SilenceJudge(settings);
     this.rate = new RateTracker(video.playbackRate);
@@ -101,6 +117,8 @@ export class VideoSession {
     this.abort.abort();
     this.source?.disconnect();
     this.analyser.disconnect();
+    for (const filter of this.voiceFilters) filter.disconnect();
+    this.voiceAnalyser.disconnect();
     for (const track of this.stream?.getTracks() ?? []) track.stop();
     this.silent = false;
     const base = this.rate.release(this.video.playbackRate);
@@ -143,6 +161,7 @@ export class VideoSession {
     try {
       this.source = this.audio.createMediaStreamSource(new MediaStream([track]));
       this.source.connect(this.analyser);
+      if (this.voiceFilters[0]) this.source.connect(this.voiceFilters[0]);
       this.trackId = track.id;
       this.failure = null;
     } catch (e) {
@@ -164,9 +183,11 @@ export class VideoSession {
     const failure =
       this.failure ??
       (this.audio.state === "running" ? null : `AudioContext が ${this.audio.state}`);
+    const weightSec = Math.min(MAX_SAMPLE_SEC, (elapsed / 1000) * this.video.playbackRate);
     if (failure) {
       this.interrupt();
       this.update(failure);
+      this.log(now, weightSec, null, null, failure);
       return;
     }
     const paused = pausedReason(this.video);
@@ -174,18 +195,22 @@ export class VideoSession {
       this.interrupt();
       this.settleUntil = now + SETTLE_MS;
       this.update(paused);
+      this.log(now, weightSec, null, null, paused);
       return;
     }
     this.analyser.getFloatTimeDomainData(this.buffer);
     const db = rmsDb(this.buffer);
+    this.voiceAnalyser.getFloatTimeDomainData(this.buffer);
+    const voiceDb = rmsDb(this.buffer);
     if (now < this.settleUntil) {
       this.update(null, { db });
+      this.log(now, weightSec, db, voiceDb, "再開直後");
       return;
     }
     const result = this.judge.process({
       db,
       mediaMs: this.video.currentTime * 1000,
-      sec: Math.min(MAX_SAMPLE_SEC, (elapsed / 1000) * this.video.playbackRate),
+      sec: weightSec,
     });
     this.setSilent(result.judgement === "silent");
     const note =
@@ -193,8 +218,41 @@ export class VideoSession {
         ? "統計を集めています"
         : result.phase === "no-signal"
           ? "音が取れていません"
-          : null;
+          : result.phase === "no-pauses"
+            ? "声と区別できる間がありません"
+            : null;
     this.update(note, { db, ...result });
+    this.log(now, weightSec, db, voiceDb, note, result);
+  }
+
+  private log(
+    wallMs: number,
+    weightSec: number,
+    fullDb: number | null,
+    bandDb: number | null,
+    note: string | null,
+    result?: {
+      phase: LogEntry["phase"];
+      speechDb: number | null;
+      floorDb: number | null;
+      thresholdDb: number | null;
+    },
+  ): void {
+    this.onSample({
+      wallMs,
+      mediaSec: this.video.currentTime,
+      weightSec,
+      fullDb,
+      bandDb,
+      speechDb: result?.speechDb ?? null,
+      noiseDb: result?.floorDb ?? null,
+      thresholdDb: result?.thresholdDb ?? null,
+      phase: result?.phase ?? null,
+      judgement: this.silent ? "silent" : "speech",
+      playbackRate: this.video.playbackRate,
+      baseRate: this.rate.base,
+      note,
+    });
   }
 
   private setSilent(silent: boolean): void {
@@ -225,6 +283,7 @@ export class VideoSession {
     values: Partial<{
       db: number;
       phase: Status["phase"];
+      speechDb: number | null;
       floorDb: number | null;
       thresholdDb: number | null;
       judgement: Status["judgement"];
@@ -235,6 +294,7 @@ export class VideoSession {
       note,
       phase: values.phase ?? null,
       rmsDb: values.db ?? null,
+      speechDb: values.speechDb ?? null,
       floorDb: values.floorDb ?? null,
       thresholdDb: values.thresholdDb ?? null,
       judgement: values.judgement ?? (this.silent ? "silent" : "speech"),

@@ -89,3 +89,11 @@ section {
   color: #2563eb;
   font-weight: 600;
 }
+
+.log {
+  margin-top: 10px;
+  width: 100%;
+  padding: 4px 8px;
+  font: inherit;
+  cursor: pointer;
+}

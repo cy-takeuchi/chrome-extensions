@@ -8,6 +8,10 @@ export const STATUS_PORT = "status";
 
 /** content script → ポップアップ */
 export type StatusMessage = { type: "status"; status: Status };
+/** ポップアップ → content script。直近の計測を CSV で求める */
+export type LogRequest = { type: "log" };
+/** content script → ポップアップ */
+export type LogMessage = { type: "log"; csv: string };
 
 export const isBadgeMessage = (m: unknown): m is BadgeMessage =>
   typeof m === "object" && m !== null && (m as { type?: unknown }).type === "badge";

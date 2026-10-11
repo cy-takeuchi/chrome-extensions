@@ -1,11 +1,20 @@
-import { type BadgeMessage, STATUS_PORT, type StatusMessage } from "@/lib/messages";
+import {
+  type BadgeMessage,
+  type LogMessage,
+  type LogRequest,
+  STATUS_PORT,
+  type StatusMessage,
+} from "@/lib/messages";
 import { pickVideo } from "@/lib/player/pick";
 import { VideoSession } from "@/lib/player/session";
+import { SampleLog } from "@/lib/sampleLog";
 import { loadSettings, type Settings, watchSettings } from "@/lib/settings";
 import { badgeFor, emptyStatus, type Status } from "@/lib/status";
 
 /** ポップアップへ状態を流す間隔 */
 const REPORT_MS = 100;
+/** 書き出せる計測の件数。40ms ごとなので約 2 分 */
+const LOG_CAPACITY = 3000;
 
 export default defineContentScript({
   matches: ["https://www.youtube.com/*"],
@@ -13,6 +22,7 @@ export default defineContentScript({
     let settings: Settings = await loadSettings();
     let session: VideoSession | null = null;
     let audio: AudioContext | null = null;
+    const log = new SampleLog(LOG_CAPACITY);
 
     /**
      * 解析専用の AudioContext。出力にはつながないので、止まっていても再生音には影響しない。
@@ -38,7 +48,7 @@ export default defineContentScript({
       if (video === session?.video) return;
       stopSession();
       if (!video) return;
-      session = new VideoSession(video, audioContext(), settings);
+      session = new VideoSession(video, audioContext(), settings, (entry) => log.push(entry));
       session.start();
     };
 
@@ -60,6 +70,11 @@ export default defineContentScript({
       if (port.name !== STATUS_PORT) return;
       ports.add(port);
       port.onDisconnect.addListener(() => ports.delete(port));
+      port.onMessage.addListener((message: LogRequest) => {
+        if (message?.type !== "log") return;
+        const reply: LogMessage = { type: "log", csv: log.toCsv() };
+        port.postMessage(reply);
+      });
     });
     browser.runtime.onMessage.addListener((message: { type?: string }) => {
       if (message?.type === "resend-badge") sendBadge(true);

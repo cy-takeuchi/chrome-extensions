@@ -35,12 +35,47 @@ describe("SilenceJudge", () => {
     warm(judge, clock);
     expect(feed(judge, clock, -60, 200)).toMatchObject({
       phase: "ready",
+      speechDb: -20,
       floorDb: -60,
       thresholdDb: -54,
       judgement: "speech",
     });
     expect(feed(judge, clock, -60, 200).judgement).toBe("silent");
     expect(feed(judge, clock, -20, 40).judgement).toBe("speech");
+  });
+
+  it("喋り続けて間のない動画では、小さめの声が続いても無音にしない", () => {
+    const judge = new SilenceJudge({ offsetDb: 6, minSilenceMs: 300 });
+    const clock = { ms: 0 };
+    const results = [];
+    // 普通の声（-18）と小さめの声（-32）が交互に続く。下位 10% は小さめの声になる
+    for (let i = 0; i < 20; i++) {
+      results.push(feed(judge, clock, -18, 1000));
+      results.push(feed(judge, clock, -32, 600));
+    }
+    expect(results.every((r) => r.judgement === "speech")).toBe(true);
+    expect(results.at(-1)?.phase).toBe("no-pauses");
+  });
+
+  it("台詞の間が完全な無音の動画では、間だけを無音にする", () => {
+    const judge = new SilenceJudge({ offsetDb: 6, minSilenceMs: 300 });
+    const clock = { ms: 0 };
+    // 声が 9.6 秒、間（完全な無音）が 0.4 秒。間は全体の 4%
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 6; j++) {
+        feed(judge, clock, -18, 1000);
+        feed(judge, clock, -32, 600);
+      }
+      feed(judge, clock, -100, 400);
+    }
+    feed(judge, clock, -18, 400);
+    expect(feed(judge, clock, -32, 600)).toMatchObject({
+      phase: "ready",
+      floorDb: -100,
+      thresholdDb: -94,
+      judgement: "speech",
+    });
+    expect(feed(judge, clock, -100, 400).judgement).toBe("silent");
   });
 
   it("オフセットを変えるとしきい値が変わる", () => {

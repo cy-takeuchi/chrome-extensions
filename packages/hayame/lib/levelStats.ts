@@ -2,7 +2,7 @@ import { MIN_DB } from "./rms";
 
 type Sample = { bin: number; sec: number };
 
-export type NoiseFloorOptions = {
+export type LevelStatsOptions = {
   /** 統計に使う直近の長さの上限（動画の秒数）。上限までは集まった分をすべて使う */
   windowSec: number;
   /** これだけ集まるまでは推定しない（動画の秒数） */
@@ -20,7 +20,7 @@ const toBin = (db: number) =>
 const toDb = (bin: number) => Math.round((MIN_DB + bin * BIN_DB) * 10) / 10;
 
 /**
- * 直近の RMS の分布を持ち、分位点を返す。
+ * 直近の RMS の分布を持ち、分位点などを返す。
  *
  * 各サンプルは、それが表す動画の長さ（間隔 × 再生速度）で重みを付ける。
  * 無音を倍速にするとその区間のサンプル数が減るので、回数で数えると分布が発話側に偏り、
@@ -28,14 +28,14 @@ const toDb = (bin: number) => Math.round((MIN_DB + bin * BIN_DB) * 10) / 10;
  *
  * 1 分でも 1,500 件ほどになり、40ms ごとに並べ替えると無駄が多いので、0.1 dB 刻みのヒストグラムで持つ
  */
-export class NoiseFloor {
+export class LevelStats {
   private samples: Sample[] = [];
   /** 先頭の、まだ捨てていないサンプルの位置 */
   private head = 0;
   private hist = new Float64Array(BINS);
   private totalSec = 0;
 
-  constructor(private readonly options: NoiseFloorOptions) {}
+  constructor(private readonly options: LevelStatsOptions) {}
 
   push(db: number, sec: number): void {
     if (!(sec > 0) || !Number.isFinite(db)) return;
@@ -77,6 +77,29 @@ export class NoiseFloor {
       if (acc >= target) return toDb(bin);
     }
     return last === null ? null : toDb(last);
+  }
+
+  /** `db` より小さいサンプルが占める割合（0〜1）。集まりきっていなければ null */
+  shareBelow(db: number): number | null {
+    if (this.totalSec < this.options.minSec) return null;
+    const end = toBin(db);
+    let sec = 0;
+    for (let bin = 0; bin < end; bin++) sec += this.hist[bin] ?? 0;
+    return sec / this.totalSec;
+  }
+
+  /** `db` より小さいサンプルだけでの分位点（0〜1）。無ければ null */
+  percentileBelow(p: number, db: number): number | null {
+    const end = toBin(db);
+    let total = 0;
+    for (let bin = 0; bin < end; bin++) total += this.hist[bin] ?? 0;
+    if (total <= 0) return null;
+    let acc = 0;
+    for (let bin = 0; bin < end; bin++) {
+      acc += this.hist[bin] ?? 0;
+      if (acc >= p * total) return toDb(bin);
+    }
+    return toDb(end - 1);
   }
 
   reset(): void {
