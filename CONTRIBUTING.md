@@ -4,6 +4,7 @@
 
 ここにはリポジトリ全体のルールを書いています。パッケージごとのコマンドやテストの詳しい説明は、各パッケージの CONTRIBUTING.md を見てください。
 
+- [hayame](packages/hayame/CONTRIBUTING.md)
 - [hoi](packages/hoi/CONTRIBUTING.md)
 - [utsushi](packages/utsushi/CONTRIBUTING.md)
 
@@ -68,7 +69,7 @@ pnpm biome:write    # lint / format を自動修正
 
 [Biome](https://biomejs.dev/) でフォーマットと lint を統一しています。共通の設定はルートの `biome.json` にあり、クォートとセミコロンの書き方だけ各パッケージの `biome.json` で上書きしています。
 
-| | hoi | utsushi |
+| | hoi | utsushi・hayame |
 |---|---|---|
 | クォート | シングル | ダブル |
 | セミコロン | なし（`asNeeded`） | あり |
@@ -95,7 +96,7 @@ chore: ビルド・CI 等の変更
 [release-please](https://github.com/googleapis/release-please) がコミットメッセージを元に、パッケージごとにバージョンと CHANGELOG を更新します。
 
 - そのパッケージのディレクトリを変更したコミットだけが、そのパッケージのリリースに入ります
-- タグは `hoi-vX.Y.Z` / `utsushi-vX.Y.Z` で、リリースには `wxt zip` で作った zip を添付します
+- タグは `hayame-vX.Y.Z` / `hoi-vX.Y.Z` / `utsushi-vX.Y.Z` で、リリースには `wxt zip` で作った zip を添付します
 - `feat` でマイナー、`fix` でパッチが上がります。1.0.0 未満の間は、破壊的変更でもマイナーが上がります
 - バージョンは各パッケージの `package.json` にだけ書きます。`manifest.json` の `version` はビルド時に WXT が入れます
 

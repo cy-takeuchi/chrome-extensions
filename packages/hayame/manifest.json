@@ -1,0 +1,21 @@
+{
+  "name": "hayame",
+  "description": "YouTube の動画で、人が喋っていない区間だけを自動で速く再生する。標準の Picture-in-Picture もショートカットで開ける",
+  "permissions": ["storage", "scripting", "activeTab"],
+  "host_permissions": ["https://www.youtube.com/*"],
+  "action": {
+    "default_title": "hayame",
+    "default_icon": {
+      "16": "icon/16.png",
+      "32": "icon/32.png",
+      "48": "icon/48.png",
+      "128": "icon/128.png"
+    }
+  },
+  "commands": {
+    "toggle-pip": {
+      "suggested_key": { "default": "Alt+P" },
+      "description": "再生中の動画を Picture-in-Picture で開く／戻す"
+    }
+  }
+}

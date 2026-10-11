@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "screenshots": "pnpm --filter hoi --filter utsushi build && op run --env-file=../packages/hoi/e2e/.env -- playwright test -c screenshots/playwright.config.ts",
+    "screenshots": "pnpm --filter hayame --filter hoi --filter utsushi build && op run --env-file=../packages/hoi/e2e/.env -- playwright test -c screenshots/playwright.config.ts",
+    "screenshots:hayame": "pnpm --filter hayame build && playwright test -c screenshots/playwright.config.ts hayame",
     "typecheck": "tsc --noEmit -p screenshots"
   },
   "devDependencies": {

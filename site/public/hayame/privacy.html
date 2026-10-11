@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hayame のプライバシーポリシー</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="site-title" href="../">Chrome 拡張機能</a>
+        <nav class="site-nav">
+          <a href="./" aria-current="page">hayame</a>
+          <a href="../hoi/">hoi</a>
+          <a href="../utsushi/">utsushi</a>
+          <a href="https://github.com/cy-takeuchi/chrome-extensions">GitHub</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <h1>hayame のプライバシーポリシー</h1>
+        <p class="lead">最終更新日: 2026 年 10 月 11 日</p>
+      </section>
+
+      <p>
+        このページでは、Chrome 拡張機能「hayame」（以下「本拡張機能」）が扱う情報と、その扱い方を説明します。
+      </p>
+
+      <h2>扱う情報</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>情報</th>
+            <th>使い道</th>
+            <th>保存・送信先</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>YouTube で再生中の動画の音声</td>
+            <td>音量を測り、無音の区間を見つけるため</td>
+            <td>
+              ブラウザの中で音量の数値にするだけです。音声そのものは保存・送信しません。音量の統計は直近 1 分ぶんだけをメモリに持ち、ページを離れると消えます
+            </td>
+          </tr>
+          <tr>
+            <td>計測のログ（音量、しきい値、判定、再生速度、再生位置）</td>
+            <td>判定の調整のため</td>
+            <td>
+              直近 2 分ぶんだけをメモリに持ち、ページを離れると消えます。ポップアップで「ログを保存」を押したときだけ、CSV ファイルとしてパソコンに保存します。動画の URL やタイトルは含みません。どこにも送信しません
+            </td>
+          </tr>
+          <tr>
+            <td>動画の再生速度と再生の状態（再生中・一時停止中など）</td>
+            <td>無音の間だけ速度を上げ、元の速度に戻すため</td>
+            <td>ページの中で使うだけで、保存・送信しません</td>
+          </tr>
+          <tr>
+            <td>設定（ON / OFF、無音速度、しきい値、最短時間）</td>
+            <td>次回以降も同じ設定で動くため</td>
+            <td>ブラウザの <code>chrome.storage.local</code>。同期はしません</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>収集しない情報</h2>
+      <ul>
+        <li>見ている動画、URL、視聴履歴は記録しません。</li>
+        <li>YouTube のアカウントの情報や、ページに表示されている内容は読み取りません。</li>
+        <li>利用状況の計測（アクセス解析）や広告のための情報は収集しません。</li>
+        <li>開発者のサーバーはありません。どの情報も第三者に送りません。</li>
+      </ul>
+
+      <h2>権限の用途</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>権限</th>
+            <th>用途</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>https://www.youtube.com/*</code></td>
+            <td>YouTube のページで動画の音量を測り、再生速度を変えるため</td>
+          </tr>
+          <tr>
+            <td><code>activeTab</code>、<code>scripting</code></td>
+            <td>
+              <kbd>⌥</kbd> <kbd>P</kbd> を押したタブで、再生中の動画を Picture-in-Picture で開くため。ショートカットを押したタブにだけ、そのときだけ働きます
+            </td>
+          </tr>
+          <tr>
+            <td><code>storage</code></td>
+            <td>設定を保存するため</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>情報の削除</h2>
+      <p>本拡張機能をアンインストールすると、保存した設定はすべて削除されます。</p>
+
+      <h2>お問い合わせ</h2>
+      <p>
+        本ポリシーや本拡張機能についての質問は、
+        <a href="https://github.com/cy-takeuchi/chrome-extensions/issues">GitHub の Issues</a> にお寄せください。
+      </p>
+
+      <h2>改定</h2>
+      <p>本ポリシーを変更した場合は、このページで公開し、最終更新日を更新します。</p>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <span>© 2026 Yoshihiko Takeuchi</span>
+        <a href="https://github.com/cy-takeuchi/chrome-extensions/tree/main/packages/hayame">ソースコード（MIT ライセンス）</a>
+        <span>YouTube は Google LLC の商標です。</span>
+      </div>
+    </footer>
+  </body>
+</html>
