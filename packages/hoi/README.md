@@ -14,7 +14,9 @@ kintone のスレッドやレコードのコメントを選択した場合は、
 
 ## インストール
 
-Chrome ウェブストアには公開していないので、パッケージ化されていない拡張機能として読み込みます。
+[Chrome ウェブストア](https://chromewebstore.google.com/detail/hoi/cgddlhnfkhodlajgnhognbbhkmnnbbbn)から「Chrome に追加」でインストールします。
+
+ウェブストアを使わない場合は、パッケージ化されていない拡張機能として読み込みます。
 
 1. 拡張機能のファイルを用意する。次のどちらか
    - [リリース](https://github.com/cy-takeuchi/chrome-extensions/releases)から `hoi-X.Y.Z-chrome.zip` をダウンロードして展開する
