@@ -1,6 +1,6 @@
 # hoi
 
-kintone などの画面で選択したテキストを、元ページへのリンク付きで GitHub Projects に Draft Issue として登録する Chrome 拡張機能です。
+kintone の画面で選択したテキストを、元ページへのリンク付きで GitHub Projects に Draft Issue として登録する Chrome 拡張機能です。
 
 kintone のスレッドやレコードのコメントを選択した場合は、一時的なページの URL ではなく、そのコメントのパーマリンクを付けます。
 
@@ -53,7 +53,7 @@ Chrome ウェブストアには公開していないので、パッケージ化�
 
 ## 使い方
 
-1. Web ページ上でテキストを選択
+1. kintone の画面でテキストを選択
 2. ショートカットを押す
    - **Mac**: `Cmd + Shift + G`
    - **Windows/Linux**: `Ctrl + Shift + G`
@@ -69,6 +69,7 @@ Chrome ウェブストアには公開していないので、パッケージ化�
 
 ## 仕組み
 
+- 動くのは kintone（`https://*.cybozu.com/*`、`https://*.kintone.com/*`）の画面だけです。ほかのサイトではショートカットを押しても何もしません
 - 本文には、選択したテキストと、いま開いているページの URL を入れます
 - kintone の画面でコメントを選択した場合は、ページの URL の代わりに、そのコメントのパーマリンクを入れます。スペースのスレッド、レコード詳細、通知画面のコメントに対応しています
 - GitHub への登録は、オプション画面で設定したトークンを使って [GitHub GraphQL API](https://docs.github.com/ja/graphql) で行います。トークンは `chrome.storage.sync` に保存されます

@@ -11,6 +11,7 @@ import type {
   SubmitDraftResponse,
   TriggerDialogMessage,
 } from "@/lib/messages";
+import { SITE_MATCHES } from "@/lib/sites";
 import dialogStyles from "./dialog.css?inline";
 
 let shadowRoot: ShadowRoot | null = null;
@@ -138,7 +139,7 @@ const handleTriggerDialog = async (): Promise<void> => {
 };
 
 export default defineContentScript({
-  matches: ["<all_urls>"],
+  matches: SITE_MATCHES,
   // ダイアログの CSS は Shadow DOM 内に ?inline で読み込むため、ページには注入しない
   cssInjectionMode: "manual",
   main() {

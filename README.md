@@ -5,7 +5,7 @@ kintone / cybozu まわりを中心とした Chrome 拡張機能をまとめた�
 | パッケージ | 説明 |
 |---|---|
 | [hayame](packages/hayame) | YouTube の動画で、人が喋っていない区間だけを自動で速く再生する。標準の Picture-in-Picture もショートカットで開ける |
-| [hoi](packages/hoi) | kintone などの画面で選択したテキストを、元ページへのリンク付きで GitHub Projects に Draft Issue として登録する |
+| [hoi](packages/hoi) | kintone の画面で選択したテキストを、元ページへのリンク付きで GitHub Projects に Draft Issue として登録する |
 | [utsushi](packages/utsushi) | kintone のレコードとコメントをテンプレートに差し込んでコピーし、添付ファイルを一括ダウンロードする |
 
 ## インストール

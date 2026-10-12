@@ -17,6 +17,7 @@
 | `lib/storage.ts` | `chrome.storage.sync` への保存と Project URL の解析 |
 | `lib/messages.ts` | background と content script の間のメッセージ |
 | `e2e` | 実際の kintone に対する E2E テスト |
+| `assets/icon.svg` | アイコンの元画像。`public/icon/*.png` は `scripts/render-icons.mjs` で書き出す |
 
 ## 技術スタック
 

@@ -1,7 +1,8 @@
 {
   "name": "hoi",
-  "description": "kintone などの画面で選択したテキストを、元ページへのリンク付きで GitHub Projects に Draft Issue として登録する",
-  "permissions": ["storage", "activeTab", "scripting"],
+  "description": "kintone の画面で選択したテキストを、元ページへのリンク付きで GitHub Projects に Draft Issue として登録する",
+  "permissions": ["storage", "scripting"],
+  "host_permissions": ["https://*.cybozu.com/*", "https://*.kintone.com/*"],
   "commands": {
     "add-to-project": {
       "suggested_key": {
