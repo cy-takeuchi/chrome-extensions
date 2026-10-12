@@ -2,7 +2,7 @@
   "name": "hayame",
   "description": "YouTube の動画で、人が喋っていない区間だけを自動で速く再生する。標準の Picture-in-Picture もショートカットで開ける",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "license": "MIT",
   "author": "Yoshihiko Takeuchi",
   "homepage": "https://github.com/cy-takeuchi/chrome-extensions/tree/main/packages/hayame#readme",
