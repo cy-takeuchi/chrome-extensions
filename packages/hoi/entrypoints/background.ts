@@ -5,6 +5,7 @@ import type {
   SubmitDraftResponse,
   TriggerDialogMessage,
 } from "@/lib/messages";
+import { isSupportedUrl } from "@/lib/sites";
 import { getSettings, parseProjectUrl } from "@/lib/storage";
 
 export default defineBackground(() => {
@@ -12,7 +13,8 @@ export default defineBackground(() => {
     if (command !== "add-to-project") return;
 
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
-    if (tab?.id) {
+    // kintone（cybozu.com・kintone.com）以外のタブでは何もしない
+    if (tab?.id && isSupportedUrl(tab.url)) {
       await triggerDialog(tab.id);
     }
   });
@@ -31,7 +33,7 @@ export default defineBackground(() => {
 /**
  * タブの content script にダイアログを開かせる。
  * 拡張機能の読み込み・リロード前から開いていたタブには content script がないので、
- * そのときは注入してから送り直す（ショートカットで activeTab の権限が付いている）
+ * そのときは注入してから送り直す（host_permissions のサイトなので注入できる）
  */
 async function triggerDialog(tabId: number): Promise<void> {
   const message: TriggerDialogMessage = { type: "TRIGGER_DIALOG" };
