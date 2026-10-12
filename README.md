@@ -10,7 +10,12 @@ kintone / cybozu まわりを中心とした Chrome 拡張機能をまとめた�
 
 ## インストール
 
-各拡張機能の README を見てください。
+hoi と utsushi は Chrome ウェブストアからインストールできます。
+
+- [hoi](https://chromewebstore.google.com/detail/hoi/cgddlhnfkhodlajgnhognbbhkmnnbbbn)
+- [utsushi](https://chromewebstore.google.com/detail/utsushi/mnggkcheopockgailaomdoncfgklnged)
+
+hayame と、ウェブストアを使わずに入れる手順は、各拡張機能の README を見てください。
 
 ## 開発
 
