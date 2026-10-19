@@ -225,6 +225,13 @@
   flex-shrink: 0;
 }
 
+.tgp-setup-message {
+  margin: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #374151;
+}
+
 /* Success panel */
 .tgp-success-panel {
   text-align: center;

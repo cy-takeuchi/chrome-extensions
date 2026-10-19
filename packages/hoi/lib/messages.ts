@@ -19,4 +19,9 @@ export interface SubmitDraftMessage {
   payload: DraftInput;
 }
 
+/** content → background: オプション画面を開く。content script からは開けないため */
+export interface OpenOptionsMessage {
+  type: "OPEN_OPTIONS";
+}
+
 export type SubmitDraftResponse = { success: true } | { success: false; error: string };

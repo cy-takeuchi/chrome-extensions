@@ -1,6 +1,7 @@
 import { addDraftIssue, getProjectId, getViewer } from "@/lib/github";
 import type {
   DraftInput,
+  OpenOptionsMessage,
   SubmitDraftMessage,
   SubmitDraftResponse,
   TriggerDialogMessage,
@@ -41,13 +42,19 @@ export default defineBackground(() => {
 
   browser.action.onClicked.addListener((tab) => openDialog(tab));
 
-  browser.runtime.onMessage.addListener((message: SubmitDraftMessage, _sender, sendResponse) => {
-    if (message.type === "SUBMIT_DRAFT") {
-      handleSubmitDraft(message.payload).then(sendResponse);
-      return true; // Keep the message channel open for async response
-    }
-    return false;
-  });
+  browser.runtime.onMessage.addListener(
+    (message: SubmitDraftMessage | OpenOptionsMessage, _sender, sendResponse) => {
+      if (message.type === "OPEN_OPTIONS") {
+        void browser.runtime.openOptionsPage();
+        return false;
+      }
+      if (message.type === "SUBMIT_DRAFT") {
+        handleSubmitDraft(message.payload).then(sendResponse);
+        return true; // Keep the message channel open for async response
+      }
+      return false;
+    },
+  );
 
   console.log("hoi: Background service worker loaded");
 });
