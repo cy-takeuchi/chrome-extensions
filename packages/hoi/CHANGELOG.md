@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/cy-takeuchi/chrome-extensions/compare/hoi-v0.3.0...hoi-v0.4.0) (2026-10-19)
+
+
+### Features
+
+* **hoi:** guide to the settings when they are not complete ([89141bd](https://github.com/cy-takeuchi/chrome-extensions/commit/89141bd566875df9f2550fbc4d86be96f5419a13))
+* **hoi:** open the dialog from the toolbar icon ([2b05014](https://github.com/cy-takeuchi/chrome-extensions/commit/2b050142e10b0e3bad27eee46a382b1b52383296))
+
 ## [0.3.0](https://github.com/cy-takeuchi/chrome-extensions/compare/hoi-v0.2.1...hoi-v0.3.0) (2026-10-12)
 
 
