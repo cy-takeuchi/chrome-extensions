@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.0](https://github.com/cy-takeuchi/chrome-extensions/compare/hoi-v0.4.0...hoi-v0.5.0) (2026-10-19)
+
+
+### Features
+
+* **hoi:** add a small ぃ to the icon ([4b0cb4e](https://github.com/cy-takeuchi/chrome-extensions/commit/4b0cb4ee73b03a2d2e56bb25268ffc7c3c26fd6f))
+
+
+### Bug Fixes
+
+* **hoi:** アイコンに小さい「ぃ」を足して「ほぃ」にする ([073a274](https://github.com/cy-takeuchi/chrome-extensions/commit/073a274449410e0277059715ddad6d4fe1dfcd61))
+
 ## [0.4.0](https://github.com/cy-takeuchi/chrome-extensions/compare/hoi-v0.3.0...hoi-v0.4.0) (2026-10-19)
 
 
