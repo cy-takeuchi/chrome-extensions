@@ -8,16 +8,38 @@ import type {
 import { isSupportedUrl } from "@/lib/sites";
 import { getSettings, parseProjectUrl } from "@/lib/storage";
 
+/** kintone（cybozu.com・kintone.com）以外のタブでは何もしない */
+const openDialog = async (tab: Browser.tabs.Tab | undefined) => {
+  if (tab?.id !== undefined && isSupportedUrl(tab.url)) await triggerDialog(tab.id);
+};
+
+/** ツールバーのアイコンは kintone の画面でだけ押せるようにする。無効なアイコンは Chrome がグレーで表示する */
+const syncAction = async (tabId: number, url: string | undefined) => {
+  if (isSupportedUrl(url)) await browser.action.enable(tabId);
+  else await browser.action.disable(tabId);
+};
+
+const syncAllTabs = async () => {
+  for (const tab of await browser.tabs.query({}))
+    if (tab.id !== undefined) await syncAction(tab.id, tab.url);
+};
+
 export default defineBackground(() => {
+  // 新しいタブは無効から始める。タブごとの設定はこれより優先される
+  void browser.action.disable();
+  browser.runtime.onInstalled.addListener(() => void syncAllTabs());
+  browser.runtime.onStartup.addListener(() => void syncAllTabs());
+  browser.tabs.onUpdated.addListener((tabId, change, tab) => {
+    if (change.url !== undefined || change.status === "loading") void syncAction(tabId, tab.url);
+  });
+
   browser.commands.onCommand.addListener(async (command) => {
     if (command !== "add-to-project") return;
-
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
-    // kintone（cybozu.com・kintone.com）以外のタブでは何もしない
-    if (tab?.id && isSupportedUrl(tab.url)) {
-      await triggerDialog(tab.id);
-    }
+    await openDialog(tab);
   });
+
+  browser.action.onClicked.addListener((tab) => openDialog(tab));
 
   browser.runtime.onMessage.addListener((message: SubmitDraftMessage, _sender, sendResponse) => {
     if (message.type === "SUBMIT_DRAFT") {
