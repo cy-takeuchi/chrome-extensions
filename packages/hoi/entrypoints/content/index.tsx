@@ -7,11 +7,13 @@ import {
 } from "@/lib/kintonePermalink";
 import type {
   DraftInput,
+  OpenOptionsMessage,
   SubmitDraftMessage,
   SubmitDraftResponse,
   TriggerDialogMessage,
 } from "@/lib/messages";
 import { SITE_MATCHES } from "@/lib/sites";
+import { getSettings, isConfigured } from "@/lib/storage";
 import dialogStyles from "./dialog.css?inline";
 
 let shadowRoot: ShadowRoot | null = null;
@@ -19,6 +21,8 @@ let reactRoot: Root | null = null;
 
 interface DialogState {
   isOpen: boolean;
+  /** 設定が済んでいないので、入力フォームの代わりに設定の案内を出す */
+  needsSetup: boolean;
   initialBody: string;
   status: DialogStatus;
   errorMessage?: string;
@@ -26,6 +30,7 @@ interface DialogState {
 
 let dialogState: DialogState = {
   isOpen: false,
+  needsSetup: false,
   initialBody: "",
   status: "idle",
 };
@@ -59,12 +64,13 @@ const updateDialogState = (updates: Partial<DialogState>) => {
   renderDialog();
 };
 
-const showDialog = (selectedText: string) => {
+const showDialog = (selectedText: string, needsSetup: boolean) => {
   if (dialogState.isOpen) return;
 
   getOrCreateShadowContainer();
   updateDialogState({
     isOpen: true,
+    needsSetup,
     initialBody: selectedText,
     status: "idle",
     errorMessage: undefined,
@@ -77,6 +83,12 @@ const closeDialog = () => {
     status: "idle",
     errorMessage: undefined,
   });
+};
+
+const openSettings = () => {
+  const message: OpenOptionsMessage = { type: "OPEN_OPTIONS" };
+  void browser.runtime.sendMessage(message).catch(() => {});
+  closeDialog();
 };
 
 const handleSubmit = async (data: DraftInput) => {
@@ -110,6 +122,8 @@ const renderDialog = () => {
   reactRoot.render(
     <AddDialog
       isOpen={dialogState.isOpen}
+      needsSetup={dialogState.needsSetup}
+      onOpenSettings={openSettings}
       initialBody={dialogState.initialBody}
       status={dialogState.status}
       errorMessage={dialogState.errorMessage}
@@ -135,7 +149,7 @@ const handleTriggerDialog = async (): Promise<void> => {
   }
 
   const bodyWithUrl = selectedText ? `${selectedText}\n\n${url}` : url;
-  showDialog(bodyWithUrl);
+  showDialog(bodyWithUrl, !isConfigured(await getSettings()));
 };
 
 export default defineContentScript({

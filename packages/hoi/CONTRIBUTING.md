@@ -8,7 +8,7 @@
 
 | ディレクトリ | 中身 |
 |---|---|
-| `entrypoints/background.ts` | ショートカットの受付と GitHub への登録 |
+| `entrypoints/background.ts` | ショートカットとツールバーのアイコンの受付、GitHub への登録 |
 | `entrypoints/content` | 選択テキストの取得とダイアログの表示（Shadow DOM 内の React） |
 | `entrypoints/options` | オプション画面（トークンと Project URL の設定） |
 | `components` | ダイアログの UI |

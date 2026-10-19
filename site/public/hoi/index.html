@@ -42,14 +42,14 @@
           width="1280"
           height="800"
         />
-        <figcaption>kintone のスレッドでコメントを選択してショートカットを押すと、登録用のダイアログが開きます</figcaption>
+        <figcaption>kintone のスレッドでコメントを選択してアイコンかショートカットを押すと、登録用のダイアログが開きます</figcaption>
       </figure>
 
       <h2>機能</h2>
       <ul class="features">
         <li>
-          <strong>ショートカットひとつで登録</strong>
-          テキストを選択して <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>G</kbd>（Windows は <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>G</kbd>）を押すだけで、登録用のダイアログが開きます。
+          <strong>ワンクリックで登録</strong>
+          テキストを選択してツールバーの hoi のアイコンを押すか、<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>G</kbd>（Windows は <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>G</kbd>）を押すだけで、登録用のダイアログが開きます。
         </li>
         <li>
           <strong>元ページへのリンク付き</strong>
@@ -90,6 +90,9 @@
         拡張機能のアイコンを右クリックして「オプション」を開き、トークンと、登録先の GitHub Projects の URL（例:
         <code>https://github.com/users/username/projects/1</code>）を入れて保存します。
       </p>
+      <p>
+        設定が済んでいないまま kintone の画面でアイコンかショートカットを押すと、ダイアログで案内が出ます。「設定を開く」からオプション画面を開けます。
+      </p>
       <figure class="screenshot">
         <img src="../images/hoi-options.png" alt="hoi のオプション画面" width="1280" height="800" />
         <figcaption>オプション画面</figcaption>
@@ -98,11 +101,13 @@
       <h2>使い方</h2>
       <ol>
         <li>kintone の画面でテキストを選択します。</li>
-        <li><kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>G</kbd>（Windows は <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>G</kbd>）を押します。</li>
+        <li>ツールバーの hoi のアイコンを押すか、<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>G</kbd>（Windows は <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>G</kbd>）を押します。</li>
         <li>タイトルを入力し、必要なら本文と担当者を直します。</li>
         <li>「Project に追加」をクリックします。</li>
       </ol>
-      <p>ショートカットは <code>chrome://extensions/shortcuts</code> で変更できます。</p>
+      <p>
+        アイコンは kintone の画面でだけ押せ、ほかのサイトではグレーになります。ショートカットは <code>chrome://extensions/shortcuts</code> で変更できます。ほかの拡張機能などと重なって割り当てられていない場合も、ここで設定できます。
+      </p>
 
       <h2>データの扱い</h2>
       <p>

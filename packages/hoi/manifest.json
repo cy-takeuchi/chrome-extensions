@@ -3,6 +3,15 @@
   "description": "kintone の画面で選択したテキストを、元ページへのリンク付きで GitHub Projects に Draft Issue として登録する",
   "permissions": ["storage", "scripting"],
   "host_permissions": ["https://*.cybozu.com/*", "https://*.kintone.com/*"],
+  "action": {
+    "default_title": "選択したテキストを GitHub Projects に登録",
+    "default_icon": {
+      "16": "icon/16.png",
+      "32": "icon/32.png",
+      "48": "icon/48.png",
+      "128": "icon/128.png"
+    }
+  },
   "commands": {
     "add-to-project": {
       "suggested_key": {

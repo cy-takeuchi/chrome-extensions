@@ -34,3 +34,7 @@ export const parseProjectUrl = (
     type: ownerType === "users" ? "user" : "org",
   };
 };
+
+/** 登録に必要な設定（トークンと、形式の正しい Project の URL）がそろっているか */
+export const isConfigured = (settings: Settings): boolean =>
+  settings.githubToken.trim() !== "" && parseProjectUrl(settings.projectUrl) !== null;

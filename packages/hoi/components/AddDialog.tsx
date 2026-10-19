@@ -5,6 +5,9 @@ export type DialogStatus = "idle" | "loading" | "success" | "error";
 
 interface AddDialogProps {
   isOpen: boolean;
+  /** 設定が済んでいないので、入力フォームの代わりに設定の案内を出す */
+  needsSetup?: boolean;
+  onOpenSettings?: () => void;
   initialBody: string;
   onClose: () => void;
   onSubmit: (data: DraftInput) => void;
@@ -47,6 +50,8 @@ function DialogFrame({ label, closable, onClose, children }: DialogFrameProps) {
 
 export function AddDialog({
   isOpen,
+  needsSetup = false,
+  onOpenSettings,
   initialBody,
   onClose,
   onSubmit,
@@ -94,6 +99,37 @@ export function AddDialog({
 
   const isLoading = status === "loading";
   const isSuccess = status === "success";
+
+  if (needsSetup) {
+    return (
+      <DialogFrame label="初期設定が済んでいません" closable onClose={onClose}>
+        <div className="tgp-dialog-panel">
+          <h2 className="tgp-dialog-title">GitHub Projects に追加</h2>
+          <div className="tgp-error-banner">
+            <span className="tgp-error-icon">!</span>
+            <span>初期設定が済んでいません</span>
+          </div>
+          <p className="tgp-setup-message">
+            GitHub のトークンと、登録先の Project の URL を設定すると使えるようになります。
+          </p>
+          <div className="tgp-actions">
+            <button type="button" className="tgp-button secondary" onClick={onClose}>
+              閉じる
+            </button>
+            <button
+              type="button"
+              className="tgp-button primary"
+              onClick={onOpenSettings}
+              // biome-ignore lint/a11y/noAutofocus: ダイアログを開いたら、すぐ Enter で設定を開けるようにする
+              autoFocus
+            >
+              設定を開く
+            </button>
+          </div>
+        </div>
+      </DialogFrame>
+    );
+  }
 
   if (isSuccess) {
     return (
